@@ -1,0 +1,48 @@
+# --- datos pesados: NUNCA al repo -------------------------------------------
+# El repo lleva solo el recorte de muestras/ (julio 2026). Todo lo demás se
+# reproduce con los scripts de 01_datos/.
+*.nc
+*.nc4
+*.grib
+*.tif
+*.tiff
+*.sqlite
+*.db
+*.npz
+*.pkl
+*.joblib
+*.h5
+*.zip
+*.gz
+datos/
+dataset/
+malla_data/
+iberfire/
+features_extra/
+rayos_data/
+gwis_data/
+firms_data/
+estado/
+
+# excepciones: el recorte reproducible sí entra
+!muestras/**/*.npz
+!muestras/**/*.parquet
+!muestras/**/*.csv
+
+# --- salidas de ejecución ----------------------------------------------------
+salida/
+*.log
+
+# --- secretos ----------------------------------------------------------------
+.cdsapirc
+.env
+*.key
+secretos*
+credenciales*
+
+# --- python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
