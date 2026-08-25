@@ -43,8 +43,12 @@ las cosas.
 - [`docs/BITACORA.md`](docs/BITACORA.md) — **la historia completa**, del primer
   modelo en producción al veredicto: qué se midió, qué se descartó y qué
   conclusión hubo que retirar.
+- [`docs/TRAZABILIDAD.md`](docs/TRAZABILIDAD.md) — **cada número de la memoria
+  con el script que lo produjo** y lo que hace falta para reejecutarlo.
 - [`docs/LIMITACIONES.md`](docs/LIMITACIONES.md) — lo que no cierra y lo que se
   dejó roto a propósito.
+- [`docs/ESTRUCTURA.md`](docs/ESTRUCTURA.md) — cómo está montado el repo y por
+  qué el código no se ha reescrito.
 
 ## Reproducibilidad
 
