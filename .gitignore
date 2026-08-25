@@ -52,3 +52,6 @@ venv/
 
 # fuentes crudas: se descargan con 01_datos/, no viajan en el repo
 datos/
+
+# excepción: las figuras del EDA son parte del capítulo, no una salida
+!02_eda/figuras/*.png
