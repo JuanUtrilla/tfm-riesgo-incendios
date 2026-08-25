@@ -33,7 +33,7 @@ las cosas.
 | `05_iteracion2/` | Rediseño con etiqueta EFFIS, DÓNDE × CUÁNDO, y las ablaciones |
 | `06_comparacion/` | Los dos sistemas sobre los mismos días y las mismas fuentes |
 | `07_produccion/` | La cadena diaria y los tres jueces que dan el veredicto de septiembre |
-| `docs/` | [Bitácora cronológica](docs/BITACORA.md), [limitaciones](docs/LIMITACIONES.md), decisiones y datos |
+| `docs/` | [Bitácora cronológica](docs/BITACORA.md), [trazabilidad](docs/TRAZABILIDAD.md), [limitaciones](docs/LIMITACIONES.md), [estructura](docs/ESTRUCTURA.md) y [lo que falta](docs/PENDIENTE.md) |
 | `muestras/` | Recorte de julio de 2026 para ejecutar el pipeline sin descargar 44 GB |
 
 ## Por dónde empezar a leer
@@ -49,6 +49,8 @@ las cosas.
   dejó roto a propósito.
 - [`docs/ESTRUCTURA.md`](docs/ESTRUCTURA.md) — cómo está montado el repo y por
   qué el código no se ha reescrito.
+- [`docs/PENDIENTE.md`](docs/PENDIENTE.md) — lo que aún le falta, en orden de
+  importancia, y los puntos a decidir en equipo.
 
 ## Reproducibilidad
 
