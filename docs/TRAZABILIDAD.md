@@ -14,6 +14,20 @@ datos hace falta ejecutarlo.
 
 ---
 
+## Capítulo 2 · Análisis exploratorio
+
+| Número | Qué es | Script | Salida | Se ejecuta con |
+|---|---|---|---|---|
+| **2-6 por 100.000** en verano | Prevalencia real de celda-día quemada, frente al 25 % del diseño caso-control | `04_bisagra/44_es_la_especificacion/dos_00_cubo_etiquetas.py` | `dos_00_etiquetas.json` · [`02_eda/ANALISIS_CUBO.md`](../02_eda/ANALISIS_CUBO.md) §2 | cubo |
+| 14,16 (2022) vs 0,40 (2018) | El rango entre un año malo y uno bueno | ídem | ídem | cubo |
+| 2,97 % · 2,68 % | Celdas con algún EGIF (2015-20) / algún EFFIS (2021-24) | ídem | ídem | cubo |
+| P(t+1\|t) = **0,51** | `is_fire` persiste: marca días ardiendo, no igniciones → se evalúa con `primer_dia` | ídem | ídem | cubo |
+| Moran **0,81** (EFFIS, 1 km) | Autocorrelación espacial: casi todo es perímetro del mismo fuego | `05_iteracion2/54_analisis/dos_04_analisis.py` | `dos_04_analisis.json` | disco |
+| **+0,036** | Lo que infla el AUC partir al azar en vez de por bloques de 100 km | ídem | ídem | disco |
+| corr 0,987-0,998, sesgo 0 | El cubo *es* ERA5-Land reprocesado (salvo precipitación, /2,02) | `04_bisagra/42_no_es_la_meteo/prototipo_TFM_fuego/malla_02_vs_cubo.py` | `malla_02_vs_cubo.json` | cubo |
+| fwi_pctl_local 84,3 vs 47,0 | Lo que separa positivos de negativos en train (medianas) | `02_eda/eda_dataset.py` | [`02_eda/figuras/eda_resumen.log`](../02_eda/figuras/eda_resumen.log) | disco |
+| popdens y dist_carreteras: **misma mediana** | Las estáticas no discriminan en el diseño caso-control — el aviso temprano del capítulo 4 | ídem | ídem | disco |
+
 ## Capítulo 3 · Primera iteración
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
