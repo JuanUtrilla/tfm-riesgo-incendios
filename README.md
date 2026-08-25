@@ -33,8 +33,18 @@ las cosas.
 | `05_iteracion2/` | Rediseño con etiqueta EFFIS, DÓNDE × CUÁNDO, y las ablaciones |
 | `06_comparacion/` | Los dos sistemas sobre los mismos días y las mismas fuentes |
 | `07_produccion/` | La cadena diaria y los tres jueces que dan el veredicto de septiembre |
-| `docs/` | Decisiones, bitácora de lo que se probó, datos, limitaciones |
+| `docs/` | [Bitácora cronológica](docs/BITACORA.md), [limitaciones](docs/LIMITACIONES.md), decisiones y datos |
 | `muestras/` | Recorte de julio de 2026 para ejecutar el pipeline sin descargar 44 GB |
+
+## Por dónde empezar a leer
+
+- [`00_marco/README.md`](00_marco/README.md) — el diagrama del hilo y las tres
+  preguntas que separan las dos iteraciones.
+- [`docs/BITACORA.md`](docs/BITACORA.md) — **la historia completa**, del primer
+  modelo en producción al veredicto: qué se midió, qué se descartó y qué
+  conclusión hubo que retirar.
+- [`docs/LIMITACIONES.md`](docs/LIMITACIONES.md) — lo que no cierra y lo que se
+  dejó roto a propósito.
 
 ## Reproducibilidad
 
