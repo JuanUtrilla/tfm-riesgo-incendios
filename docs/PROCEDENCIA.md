@@ -1,0 +1,296 @@
+# Procedencia de cada fichero
+
+Este repositorio **no reescribe código**: cada script es una copia literal del
+repositorio donde se ejecutó y produjo los números de la memoria. Lo único que
+se ha adaptado son las rutas, y solo en los cuatro módulos compartidos de
+`01_datos/comun/` (ver [`ESTRUCTURA.md`](ESTRUCTURA.md)).
+
+La razón es de evidencia, no de pereza: si se reescribiera `dos_18_ratio.py`,
+el 87,6 de percentil ponderado que aparece en la memoria ya no lo habría
+producido el código que se enseña. Se conserva el original y se documenta de
+dónde viene.
+
+Origen: **T** = `TFM_fuego` · **M** = `TFM_fuego_malla` · **P** =
+`aemet-horario-verano2026`. El hash es el `md5` (8 primeros dígitos) del
+fichero en su repo de origen el 25/08/2026, para poder comprobar que la copia
+es literal.
+
+## Homónimos que divergen
+
+Cinco ficheros existen con el mismo nombre en `TFM_fuego` y en
+`TFM_fuego_malla` con contenido distinto: son el **prototipo** de la malla y su
+**versión definitiva**. Se conservan los dos, porque los dos produjeron
+resultados citados: el prototipo sostiene el capítulo de la bisagra («no es la
+meteorología») y la versión definitiva es la que sirve hoy. El prototipo vive
+en `04_bisagra/42_no_es_la_meteo/prototipo_TFM_fuego/`.
+
+`fwi_canadiense.py` aparecía en los tres repos: las copias de `TFM_fuego` y del
+repo de producción son idénticas entre sí, y la de `TFM_fuego_malla` solo
+cambia en que su bloque de demostración lee la ruta del cubo de `config` en vez
+de tenerla escrita. Se conserva **una sola**, la de `TFM_fuego_malla`, en
+`01_datos/comun/`.
+
+## Qué se ha dejado fuera
+
+Veintiún scripts del bloque de visión por satélite (Sentinel-2, D-Fire,
+timelapses y los casos de Sotalvo, Luna y Ponteareas). Es trabajo real, pero no
+aparece en el hilo conductor de la memoria y arrastra 55 MB de imágenes. Sigue
+en `TFM_fuego`.
+
+## El inventario
+
+
+### `01_datos/aemet` — 7 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `aemet_descarga_historico.py` | TFM_fuego | `abbbb282` |
+| `aemet_descarga_key2.py` | TFM_fuego | `e098508e` |
+| `aemet_descarga_key3.py` | TFM_fuego | `ca9b803c` |
+| `aemet_horario_collector.py` | aemet_horario_verano2026 | `910dee39` |
+| `descargar_datos_2025_2026.py` | TFM_fuego | `07ac5278` |
+| `descargar_historico_aemet.py` | TFM_fuego | `3c43221f` |
+| `observacion_horaria.py` | TFM_fuego | `2dfdc914` |
+
+### `01_datos/comun` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `exportar_limites.py` | aemet_horario_verano2026 | `7d7379a6` |
+
+### `01_datos/cubo` — 3 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `exportar_malla_gh.py` | TFM_fuego | `ed0d96fa` |
+| `extraer_features_cubo.py` | TFM_fuego | `a654779c` |
+| `extraer_features_cubo_v4.py` | TFM_fuego | `04b0c96f` |
+
+### `01_datos/effis` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `descargar_effis.py` | aemet_horario_verano2026 | `04384cdd` |
+
+### `01_datos/era5land` — 6 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `descargar_cape_era5.py` | TFM_fuego | `0ade9ad7` |
+| `descargar_era5_2026.py` | TFM_fuego | `0f0eb172` |
+| `malla_01_nodos.py` | TFM_fuego_malla | `692e0041` |
+| `malla_02_descarga.py` | TFM_fuego_malla | `a7a43500` |
+| `malla_04_climatologia.py` | TFM_fuego_malla | `f2d70834` |
+| `malla_06_descarga_historico.py` | TFM_fuego_malla | `68fc867e` |
+
+### `01_datos/extra` — 2 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `descargar_features_extra.py` | TFM_fuego | `e3eba05f` |
+| `ganaderia_descarga.py` | TFM_fuego | `77eda75d` |
+
+### `01_datos/firms` — 4 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `extraer_historia_firms_v3.py` | TFM_fuego | `2224aa05` |
+| `firms_api.py` | aemet_horario_verano2026 | `646c27ef` |
+| `firms_descarga.py` | TFM_fuego | `3864ef77` |
+| `focos_activos.py` | aemet_horario_verano2026 | `27a4c944` |
+
+### `02_eda` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `eda_dataset.py` | TFM_fuego | `64f1d307` |
+
+### `03_iteracion1/31_muestreo` — 4 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `ensamblar_dataset.py` | TFM_fuego | `557fae54` |
+| `ensamblar_dataset_v4.py` | TFM_fuego | `555315bb` |
+| `muestrear_dataset.py` | TFM_fuego | `376ca55f` |
+| `muestrear_dataset_v4.py` | TFM_fuego | `a18233a8` |
+
+### `03_iteracion1/32_features` — 2 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `extraer_features_historia.py` | TFM_fuego | `e321ddac` |
+| `extraer_features_historia_v4.py` | TFM_fuego | `7f95377a` |
+
+### `03_iteracion1/33_train` — 5 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `entrenar_modelo.py` | TFM_fuego | `447554b0` |
+| `entrenar_modelo_v3.py` | TFM_fuego | `4ded7410` |
+| `entrenar_modelo_v4.py` | TFM_fuego | `bdc1c692` |
+| `modelo_nativo_estacion.py` | TFM_fuego | `a477be3b` |
+| `tuning_optuna.py` | TFM_fuego | `994199c8` |
+
+### `03_iteracion1/34_produccion` — 11 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `mapa_diario.py` | aemet_horario_verano2026 | `7d3f1734` |
+| `mapa_riesgo_dia.py` | TFM_fuego | `1c19f696` |
+| `mapa_riesgo_hoy.py` | TFM_fuego | `f47e58ff` |
+| `predecir_punto.py` | TFM_fuego | `caff6798` |
+| `preparar_prototipo.py` | TFM_fuego | `62a171d0` |
+| `publicar_mapas_gh.py` | TFM_fuego | `f877e252` |
+| `ranking_diario.py` | aemet_horario_verano2026 | `d941462e` |
+| `ranking_diario_cron.py` | TFM_fuego | `bbb99401` |
+| `retro_julio.py` | aemet_horario_verano2026 | `e21c5315` |
+| `tiempo_real.py` | TFM_fuego | `3cfc5f88` |
+| `validar_modelo.py` | aemet_horario_verano2026 | `fb77c1fc` |
+
+### `03_iteracion1/35_ablaciones` — 2 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `ablacion_features.py` | TFM_fuego | `19fb1fe2` |
+| `ablacion_v3_firms.py` | TFM_fuego | `a904933f` |
+
+### `04_bisagra/41_validacion_operativa` — 7 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dashboard_miteco_datos.py` | TFM_fuego | `ba8bfabd` |
+| `descargar_verdad_operativa.py` | TFM_fuego | `4a42ab67` |
+| `extraer_evento.py` | TFM_fuego | `77c715ef` |
+| `validar_eventos_estaciones.py` | TFM_fuego | `e37d005c` |
+| `validar_eventos_firms.py` | TFM_fuego | `5304bee9` |
+| `validar_miteco.py` | TFM_fuego | `ae29060c` |
+| `validar_operativo.py` | TFM_fuego | `8934c2ba` |
+
+### `04_bisagra/42_no_es_la_meteo` — 23 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `construir_clim_fwi_aemet.py` | TFM_fuego | `a7e39211` |
+| `diagnostico_fwi.py` | TFM_fuego_malla | `06c0ceb1` |
+| `experimento_b_era5.py` | TFM_fuego | `c60a7ed1` |
+| `experimento_b_fase2.py` | TFM_fuego | `4eac4933` |
+| `malla_02_verificar.py` | TFM_fuego | `544fc9ab` |
+| `malla_02_vs_cubo.py` | TFM_fuego | `99a8e42d` |
+| `malla_02b_correccion.py` | TFM_fuego_malla | `d6a58bf0` |
+| `malla_02b_hibrido.py` | TFM_fuego_malla | `ddb601fe` |
+| `malla_02b_ifs.py` | TFM_fuego_malla | `c1607b2f` |
+| `malla_02b_prueba.py` | TFM_fuego_malla | `80063163` |
+| `malla_02b_reajuste.py` | TFM_fuego_malla | `0422b1cd` |
+| `malla_03_cuantiles.py` | TFM_fuego | `6cc4a23e` |
+| `malla_03b_fwi_qm.py` | TFM_fuego | `5b5ded7a` |
+| `malla_03c_aceptacion.py` | TFM_fuego | `dba35e77` |
+| `malla_05_riesgo.py` | TFM_fuego_malla | `0406d9d5` |
+| `malla_05b_evaluacion.py` | TFM_fuego_malla | `94a8fb26` |
+| `prueba_era5_atribucion.py` | TFM_fuego | `1e5b37be` |
+| `prueba_era5_produccion.py` | TFM_fuego | `93d82327` |
+| `prueba_hibrido_corregido.py` | TFM_fuego | `b8897932` |
+| `prueba_hibrido_produccion.py` | TFM_fuego | `d0026180` |
+| `prueba_ifs_produccion.py` | TFM_fuego | `e100b6a5` |
+| `verificar_fuentes_meteo.py` | TFM_fuego | `9e5341bd` |
+| `verificar_hora_fwi.py` | TFM_fuego_malla | `03ed0c9d` |
+
+### `04_bisagra/42_no_es_la_meteo/prototipo_TFM_fuego` — 5 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `malla_01_nodos.py` | TFM_fuego | `1130f871` |
+| `malla_02_descarga.py` | TFM_fuego | `b4cd16ea` |
+| `malla_04_climatologia.py` | TFM_fuego | `89ee1705` |
+| `malla_05_riesgo.py` | TFM_fuego | `a6d1ad2a` |
+| `malla_05b_evaluacion.py` | TFM_fuego | `afb6013d` |
+
+### `04_bisagra/43_no_es_el_train_serve` — 3 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `ablacion_proxies_operativos.py` | TFM_fuego | `3514a799` |
+| `auditoria_train_serve.py` | TFM_fuego | `2eda1751` |
+| `dos_06_deriva.py` | TFM_fuego_malla | `cf471ddc` |
+
+### `04_bisagra/44_es_la_especificacion` — 2 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_00_cubo_etiquetas.py` | TFM_fuego_malla | `9f4fcdff` |
+| `dos_02_muestrear.py` | TFM_fuego_malla | `810dadc5` |
+
+### `05_iteracion2/51_celdas` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_01_celdas.py` | TFM_fuego_malla | `70dc3f66` |
+
+### `05_iteracion2/52_muestreo` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_12_muestrear_effis.py` | TFM_fuego_malla | `4efefb1f` |
+
+### `05_iteracion2/53_features` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_03_features.py` | TFM_fuego_malla | `7b9c9de0` |
+
+### `05_iteracion2/54_analisis` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_04_analisis.py` | TFM_fuego_malla | `1e9f8d2d` |
+
+### `05_iteracion2/55_train` — 3 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_05_modelos.py` | TFM_fuego_malla | `7f7391b7` |
+| `dos_10_donde_effis.py` | TFM_fuego_malla | `881e4389` |
+| `dos_13_modelos_effis.py` | TFM_fuego_malla | `7d536c87` |
+
+### `05_iteracion2/56_calibracion` — 1 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_14_cortes.py` | TFM_fuego_malla | `015bf04c` |
+
+### `05_iteracion2/57_ablaciones` — 3 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_08_verano.py` | TFM_fuego_malla | `49ee55c8` |
+| `dos_17_capa_quemado.py` | TFM_fuego_malla | `24f36389` |
+| `dos_18_ratio.py` | TFM_fuego_malla | `efa65daa` |
+
+### `06_comparacion` — 7 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `comparar_julio2026.py` | TFM_fuego_malla | `c26881e0` |
+| `comparar_produccion.py` | TFM_fuego_malla | `937820f1` |
+| `comparar_rankings.py` | TFM_fuego_malla | `3b866e80` |
+| `comparar_rankings_justo.py` | TFM_fuego_malla | `106b1e6d` |
+| `dos_09_temporada2026.py` | TFM_fuego_malla | `845e98ec` |
+| `dos_11_miteco.py` | TFM_fuego_malla | `ea381a5d` |
+| `dos_19_veredicto.py` | TFM_fuego_malla | `4de2f9cb` |
+
+### `07_produccion` — 13 ficheros
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `capa_base.py` | TFM_fuego_malla | `ce1591a2` |
+| `capa_verdad.py` | TFM_fuego_malla | `3c0b9cb5` |
+| `dos_07_mapa_hoy.py` | TFM_fuego_malla | `879a1af7` |
+| `dos_15_veredicto_miteco.py` | TFM_fuego_malla | `68bb35e9` |
+| `dos_16_juez_estaciones.py` | TFM_fuego_malla | `6de24fc5` |
+| `dos_riesgo_hoy.py` | TFM_fuego_malla | `1826ab26` |
+| `gh_estado.py` | TFM_fuego_malla | `577e9e58` |
+| `gh_exportar_estado.py` | TFM_fuego_malla | `0afbd6a5` |
+| `gh_mensual_rapido.py` | TFM_fuego_malla | `c05c5f07` |
+| `gh_reanalisis.py` | TFM_fuego_malla | `66fd4bb8` |
+| `puntuar_effis.py` | TFM_fuego_malla | `00669d93` |
+| `redibujar.py` | TFM_fuego_malla | `29bddbe7` |
+| `riesgo_hoy.py` | TFM_fuego_malla | `5cc7b58c` |

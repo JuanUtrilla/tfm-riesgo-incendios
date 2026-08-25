@@ -24,10 +24,13 @@ gwis_data/
 firms_data/
 estado/
 
-# excepciones: el recorte reproducible sí entra
+# excepciones: el recorte reproducible de julio de 2026 sí entra (48 MB)
 !muestras/**/*.npz
+!muestras/**/*.nc
 !muestras/**/*.parquet
 !muestras/**/*.csv
+!muestras/**/*.ubj
+!muestras/**/*.geojson
 
 # --- salidas de ejecución ----------------------------------------------------
 salida/
@@ -46,3 +49,6 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 venv/
+
+# fuentes crudas: se descargan con 01_datos/, no viajan en el repo
+datos/

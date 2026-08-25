@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""
+Estado de la cadena diaria en un Release de GitHub: bajar y subir.
+
+=============================================================================
+POR QUÉ UN RELEASE Y NO GIT
+=============================================================================
+El portátil se apaga a diario; la cadena corre en GitHub Actions. Allí no hay
+disco persistente: lo que cada corrida necesita de la anterior (el reanálisis
+diario acumulado desde el 1-may, los mapas de los últimos 45 días para
+puntuarlos cuando llegue EFFIS, los CSV de veredictos, el geojson de EFFIS,
+los partes de MITECO) tiene que vivir fuera. Commitearlo inflaría el repo
+~50 MB/día; un Release admite assets grandes y se reescriben con --clobber.
+Mismo patrón que el colector del proyecto hermano (`mapa_diario.yml`).
+
+Dos assets en el release `estado`:
+  estado_base.tar.gz    lo que NO cambia: capas estáticas 2D del cubo, clim
+                        FWI por nodo, nodos, mapeo IFS, cachés mensuales,
+                        modelos, municipios, ficheros del juez de julio.
+                        Lo genera `gh_exportar_estado.py` en local.
+  estado_diario.tar.gz  lo que cambia cada día. Lo sube la corrida.
+
+Uso:
+    python gh_estado.py pull            # baja y desempaqueta los dos
+    python gh_estado.py push            # empaqueta y sube el diario
+    python gh_estado.py push --base     # (local) sube también el base
+"""
+
+import argparse
+import os
+import subprocess
+import sys
+import tarfile
+import time
+
+import config
+
+RELEASE = "estado"
+BASE_DIR = config.ESTADO                    # estado/ (inmutable)
+SAL = config.SALIDA
+DIARIO = [                                  # rutas relativas a salida/
+    "era5land_diario.nc", "effis_ba_season_ES.geojson",
+    "puntuacion_effis.csv", "veredicto_acumulado.json",
+    "veredicto_miteco.csv", "veredicto_miteco.json", "miteco",
+    "miteco_incidentes.csv",
+    "mapas_diarios", "ifs_historico.parquet", "rankings_justo.csv",
+    "veredicto_estaciones.csv", "veredicto_estaciones.json",
+]
+
+
+def gh(*args, intentos=3):
+    for i in range(intentos):
+        r = subprocess.run(["gh", *args], capture_output=True, text=True)
+        if r.returncode == 0:
+            return r.stdout
+        print(f"  gh {' '.join(args[:3])} falló ({i+1}/{intentos}): "
+              f"{r.stderr.strip()[:200]}", flush=True)
+        time.sleep(20)
+    return None
+
+
+def asegurar_release():
+    if gh("release", "view", RELEASE, intentos=1) is None:
+        gh("release", "create", RELEASE, "--title", "estado de la cadena diaria",
+           "--notes", "Assets reescritos por la cadena diaria; no editar a mano.")
+
+
+def pull():
+    os.makedirs(SAL, exist_ok=True)
+    for nombre, dest in (("estado_base.tar.gz", config.BASE),
+                         ("estado_diario.tar.gz", SAL)):
+        if gh("release", "download", RELEASE, "--pattern", nombre,
+              "--dir", "/tmp", "--clobber") is None:
+            print(f"  {nombre}: no disponible", flush=True)
+            continue
+        with tarfile.open(f"/tmp/{nombre}") as t:
+            t.extractall(dest)
+        print(f"  {nombre} → {dest}", flush=True)
+    os.makedirs(f"{SAL}/mapas_diarios", exist_ok=True)
+
+
+def push(base=False):
+    asegurar_release()
+    if base:
+        with tarfile.open("/tmp/estado_base.tar.gz", "w:gz") as t:
+            t.add(BASE_DIR, arcname="estado")
+        print(f"  base: {os.path.getsize('/tmp/estado_base.tar.gz')/1e6:.0f} MB", flush=True)
+        gh("release", "upload", RELEASE, "/tmp/estado_base.tar.gz", "--clobber")
+    with tarfile.open("/tmp/estado_diario.tar.gz", "w:gz") as t:
+        for r in DIARIO:
+            if os.path.exists(f"{SAL}/{r}"):
+                t.add(f"{SAL}/{r}", arcname=r)
+    print(f"  diario: {os.path.getsize('/tmp/estado_diario.tar.gz')/1e6:.0f} MB", flush=True)
+    gh("release", "upload", RELEASE, "/tmp/estado_diario.tar.gz", "--clobber")
+
+
+if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument("accion", choices=["pull", "push"])
+    p.add_argument("--base", action="store_true")
+    a = p.parse_args()
+    pull() if a.accion == "pull" else push(a.base)

@@ -1,0 +1,203 @@
+{
+ "dias": [
+  {
+   "fecha": "2026-07-08",
+   "celdas_quemadas": 78,
+   "area_ha": 1724.0,
+   "estaciones": 673,
+   "pctl_produccion": 67.209395623132,
+   "auc_produccion": 0.6276848121785047,
+   "pctl_malla": 63.86556476039556,
+   "auc_malla": 0.5422293188943739
+  },
+  {
+   "fecha": "2026-07-09",
+   "celdas_quemadas": 111,
+   "area_ha": 5623.0,
+   "estaciones": 674,
+   "pctl_produccion": 90.89021723868173,
+   "auc_produccion": 0.8434642953631997,
+   "pctl_malla": 88.1268930656129,
+   "auc_malla": 0.7832578866628531
+  },
+  {
+   "fecha": "2026-07-10",
+   "celdas_quemadas": 36,
+   "area_ha": 659.0,
+   "estaciones": 678,
+   "pctl_produccion": 78.67029065452431,
+   "auc_produccion": 0.765475946885352,
+   "pctl_malla": 80.58181052293745,
+   "auc_malla": 0.7197566291893405
+  },
+  {
+   "fecha": "2026-07-11",
+   "celdas_quemadas": 22,
+   "area_ha": 263.0,
+   "estaciones": 678,
+   "pctl_produccion": 62.69773133011053,
+   "auc_produccion": 0.5784101577288447,
+   "pctl_malla": 49.98064309068662,
+   "auc_malla": 0.4994498127868104
+  },
+  {
+   "fecha": "2026-07-12",
+   "celdas_quemadas": 38,
+   "area_ha": 548.0,
+   "estaciones": 677,
+   "pctl_produccion": 47.919784165446416,
+   "auc_produccion": 0.4583759091102977,
+   "pctl_malla": 68.0647102481295,
+   "auc_malla": 0.599722948623575
+  },
+  {
+   "fecha": "2026-07-13",
+   "celdas_quemadas": 20,
+   "area_ha": 308.0,
+   "estaciones": 675,
+   "pctl_produccion": 19.393817824403747,
+   "auc_produccion": 0.3293962508274659,
+   "pctl_malla": 21.881732292941248,
+   "auc_malla": 0.24630659364907423
+  },
+  {
+   "fecha": "2026-07-14",
+   "celdas_quemadas": 6,
+   "area_ha": 32.0,
+   "estaciones": 681,
+   "pctl_produccion": 45.83665977975247,
+   "auc_produccion": 0.42565837686182945,
+   "pctl_malla": 52.166569714961994,
+   "auc_malla": 0.4905885507351034
+  },
+  {
+   "fecha": "2026-07-15",
+   "celdas_quemadas": 229,
+   "area_ha": 15907.0,
+   "estaciones": 678,
+   "pctl_produccion": 86.32760315327062,
+   "auc_produccion": 0.8386200413809618,
+   "pctl_malla": 86.06302529436543,
+   "auc_malla": 0.8328945512309343
+  },
+  {
+   "fecha": "2026-07-16",
+   "celdas_quemadas": 483,
+   "area_ha": 34469.0,
+   "estaciones": 679,
+   "pctl_produccion": 16.69087116121397,
+   "auc_produccion": 0.23792484583499504,
+   "pctl_malla": 58.001925661444645,
+   "auc_malla": 0.5723432331240692
+  },
+  {
+   "fecha": "2026-07-17",
+   "celdas_quemadas": 7,
+   "area_ha": 81.0,
+   "estaciones": 686,
+   "pctl_produccion": 31.015385232583796,
+   "auc_produccion": 0.3645775334624194,
+   "pctl_malla": 15.389846147674163,
+   "auc_malla": 0.1872150332080967
+  },
+  {
+   "fecha": "2026-07-18",
+   "celdas_quemadas": 14,
+   "area_ha": 159.0,
+   "estaciones": 686,
+   "pctl_produccion": 47.02013920927527,
+   "auc_produccion": 0.503865186158232,
+   "pctl_malla": 60.363669187410984,
+   "auc_malla": 0.5966008541923858
+  },
+  {
+   "fecha": "2026-07-20",
+   "celdas_quemadas": 64,
+   "area_ha": 3511.0,
+   "estaciones": 675,
+   "pctl_produccion": 67.17278799671033,
+   "auc_produccion": 0.6622388268457629,
+   "pctl_malla": 51.91482959902112,
+   "auc_malla": 0.547868140705685
+  },
+  {
+   "fecha": "2026-07-21",
+   "celdas_quemadas": 155,
+   "area_ha": 7417.0,
+   "estaciones": 683,
+   "pctl_produccion": 30.534972820091067,
+   "auc_produccion": 0.34794991464194114,
+   "pctl_malla": 31.5415321043869,
+   "auc_malla": 0.3948441208119938
+  },
+  {
+   "fecha": "2026-07-22",
+   "celdas_quemadas": 668,
+   "area_ha": 45905.0,
+   "estaciones": 686,
+   "pctl_produccion": 83.05568371010772,
+   "auc_produccion": 0.771076420679015,
+   "pctl_malla": 95.3166308948308,
+   "auc_malla": 0.8836356791580919
+  },
+  {
+   "fecha": "2026-07-23",
+   "celdas_quemadas": 333,
+   "area_ha": 21348.0,
+   "estaciones": 686,
+   "pctl_produccion": 98.33129400437286,
+   "auc_produccion": 0.9213651213061085,
+   "pctl_malla": 98.47832627926103,
+   "auc_malla": 0.9475644640037441
+  },
+  {
+   "fecha": "2026-07-24",
+   "celdas_quemadas": 62,
+   "area_ha": 1999.0,
+   "estaciones": 691,
+   "pctl_produccion": 85.05305598459472,
+   "auc_produccion": 0.7100599786131805,
+   "pctl_malla": 95.21382865624938,
+   "auc_malla": 0.7206027655834251
+  },
+  {
+   "fecha": "2026-07-25",
+   "celdas_quemadas": 152,
+   "area_ha": 9408.0,
+   "estaciones": 692,
+   "pctl_produccion": 88.29027340380719,
+   "auc_produccion": 0.8689958976921132,
+   "pctl_malla": 94.22121035845385,
+   "auc_malla": 0.9249309892871422
+  }
+ ],
+ "resumen": {
+  "produccion": {
+   "pctl_mediano": 79.5982187631637,
+   "pctl_medio": 65.37710772819791,
+   "auc_medio": 0.6032435009158955
+  },
+  "malla": {
+   "pctl_mediano": 87.41600304896396,
+   "pctl_medio": 75.07816645182194,
+   "auc_medio": 0.617047739520394
+  }
+ },
+ "dif_pctl_media": 3.8272226227461656,
+ "ic95_pctl": [
+  -2.103730703562595,
+  10.470271863985994
+ ],
+ "dif_auc_media": 0.013804238604498533,
+ "ic95_auc": [
+  -0.038522608361218895,
+  0.07127704567390593
+ ],
+ "dif_pctl_ponderada": 11.700996652515128,
+ "ic95_ponderada": [
+  -0.32692615100988465,
+  23.781736809697144
+ ],
+ "dias_ganados": 11,
+ "veredicto": "mejor de media, pero con 17 días no se distingue del ruido"
+}
