@@ -68,8 +68,12 @@ instrumento. Lo acotado:
 
 El veredicto acumulado dice literalmente *«mejor de media, pero con 17 días no
 se distingue del ruido»*, y así debe citarse hasta el cierre de septiembre. El
-único resultado con intervalo que no toca el cero es el retrospectivo sobre la
-temporada 2026 completa (Δ +0,049, IC95 [+0,014, +0,085]).
+resultado con intervalo que no toca el cero es el retrospectivo sobre la
+temporada 2026 completa (Δ +0,112, IC95 [+0,074, +0,151]); desde que se
+corrigió la fuga de FIRMS del 31/08/2026 también lo son el único 1:3
+(+0,105 [+0,067, +0,146]) y la pareja (+0,058 [+0,027, +0,090]). Sigue siendo
+un resultado RETROSPECTIVO, con reanálisis para todos: es una cota superior de
+lo que daría la operación, no la operación.
 
 ---
 

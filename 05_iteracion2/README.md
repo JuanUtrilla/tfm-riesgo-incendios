@@ -35,11 +35,11 @@ atribuir a información nueva.
 ## Los tres modelos que salen de aquí
 
 - **único** (`donde_dia_effis`): las 46 features, muestreo del mismo día,
-  etiqueta EFFIS. **0,773** sobre la temporada 2026 (0,785 con ratio 1:10).
+  etiqueta EFFIS. **0,752** sobre la temporada 2026 (**0,759** con ratio 1:10).
 - **dónde** (`donde_effis_c`): una fila por celda, sin meteorología. Responde
   «¿esta celda es propensa?» y su mapa es el mismo todos los días.
 - **cuándo**: solo las 29 dinámicas, diseño misma-celda-otro-día. Responde
-  «¿hoy es peligroso?». La **pareja** es el producto de los dos: 0,754.
+  «¿hoy es peligroso?». La **pareja** es el producto de los dos: 0,705.
 
 ## Las ablaciones, que son casi todas negativas
 

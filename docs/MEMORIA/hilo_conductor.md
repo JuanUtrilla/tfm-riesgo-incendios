@@ -133,9 +133,15 @@ porque está medido, no porque esté bien argumentado:
 - **No presentes la segunda iteración como una mejora incremental.** No se
   afinaron hiperparámetros: se cambió la pregunta. Si lo cuentas como «además
   probé otra configuración y fue algo mejor», pierdes la aportación.
-- **No escondas que la ventaja es modesta.** +0,037 con el IC rozando el cero
-  es lo que hay; escribirlo con su intervalo vale más que redondearlo a
-  «mejora significativa». La honestidad estadística se nota y se premia.
+- **La ventaja es sólida en el retrospectivo y aún no en operación, y esa
+  distinción es el argumento.** +0,112 con IC95 [+0,074, +0,151] sobre 74 días
+  es significativo, pero con reanálisis para todos: cota superior. Los jueces
+  diarios llevan 6-17 días y sus intervalos siguen cruzando el cero. Escribir
+  las dos cosas con su intervalo vale más que quedarse con la que conviene.
+  (Hasta el 31/08/2026 esta sección decía «+0,037 con el IC rozando el cero»:
+  era una fuga de futuro en la ventana de FIRMS que inflaba a producción. Que
+  el arreglo REFORZARA el resultado, en vez de hundirlo, es en sí un episodio
+  que merece contarse.)
 
 ## 6. Texto redactado: por qué un segundo pipeline
 
@@ -161,16 +167,17 @@ y esas tres decisiones son las que explican la diferencia de rendimiento.
 
 **Lo que gana el segundo pipeline.** Sobre los 74 días de la temporada de
 2026, juzgado con los perímetros de EFFIS, el AUC dentro del día pasa de
-0,737 a 0,773; con el parte diario de MITECO, de 0,693 a 0,731; y en la única
-comparación previsión-contra-previsión disponible —19 días contra el ranking
-sellado que producción publicó de verdad—, de 0,568 a 0,625, ganando 16 de los
-19 días.
+0,647 a 0,752 —0,759 con el ratio de negativos a 1:10—; con el parte diario de
+MITECO, de 0,638 a 0,710; y en la única comparación previsión-contra-previsión
+disponible —19 días contra el ranking sellado que producción publicó de
+verdad—, de 0,568 a 0,605, ganando 14 de los 19 días.
 
-**Lo que gana y no se ve en el AUC.** Producción depende de las detecciones
-térmicas de FIRMS hasta el punto de que sin ellas su AUC cae a 0,611 y su
-discriminación contra el parte de MITECO desaparece (0,52, indistinguible del
-azar). El candidato sin FIRMS se queda en 0,744, es decir, **iguala a
-producción *con* FIRMS**. Esto no es un matiz académico: cualquier día con
+**Lo que gana y no se ve en el AUC.** Producción se apoya en las detecciones
+térmicas de FIRMS —sin ellas su discriminación contra el parte de MITECO
+desaparece (0,52, indistinguible del azar) y su AUC EFFIS cae de 0,647 a
+0,611—, pero mucho menos de lo que se creyó hasta el 31/08/2026: la caída es
+de 0,036, no de 0,126. El candidato sin FIRMS se queda en 0,744, es decir,
+**queda por encima de producción *con* FIRMS**. Esto no es un matiz académico: cualquier día con
 VIIRS cubierto de nubes o con la API caída —ya ocurrió durante la temporada—
 deja al sistema en producción sin su variable más informativa, y al candidato
 prácticamente igual. Es la diferencia entre un modelo que ha aprendido dónde y
@@ -198,11 +205,15 @@ en lugar de zanjarse con una figura.
 **Lo que cuesta.** El segundo pipeline no es gratis. Su probabilidad no está
 calibrada —el producto de dos modelos con prevalencias de diseño distintas no
 tiene interpretación probabilística—, y por eso el mapa se sirve en percentil
-del día y los niveles se cortan por percentil y no por probabilidad. Además,
-en los días de megaincendio producción sigue por delante (0,883 frente a
-0,794) precisamente gracias a FIRMS: el fuego que ya arde predice bien el
-fuego de mañana. Un sistema operativo maduro probablemente debería combinar
-las dos señales en vez de elegir.
+del día y los niveles se cortan por percentil y no por probabilidad. Hasta el
+31/08/2026 este párrafo añadía que en los días de megaincendio producción
+seguía por delante (0,883 frente a 0,794) gracias a FIRMS. Era falso: ese
+0,883 lo producía la fuga de futuro de la ventana de FIRMS. Con la ventana
+bien calculada, producción baja a 0,692 en esos once días —y sin FIRMS saca
+0,689, o sea que la feature no le aporta nada ahí— mientras el único con
+ratio 1:10 sube a 0,763. La lección se mantiene, pero al revés de como estaba
+escrita: no es que el fuego que ya arde prediga bien el de mañana, es que
+medirlo mal lo hacía parecer.
 
 ## 7. Y la conclusión, que es la lección del trabajo
 
@@ -247,11 +258,15 @@ modelo.
 
 | negativos por positivo | negativos/día (mediana) | filas de entrenamiento | AUC test 2024 | AUC temporada 2026 | percentil ponderado por ha, 2026 |
 |---|---|---|---|---|---|
-| 1:3 (el heredado) | 21 | 59.444 | 0,804 | 0,778 | 83,3 |
-| 1:10 | 70 | 163.471 | 0,805 | **0,785** | 87,6 |
-| 1:30 | 210 | 460.691 | 0,815 | 0,784 | **87,9** |
-| 1:60 | 420 | 906.521 | **0,822** | 0,775 | 85,8 |
-| hasta 1:100 | 700 | 1.457.619 | 0,813 | 0,766 | 82,3 |
+| 1:3 (el heredado) | 21 | 59.444 | 0,804 | 0,748 | 79,5 |
+| 1:10 | 70 | 163.471 | 0,805 | **0,759** | **81,9** |
+| 1:30 | 210 | 460.691 | 0,815 | 0,753 | 80,6 |
+| 1:60 | 420 | 906.521 | **0,822** | 0,748 | 78,5 |
+| hasta 1:100 | 700 | 1.457.619 | 0,813 | 0,745 | 76,8 |
+
+Las dos últimas columnas se recalcularon el 31/08/2026 desde el `dos_09` ya sin
+la fuga de FIRMS; la de test 2024 no dependía de ella. El orden no cambia: el
+óptimo sigue en 1:10-1:30 y el 1:100 sigue perdiendo.
 
 De aquí salen tres lecturas.
 

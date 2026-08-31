@@ -211,7 +211,10 @@ comparados, dejan ver lo que la métrica de desarrollo escondía:
 
 El rediseño que sale de ahí: negativos del **mismo día**, y etiqueta **EFFIS**
 —la misma con la que se valida— en vez de igniciones EGIF. Resultado sobre la
-temporada 2026: **0,773 dentro del día frente a 0,737** de producción.
+temporada 2026: **0,752 dentro del día frente a 0,647** de producción. (Estas
+cifras son las corregidas el 31/08/2026; hasta esa fecha se publicaron 0,773 y
+0,737, infladas por una fuga de futuro en la ventana de FIRMS —ver la entrada
+del 31/08— que favorecía a producción.)
 
 Ese mismo día se montó la infraestructura para juzgarlo en operación sin
 depender de que el portátil esté encendido: la cadena diaria en **GitHub
@@ -256,9 +259,10 @@ los tres jueces:
 
 Y el veredicto de temporada, que es el número que se defiende:
 
-> **Único con etiqueta EFFIS y ratio 1:10 — AUC 0,785 frente a 0,736 de
-> producción. Δ +0,049, IC95 [+0,014, +0,085].** Es el único candidato cuyo
-> intervalo de confianza **no toca el cero**.
+> **Único con etiqueta EFFIS y ratio 1:10 — AUC 0,759 frente a 0,647 de
+> producción. Δ +0,112, IC95 [+0,074, +0,151].** Gana el 76 % de los días y su
+> intervalo de confianza **no toca el cero**; tras corregir la fuga tampoco lo
+> tocan el único 1:3 (+0,105) ni la pareja (+0,058).
 
 El veredicto acumulado sigue siendo prudente a propósito: *«mejor de media, pero
 con 17 días no se distingue del ruido»*. El cierre está previsto para mediados
@@ -280,3 +284,54 @@ de septiembre, cuando venzan los 45 días de desfase de EFFIS.
 4. **Lo que no cerró se dice.** El control fallido del Experimento B y el bug
    sellado en producción van a [`LIMITACIONES.md`](LIMITACIONES.md), no debajo
    de la alfombra.
+
+---
+
+## 31/08/2026 — Una fuga de futuro en FIRMS, y por qué el arreglo refuerza el resultado
+
+`comparar_rankings.firms_dia` pedía a la API de FIRMS `/5/{D-1}` creyendo que
+la ventana de 5 días iba hacia atrás. La API los cuenta **hacia adelante**
+desde la fecha, así que devolvía `[D−1, D+3]`: el mapa del día D llevaba dentro
+los focos térmicos del propio incendio y de los tres días siguientes.
+
+**Cómo se detectó.** No leyendo el código, sino mirando si el acierto decaía al
+alejarse del día del suceso. Puntuando el fuego del día D con el mapa de D−2,
+producción no perdía nada (63 % → 62 % de incendios de ≥500 ha en el top-2 %
+del día) mientras que su variante sin FIRMS sí (31 % → 18 %). Un predictor
+honesto pierde fuerza con la distancia; uno que está viendo el suceso, no. La
+confirmación: los 33 incendios de ≥500 ha tenían un foco FIRMS a menos de 5 km
+en su ventana «pasada» (control aleatorio: 1,2 %). Tras el arreglo, 9,1 %.
+
+**Alcance.** Producción en vivo **nunca** estuvo afectada: `riesgo_hoy.py` y el
+`firms_api.py` del repo hermano llaman sin fecha de inicio, que son los cinco
+últimos días hasta hoy, y en operación el futuro no existe. El entrenamiento
+tampoco: `extraer_features_historia.py:117` usa `(vf_d >= d-7) & (vf_d < d)`,
+estrictamente anterior a D. La fuga solo se materializó en la evaluación
+retrospectiva, porque la caché de junio y julio se descargó en agosto, cuando
+el futuro ya existía. Se relanzaron `dos_09`, `dos_11`, `dos_14`, `dos_19`,
+`comparar_rankings` y `comparar_rankings_justo`.
+
+**Qué cambia.** Producción baja de 0,737 a **0,647** de AUC medio en 2026 y el
+único de 0,773 a **0,752**, de modo que la ventaja pasa de +0,037 con el
+intervalo rozando el cero a **+0,105 [+0,065, +0,145]**; el ratio 1:10 llega a
+**+0,112 [+0,074, +0,151]**, ganando el 76 % de los días. Dos afirmaciones se
+caen enteras: que producción acertaba los megaincendios (0,883 era la fuga; el
+valor real es 0,692, y sin FIRMS saca 0,689: la feature no le aportaba nada
+ahí) y que la malla batía al ranking sellado en el cara a cara justo (0,602 era
+la fuga; limpia da 0,547 y **pierde**). Comprobación de que el recálculo es
+correcto: todas las filas *sin FIRMS* y el percentil del FWI no se mueven ni un
+dígito.
+
+**Lo que se aprende, que es lo que va a la memoria.** Un error de una línea en
+el código de EVALUACIÓN —no en el modelo, no en el entrenamiento, no en
+producción— sostuvo durante semanas la conclusión de que la mejora era
+marginal. La comprobación que lo destapó es barata y general: *si el acierto no
+decae al alejar el predictor del suceso, algo está viendo el suceso*. Se ha
+dejado automatizada en `dos_24_auditoria_fugas.py`, que audita los 17 modelos
+separando causa de fuga por dos criterios —la escala espacial (¿se mueve solo
+donde arde, o también en el anillo de 50-150 km?) y si la fuente puede ver el
+fuego (el reanálisis no; el satélite sí)—. Su resultado: ningún modelo tiene
+fuga seria, y los tres únicos rasgos concurrentes (`lst`, `ndvi`, `swi010`, del
+día D) pesan entre el 2,1 % y el 7,5 % del *gain* según el modelo, **la misma
+proporción en todos**, así que no sesgan ninguna comparación pero obligan a
+presentar los números del mismo día como cota superior.

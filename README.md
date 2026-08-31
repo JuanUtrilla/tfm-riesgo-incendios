@@ -15,8 +15,8 @@ pregunta *«¿es hoy un día peligroso en esta celda?»*, distinta de la que se
 evalúa en operación, *«¿cuál de las 498.530 celdas arde hoy?»*. A partir de
 ese diagnóstico se rediseñó el conjunto de entrenamiento y se construyó un
 segundo sistema. Sobre la temporada 2026 el modelo único con etiqueta EFFIS
-alcanza **AUC 0,785** frente a 0,736 de producción (Δ +0,049, IC95
-[+0,014, +0,085]).
+alcanza **AUC 0,759** frente a 0,647 de producción (Δ +0,112, IC95
+[+0,074, +0,151]), ganando el 76 % de los días.
 
 ## Cómo se lee este repositorio
 

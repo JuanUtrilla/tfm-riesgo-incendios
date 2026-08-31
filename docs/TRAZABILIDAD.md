@@ -88,12 +88,12 @@ datos hace falta ejecutarlo.
 |---|---|---|---|---|
 | 0,828 · +0,083 [+0,063, +0,105] | `donde_dia` (único, muestreo del mismo día), test 2020 EGIF | `05_iteracion2/55_train/dos_05_modelos.py` | `dos_05_metricas.json` | disco |
 | 0,831 · +0,087 [+0,065, +0,108] | `donde_cel_hist × cuando` (la pareja) | ídem | ídem | disco |
-| **0,809** test 2024 · **0,773** en 2026 | `donde_dia_effis` — el único con etiqueta EFFIS | `05_iteracion2/55_train/dos_13_modelos_effis.py` | `dos_13_metricas.json` | disco |
+| **0,809** test 2024 · **0,752** en 2026 | `donde_dia_effis` — el único con etiqueta EFFIS | `05_iteracion2/55_train/dos_13_modelos_effis.py` | `dos_13_metricas.json` | disco |
 | 0,840 [+0,015, +0,085] test 2024 | `donde_effis_c × cuando_egif` — la pareja definitiva | ídem | ídem | disco |
-| 0,744 | El único **sin FIRMS** (producción cae a 0,611) | ídem | ídem | disco |
+| 0,744 | El único **sin FIRMS** (producción, 0,647, cae a 0,611) | ídem | ídem | disco |
 | p30/p90/p98 | Los cortes BAJO/MODERADO/ALTO/EXTREMO | `05_iteracion2/56_calibracion/dos_14_cortes.py` | `dos_14_cortes.json` | disco |
-| **1:10-1:30** óptimo · 0,785 en 2026 | La escalera del ratio de negativos | `05_iteracion2/57_ablaciones/dos_18_ratio.py` | `dos_18_ratio.json` | disco |
-| **81,7 → 87,6-87,9** | Percentil ponderado por hectáreas: lo que sí mejora | ídem | ídem | disco |
+| **1:10-1:30** óptimo · 0,759 en 2026 | La escalera del ratio de negativos | `05_iteracion2/57_ablaciones/dos_18_ratio.py` | `dos_18_ratio.json` | disco |
+| **79,5 → 81,9-80,6** | Percentil ponderado por hectáreas: lo que sí mejora | ídem | ídem | disco |
 | 0,005 | El **ruido del sorteo de negativos**, midiendo el mismo diseño otra vez | ídem | ídem | disco |
 | entrenar solo verano: peor | Resultado negativo | `05_iteracion2/57_ablaciones/dos_08_verano.py` | `dos_08_verano.json` | disco |
 | −0,02 | La capa «ya quemado» empeora | `05_iteracion2/57_ablaciones/dos_17_capa_quemado.py` | `dos_17_capa_quemado.csv/json` | disco |
@@ -102,12 +102,13 @@ datos hace falta ejecutarlo.
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
-| 0,737 prod · 0,773 único · 0,754 pareja | Temporada 2026 contra EFFIS | `06_comparacion/dos_09_temporada2026.py` | `dos_09_temporada2026.csv/json` | disco |
-| **0,611** | Producción sin FIRMS (0,520 con juez MITECO) | ídem | ídem | disco |
-| 0,883 vs 0,794 en días grandes | Dónde gana producción: los megaincendios | ídem | ídem | disco |
-| 0,568 · 0,602 · **0,625** (16/19 días) | Cara a cara justo: previsión contra previsión, 19 días | `06_comparacion/comparar_rankings_justo.py` | `rankings_justo.csv/json` | sellado |
+| 0,647 prod · 0,752 único · **0,759** único 1:10 · 0,705 pareja | Temporada 2026 contra EFFIS | `06_comparacion/dos_09_temporada2026.py` | `dos_09_temporada2026.csv/json` | disco |
+| **0,611** | Producción sin FIRMS (0,520 con juez MITECO): la caída real es de 0,036, no de 0,126 | ídem | ídem | disco |
+| 0,692 vs 0,763 en los 11 días grandes | Los megaincendios: los acierta el único 1:10, no producción | ídem | ídem | disco |
+| 0,568 · 0,547 · **0,605** (14/19 días) | Cara a cara justo: previsión contra previsión, 19 días | `06_comparacion/comparar_rankings_justo.py` | `rankings_justo.csv/json` | sellado |
 | 17 días de julio 2026 | La primera comparación seria con área quemada | `06_comparacion/comparar_julio2026.py` | `julio2026_effis.json` | cubo |
-| **0,785 · Δ+0,049 [+0,014, +0,085]** | **El veredicto de la memoria** | `06_comparacion/dos_19_veredicto.py` | `dos_19_veredicto.json/png` | disco |
+| **0,759 · Δ+0,112 [+0,074, +0,151]** | **El veredicto de la memoria** | `06_comparacion/dos_19_veredicto.py` | `dos_19_veredicto.json/png` | disco |
+| — | **Todas las cifras de 2026 y MITECO de esta página se recalcularon el 31/08/2026** tras corregir la fuga de futuro de FIRMS (`docs/BITACORA.md`). Las de test 2020/2024 no dependían de ella y no cambian. | `06_comparacion/comparar_rankings.py` | — | — |
 
 ## Capítulo 7 · Producción y jueces
 

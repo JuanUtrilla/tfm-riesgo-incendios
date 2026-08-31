@@ -168,15 +168,25 @@ variables de reanálisis para todos); juez MITECO (14 días, 49 incidentes, radi
 
 | modelo | etiqueta · muestreo | test | 2026 | 2026 megaincendios (11 d) | 2026 resto (63 d) | MITECO |
 |---|---|---|---|---|---|---|
-| producción `xgb_v2` | EGIF · cuándo | 0,744 | 0,737 | 0,883 | 0,711 | 0,693 |
+| producción `xgb_v2` | EGIF · cuándo | 0,744 | 0,647 | 0,692 | 0,639 | 0,638 |
 | producción **sin FIRMS** | | — | 0,611 | 0,689 | 0,597 | **0,520** |
-| único, muestreo dónde | EGIF · dónde | 0,828 | 0,733 | 0,728 | 0,734 | 0,698 |
-| único, muestreo mixto | EGIF · mixto | 0,805 | 0,731 | — | — | — |
-| dónde × cuándo | EGIF | 0,831 (+0,087 [+0,065, +0,108]) | 0,698 (−0,038) | 0,615 | 0,713 | 0,680 |
-| dónde(EFFIS) × cuándo(EGIF) | híbrido | 0,840 | 0,754 (+0,017) | 0,830 | 0,740 | 0,696 |
-| **único, muestreo dónde** | **EFFIS · dónde** | 0,809 | **0,773 (+0,037 [−0,004, +0,076])** | 0,794 | **0,770** | **0,731** |
-| el mismo **sin FIRMS** | | — | **0,744** | 0,739 | 0,745 | 0,706 |
-| percentil del FWI (sin modelo) | — | 0,627 | 0,653 | — | — | 0,629 |
+| único, muestreo dónde | EGIF · dónde | 0,828 | 0,698 (+0,051) | 0,630 | 0,710 | 0,683 |
+| único, muestreo mixto | EGIF · mixto | 0,805 | 0,731 ᵃ | — | — | — |
+| dónde × cuándo | EGIF | 0,831 (+0,087 [+0,065, +0,108]) | 0,677 (+0,030) | 0,580 | 0,694 | 0,671 |
+| dónde(EFFIS) × cuándo(EGIF) | híbrido | 0,840 | 0,705 (+0,058 [+0,030, +0,089]) | 0,763 | 0,695 | 0,673 |
+| **único, muestreo dónde** | **EFFIS · dónde** | 0,809 | **0,752 (+0,105 [+0,065, +0,145])** | 0,746 | **0,753** | **0,710** |
+| el mismo **sin FIRMS** | | — | 0,744 | 0,739 | 0,745 | 0,706 |
+| **el mismo, ratio 1:10** | | — | **0,759 (+0,112 [+0,072, +0,151])** | **0,763** | **0,758** | 0,697 |
+| percentil del FWI (sin modelo) | — | 0,627 | 0,653 | 0,718 | 0,642 | 0,629 |
+
+Las columnas de 2026 y MITECO se recalcularon el 31/08/2026 tras corregir una
+fuga de futuro en la ventana de FIRMS que favorecía a producción (`BITACORA.md`);
+las de `test` no dependían de ella. Comprobación de que el recálculo es
+correcto: las filas **sin FIRMS** y el percentil del FWI no se mueven ni un
+dígito, que es lo que tiene que pasar con lo que nunca usó esa feature.
+ᵃ El mixto con etiqueta EGIF no está en la salida de `dos_09` y no se ha
+podido recalcular; su 0,731 procede de la tanda antigua y debe tomarse con la
+misma reserva.
 
 **Lo que se descubrió, en orden.**
 
@@ -187,18 +197,23 @@ variables de reanálisis para todos); juez MITECO (14 días, 49 incidentes, radi
 2. *La etiqueta también.* Con área quemada real (2026), el modelo de susceptibilidad entrenado con
    igniciones EGIF se hunde en los megaincendios (AUC 0,51; su decil superior contenía el 0-7 % de
    lo quemado): las igniciones se concentran en el noroeste y la superficie quemada de 2026 en el
-   centro-este. Reentrenado con etiqueta EFFIS, el modelo único es el mejor de la temporada (0,773),
-   el mejor en MITECO y el mejor de largo en los días normales (0,770 frente a 0,711).
+   centro-este. Reentrenado con etiqueta EFFIS, el modelo único es el mejor de la temporada (0,752;
+   0,759 con ratio 1:10), el mejor en MITECO y el mejor de largo en los días normales (0,753 frente
+   a 0,639).
 3. *EFFIS ayuda al dónde y perjudica al cuándo.* El componente de peligro diario con etiqueta EFFIS
    empeora (0,661 frente a 0,697): sus positivos se concentran en pocos días extremos y aprende
    "qué día es extremo". Si se quiere la pareja, la buena es híbrida.
-4. *La ventaja de producción es FIRMS.* Sin las detecciones de los cinco días previos cae a 0,611
-   (EFFIS) y a 0,52 —aleatorio— (MITECO): su habilidad en megaincendios es persistencia del fuego
-   activo, legítima en operación pero circular como anticipación. El modelo nuevo sin FIRMS
-   iguala a producción con FIRMS (0,744 frente a 0,737).
-5. *Dónde sigue ganando producción.* En la cola alta: con niveles por percentil del día
-   (p30/p90/p98), el EXTREMO (2 % del territorio) de producción concentra el 28 % de lo quemado
-   (lift ×14) y el del nuevo el 12 % (×6). El intervalo global aún roza el cero.
+4. *FIRMS aporta mucho menos de lo que parecía, y la habilidad de producción en megaincendios era
+   un artefacto.* Con la ventana de FIRMS bien calculada, producción pasa de 0,647 a 0,611 al
+   quitarla: +0,036, no el +0,126 que se midió antes del 31/08/2026. Y en los once días de
+   megaincendio, producción con FIRMS (0,692) y sin ella (0,689) son indistinguibles: el 0,883 que
+   se publicó era la fuga, no la persistencia del fuego activo. Quien acierta los megaincendios es
+   el único con ratio 1:10 (0,763). El modelo nuevo sin FIRMS (0,744) queda por encima de
+   producción con FIRMS (0,647).
+5. *En la cola alta la distancia se estrecha.* Con niveles por percentil del día (p30/p90/p98), el
+   EXTREMO (2 % del territorio) de producción concentra el 11,3 % de lo quemado (lift ×5,6) y el
+   del nuevo el 8,3 % (×4,1). Antes de corregir la fuga esos valores eran 28 % (×14) y 12 % (×6):
+   la ventaja de producción en la punta del ranking era, en su mayor parte, el mismo artefacto.
 
 **Validación en condiciones reales (previsión contra previsión).** La tabla anterior usa
 reanálisis para todos los modelos. Para los 19 días con fuego entre el 22-jul y el 15-ago de 2026
@@ -209,13 +224,16 @@ selló** esas mañanas (687 estaciones, estación positiva si hay perímetro EFF
 | sistema | AUC por estación | Δ vs producción publicada | gana |
 |---|---|---|---|
 | producción publicada (AEMET + previsión municipal) | 0,568 | — | — |
-| modelo de producción sobre la malla | 0,602 | +0,034 [−0,015, +0,082] | 13/19 |
-| **único (etiqueta EFFIS, muestreo dónde)** | **0,625** | **+0,057 [−0,004, +0,108]** | **16/19** |
-| pareja dónde(EFFIS) × cuándo | 0,595 | +0,027 [−0,030, +0,075] | 13/19 |
+| modelo de producción sobre la malla | 0,547 | −0,022 [−0,051, +0,007] | 6/19 |
+| **único (etiqueta EFFIS, muestreo dónde)** | **0,605** | **+0,036 [−0,020, +0,085]** | **14/19** |
+| pareja dónde(EFFIS) × cuándo | 0,548 | −0,020 [−0,062, +0,020] | 8/19 |
 
-Por celda, contra los perímetros EFFIS de esos días, el único da 0,776 y el modelo de producción
-sobre la malla 0,765 (empate). Es el número que más se parece a lo que se publicará: el candidato
-gana 16 de 19 días con previsión real, con un intervalo que roza el cero.
+Por celda, contra los perímetros EFFIS de esos días, el único da 0,755 y el modelo de producción
+sobre la malla 0,669 (+0,086 [+0,022, +0,156]). Es el número que más se parece a lo que se
+publicará, y el único experimento sin retrovisor para nadie: el candidato gana 14 de 19 días con
+previsión real, con un intervalo que todavía roza el cero. Nótese que aquí **la malla pierde**
+contra el ranking sellado: su ventaja de +0,034 que se publicó hasta el 31/08/2026 era la fuga, y
+lo que queda es que el único gana en la geometría por estación, la de casa de producción.
 
 **Importancia (ganancia) del modelo final, por bloques:** historial y FIRMS 34 % (la densidad
 EGIF del mismo mes sola, 29 %), meteorología 26 % (`fwi_pctl_local` y `vpd_max` a la cabeza; el
@@ -285,7 +303,10 @@ El modelo no estaba mal entrenado; estaba entrenado para otra pregunta y con otr
 cambios, cada uno medido —negativos del mismo día para aprender el **dónde**, la misma malla y la
 misma fuente meteorológica en entrenamiento y servicio, y la misma etiqueta (superficie quemada)
 en entrenamiento y validación— convierten las mismas 46 variables y el mismo XGBoost en un sistema
-que pasa de 0,737 a 0,773 de AUC dentro del día en la temporada 2026 y que ya no depende de las
-detecciones satelitales del día anterior. La ventaja es consistente en tres jueces y todavía no
-significativa; la cadena está montada para que la propia temporada lo decida sin intervención, y
-para que este capítulo pueda cerrar con el intervalo, sea el que sea.
+que pasa de 0,647 a 0,752 de AUC dentro del día en la temporada 2026 —0,759 ajustando el ratio de
+negativos a 1:10— y que no se apoya en las detecciones satelitales del día anterior. La ventaja es
+consistente en tres jueces y, en el retrospectivo de 74 días, significativa: Δ +0,112, IC95
+[+0,074, +0,151], ganando el 76 % de los días. Sigue siendo un resultado con reanálisis para
+todos, es decir una cota superior de lo que dará la operación; la cadena está montada para que la
+propia temporada lo decida sin intervención, y para que este capítulo pueda cerrar con el
+intervalo operativo, sea el que sea.
