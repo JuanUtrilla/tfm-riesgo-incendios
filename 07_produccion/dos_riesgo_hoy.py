@@ -21,6 +21,16 @@ mapas nuevos en vez del modelo de producción:
            `cuando` (solo dinámicas, etiqueta EGIF: el cuándo con EFFIS salió
            peor, `RESULTADOS_DOS_MODELOS.md`). 0,754 en 2026. Interpretable:
            el mapa estático va aparte.
+  r10      `donde_dia_effis_r10`: EL MISMO modelo que `unico` cambiando solo
+           cuántos negativos del mismo día ve en entrenamiento — 10 por
+           positivo en vez de 3 (`dos_18_ratio.py`, escalera anidada: los
+           negativos del 1:3 son un subconjunto de los del 1:10, así que la
+           diferencia es cuántos y no cuáles). Añadido el 31/08/2026 como
+           CANDIDATO ADICIONAL: en AUC medio empata con el 1:3 (0,759 vs
+           0,752) pero mete más fuego grande en la punta del día (34 % de los
+           incendios de ≥500 ha en el top-2 % contra 29 %) y sube el percentil
+           ponderado por hectáreas (81,9 vs 79,8). No sustituye al 1:3: este
+           sigue sirviéndose y su serie de jueces no se rompe.
 
 Los dos se publican como PERCENTIL DEL DÍA sobre las 498.530 celdas y con
 niveles por percentil (p30/p90/p98, `dos_14_cortes.py`): la probabilidad
@@ -65,6 +75,7 @@ NIVELES = ["BAJO", "MODERADO", "ALTO", "EXTREMO"]
 CORTES_MAPA = [0, 10, 30, 60, 90, 98, 100]
 COLORES_MAPA = ["#ffffd9", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#bd0026"]
 MODELO_UNICO = f"{ce.MODELOS}/donde_dia_effis.ubj"
+MODELO_R10 = f"{ce.MODELOS}/donde_dia_effis_r10.ubj"
 MODELO_CUANDO = f"{ce.MODELOS}/cuando.ubj"
 MAPA_DONDE = config.entrada("dos_13_mapa_donde_effis_c.npz")
 
@@ -109,6 +120,7 @@ def main(a):
     B["rayos_dia"] = np.zeros((ny, nx)); B["rayos_7d"] = np.zeros((ny, nx))
 
     unico = xgb.XGBClassifier(); unico.load_model(MODELO_UNICO)
+    r10 = xgb.XGBClassifier(); r10.load_model(MODELO_R10)
     cuando = xgb.XGBClassifier(); cuando.load_model(MODELO_CUANDO)
     md = np.load(MAPA_DONDE)
     donde = np.full((ny, nx), np.nan); donde[md["iy"], md["ix"]] = md["p"]
@@ -134,19 +146,21 @@ def main(a):
         X = pd.DataFrame({c: (M[c] if c in M else G[c]).ravel()[sel]
                           for c in sorted(set(FULL) | set(FEATS_CUANDO))})
         p_unico = unico.predict_proba(X[FULL].values)[:, 1]
+        p_r10 = r10.predict_proba(X[FULL].values)[:, 1]
         p_cuando = cuando.predict_proba(X[FEATS_CUANDO].values)[:, 1]
         p_pareja = p_donde * p_cuando
 
         out, res = {}, {"fecha": fstr, "rama": "reanálisis + IFS mapeado" if k >= nre
                         else "solo reanálisis", "nodos_respaldo": int(n_malo)}
-        for nom, p in (("unico", p_unico), ("pareja", p_pareja),
+        for nom, p in (("unico", p_unico), ("r10", p_r10),
+                       ("pareja", p_pareja),
                        ("donde", p_donde), ("cuando", p_cuando)):
             g = np.full(ny * nx, np.nan, np.float32); g[sel] = p
             out[f"prob_{nom}"] = g.reshape(ny, nx)
             pc = percentil_dia(p)
             g = np.full(ny * nx, np.nan, np.float32); g[sel] = pc
             out[f"pctl_{nom}"] = g.reshape(ny, nx)
-            if nom in ("unico", "pareja"):
+            if nom in ("unico", "r10", "pareja"):
                 lv = np.searchsorted(CORTES_PCTL, pc, side="right")
                 res[f"niveles_{nom}"] = {NIVELES[i]: float((lv == i).mean() * 100)
                                         for i in range(4)}
@@ -156,6 +170,7 @@ def main(a):
         res["fwi_medio"] = float(fw.mean())
         res["fwi_medio_pctl_clim"] = float((C <= fw.mean()).mean() * 100)
         res["spearman_unico_pareja"] = float(spearmanr(p_unico, p_pareja).correlation)
+        res["spearman_unico_r10"] = float(spearmanr(p_unico, p_r10).correlation)
         rp = config.salida(f"riesgo_hoy_{fstr}.npz")
         if os.path.exists(rp):
             pr = np.load(rp)["prob"].astype(float).ravel()[sel]
@@ -175,7 +190,8 @@ def main(a):
                                 prob=np.load(rp)["prob"].astype(np.float16))
         json.dump(res, open(config.salida(f"dos_riesgo_{fstr}.json"), "w"), indent=1)
         print(f"  FWI medio {res['fwi_medio']:.1f} (pctl clim {res['fwi_medio_pctl_clim']:.0f}) · "
-              f"unico~pareja {res['spearman_unico_pareja']:.2f}"
+              f"unico~pareja {res['spearman_unico_pareja']:.2f} · "
+              f"unico~r10 {res['spearman_unico_r10']:.2f}"
               + (f" · unico~prod {res['spearman_unico_prod_malla']:.2f}"
                  if "spearman_unico_prod_malla" in res else ""), flush=True)
 
@@ -184,22 +200,25 @@ def main(a):
         # ver es DÓNDE discrepa el candidato, y eso es una resta de
         # percentiles con paleta divergente centrada en cero.
         if "pctl_prod_malla" in out:
-            for nom in ("unico", "pareja"):
+            for nom in ("unico", "r10", "pareja"):
                 if f"pctl_{nom}" in out:
                     out[f"dif_{nom}"] = out[f"pctl_{nom}"] - out["pctl_prod_malla"]
         paneles = [("pctl_prod_malla", "PRODUCCIÓN (xgb_v2 sobre la malla)"),
-                   ("pctl_unico", "ÚNICO · etiqueta EFFIS · muestreo del mismo día"),
+                   ("pctl_unico", "ÚNICO 1:3 · etiqueta EFFIS · mismo día"),
+                   ("pctl_r10", "ÚNICO 1:10 · mismo modelo, más negativos"),
                    ("pctl_pareja", "DÓNDE × CUÁNDO"),
                    ("pctl_donde", "DÓNDE · susceptibilidad EFFIS (estático)")]
         paneles = [p for p in paneles if p[0] in out]
-        difs = [("dif_unico", "ÚNICO − PRODUCCIÓN"),
+        difs = [("dif_unico", "ÚNICO 1:3 − PRODUCCIÓN"),
+                ("dif_r10", "ÚNICO 1:10 − PRODUCCIÓN"),
                 ("dif_pareja", "PAREJA − PRODUCCIÓN")]
         difs = [p for p in difs if p[0] in out]
         from matplotlib.colors import BoundaryNorm, ListedColormap
         cmap_niv = ListedColormap(COLORES_MAPA)
         norm_niv = BoundaryNorm(CORTES_MAPA, cmap_niv.N)
         capas = capa_verdad.preparar(ds, fstr)
-        nc = 3 if difs else 2
+        # con el r10 son 5 paneles de nivel + 3 restas = 8 = 2x4 exacto
+        nc = 4 if difs else 2
         fig, axs = plt.subplots(2, nc, figsize=(8 * nc, 12))
         rejilla = list(axs.ravel())
         # fila de arriba los tres mapas, fila de abajo el estático y las restas

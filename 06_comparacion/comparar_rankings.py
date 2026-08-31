@@ -48,6 +48,8 @@ import json
 import os
 import time
 
+from io import StringIO
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -68,21 +70,60 @@ load_dotenv(f"{config.FUENTE}/.env")
 RANKINGS = ("/home/charredgem/Desktop/Master/aemet_horario_verano2026/"
             "rankings/prevision_D0_%s.csv")
 RADIO_KM = 25
+# días de la ventana FIRMS [D−n, D−1]. 7 = la del entrenamiento.
+VENTANA_FIRMS = int(os.environ.get("TFM_FIRMS_DIAS", 7))
 
 
 def firms_dia(dia, ds):
-    """FIRMS [D−5, D−1] de una fecha PASADA, cacheado. Ventana de 5 días."""
-    cache = config.salida(f"_firms/{dia:%Y-%m-%d}.csv")
+    """FIRMS [D−5, D−1] de una fecha PASADA, cacheado. Ventana de 5 días.
+
+    31/08/2026 — FUGA DE FUTURO CORREGIDA. La API de FIRMS interpreta
+    `/{rango}/{fecha}` como `rango` días HACIA ADELANTE desde `fecha`,
+    inclusive; no hacia atrás. Pasar D−1 devolvía [D−1, D+3]: el mapa del día D
+    llevaba dentro los focos del propio incendio y de los tres días siguientes.
+    Se veía en que `prod` no perdía acierto al alejarse del día del fuego
+    (63 %→62 % de incendios grandes de D−0 a D−2) mientras que `prod_sin_firms`
+    sí (31 %→18 %), y en que los 33 incendios de ≥500 ha tenían un foco FIRMS a
+    menos de 5 km en su ventana «pasada» (control aleatorio: 1,2 %).
+    Para obtener [D−5, D−1] hay que pedir como inicio D−5.
+
+    31/08/2026 — DESAJUSTE TRAIN/SERVE. El modelo se ENTRENÓ con
+    `[D−7, D−1]` (`extraer_features_historia.py:117`, y de ahí el nombre
+    `frp_max_50km_7d`), pero toda la tubería de servicio pedía 5 días. Como
+    `n_detec_50km_7d` es un conteo, en producción llegaba ~29 % más bajo de lo
+    que el modelo aprendió. `VENTANA_FIRMS` fija la ventana; el valor por
+    defecto es 7 para que coincida con el entrenamiento. Se cachea en
+    `_firms{n}/` para poder comparar las dos.
+
+    Producción NUNCA estuvo afectada: `riesgo_hoy.py` y el `firms_api.py` del
+    repo hermano llaman sin fecha de inicio (`.../-10,35,5,44/5`), que son los
+    5 últimos días hasta hoy. La fuga solo se materializó aquí porque la caché
+    de junio y julio se descargó en agosto, cuando el futuro ya existía.
+    """
+    n = VENTANA_FIRMS
+    cache = config.salida(f"_firms{n}/{dia:%Y-%m-%d}.csv")
     os.makedirs(os.path.dirname(cache), exist_ok=True)
     if not os.path.exists(cache):
         import requests
-        u = (f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/"
-             f"{os.environ['FIRMS_MAP_KEY']}/VIIRS_NOAA20_NRT/-10,35,5,44/5/"
-             f"{(dia - pd.Timedelta(days=1)):%Y-%m-%d}")
-        r = requests.get(u, timeout=90)
-        open(cache, "w").write(r.text if r.text.startswith("latitude")
-                               else "latitude,longitude,acq_date,frp\n")
-        time.sleep(2)
+        # la API tope a 5 días por petición ("Invalid day range. Expects [1..5]"),
+        # así que una ventana de 7 se arma con dos llamadas consecutivas.
+        trozos, ini = [], dia - pd.Timedelta(days=n)
+        while ini < dia:
+            k = min(5, (dia - ini).days)
+            u = (f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/"
+                 f"{os.environ['FIRMS_MAP_KEY']}/VIIRS_NOAA20_NRT/"
+                 f"-10,35,5,44/{k}/{ini:%Y-%m-%d}")
+            r = requests.get(u, timeout=90)
+            if r.text.startswith("latitude"):
+                trozos.append(pd.read_csv(StringIO(r.text)))
+            ini += pd.Timedelta(days=k)
+            time.sleep(2)
+        if trozos:
+            d = pd.concat(trozos, ignore_index=True).drop_duplicates()
+            d = d[pd.to_datetime(d["acq_date"]) < dia]      # cinturón: nunca el día D
+            d.to_csv(cache, index=False)
+        else:
+            open(cache, "w").write("latitude,longitude,acq_date,frp\n")
     df = pd.read_csv(cache)
     ny, nx = ds.sizes["y"], ds.sizes["x"]
     gf, gn = np.zeros((ny, nx)), np.zeros((ny, nx))

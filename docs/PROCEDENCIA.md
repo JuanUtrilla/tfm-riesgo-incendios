@@ -271,7 +271,7 @@ en `TFM_fuego`.
 |---|---|---|
 | `comparar_julio2026.py` | TFM_fuego_malla | `c26881e0` |
 | `comparar_produccion.py` | TFM_fuego_malla | `937820f1` |
-| `comparar_rankings.py` | TFM_fuego_malla | `3b866e80` |
+| `comparar_rankings.py` | TFM_fuego_malla | `fefc67f1` |
 | `comparar_rankings_justo.py` | TFM_fuego_malla | `106b1e6d` |
 | `dos_09_temporada2026.py` | TFM_fuego_malla | `845e98ec` |
 | `dos_11_miteco.py` | TFM_fuego_malla | `ea381a5d` |
@@ -284,13 +284,33 @@ en `TFM_fuego`.
 | `capa_base.py` | TFM_fuego_malla | `ce1591a2` |
 | `capa_verdad.py` | TFM_fuego_malla | `3c0b9cb5` |
 | `dos_07_mapa_hoy.py` | TFM_fuego_malla | `879a1af7` |
-| `dos_15_veredicto_miteco.py` | TFM_fuego_malla | `68bb35e9` |
-| `dos_16_juez_estaciones.py` | TFM_fuego_malla | `6de24fc5` |
-| `dos_riesgo_hoy.py` | TFM_fuego_malla | `1826ab26` |
-| `gh_estado.py` | TFM_fuego_malla | `577e9e58` |
+| `dos_15_veredicto_miteco.py` | TFM_fuego_malla | `cde26ca7` |
+| `dos_16_juez_estaciones.py` | TFM_fuego_malla | `67d97248` |
+| `dos_riesgo_hoy.py` | TFM_fuego_malla | `bfa6f6a9` |
+| `gh_estado.py` | TFM_fuego_malla | `7dc13951` |
 | `gh_exportar_estado.py` | TFM_fuego_malla | `0afbd6a5` |
 | `gh_mensual_rapido.py` | TFM_fuego_malla | `c05c5f07` |
-| `gh_reanalisis.py` | TFM_fuego_malla | `66fd4bb8` |
-| `puntuar_effis.py` | TFM_fuego_malla | `00669d93` |
+| `gh_reanalisis.py` | TFM_fuego_malla | `278c7ac2` |
+| `puntuar_effis.py` | TFM_fuego_malla | `2d17322d` |
 | `redibujar.py` | TFM_fuego_malla | `29bddbe7` |
 | `riesgo_hoy.py` | TFM_fuego_malla | `5cc7b58c` |
+
+## Actualización del 31/08/2026 — corrección de una fuga
+
+Siete ficheros de `TFM_fuego_malla` cambiaron el 31/08/2026 y sus copias se han
+rehecho, con los hashes de esa fecha en vez de los del 25/08:
+
+  · `comparar_rankings.py` — **corrige una fuga de futuro**. `firms_dia` pedía a
+    la API de FIRMS `/5/{D-1}` creyendo que la ventana iba hacia atrás; FIRMS
+    cuenta los días HACIA ADELANTE, así que devolvía `[D-1, D+3]` y el mapa del
+    día D llevaba dentro los focos del propio incendio. La versión copiada el
+    25/08 (`3b866e80`) TENÍA ESE BUG: los números que produjo están inflados a
+    favor de producción (AUC 0,737 en vez de 0,647) y no deben citarse.
+    Producción en vivo nunca estuvo afectada, y el entrenamiento tampoco.
+  · `puntuar_effis.py`, `dos_15_veredicto_miteco.py`, `dos_16_juez_estaciones.py`,
+    `dos_riesgo_hoy.py` — añaden `donde_dia_effis_r10` como cuarto candidato.
+  · `gh_estado.py` — guarda contra pisar el estado diario del Release.
+  · `gh_reanalisis.py` — comprueba que el reanálisis cubre hasta D−6 sin huecos.
+
+El principio del repositorio no cambia: siguen siendo copias literales, y el
+hash permite comprobarlo. Lo que cambia es a qué fecha del original apuntan.

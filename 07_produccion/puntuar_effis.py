@@ -45,6 +45,7 @@ import pandas as pd
 import xarray as xr
 
 import config
+import historico
 from comparar_julio2026 import auc, quemadas
 
 CSV = config.salida("puntuacion_effis.csv")
@@ -113,6 +114,10 @@ def mapas(fecha):
         z = np.load(d)
         out["unico"] = z["prob_unico"].astype(float)
         out["pareja"] = z["prob_pareja"].astype(float)
+        # r10 solo existe en los mapas del 31/08/2026 en adelante; los días
+        # anteriores se quedan sin él y el juez los salta sin romperse.
+        if "prob_r10" in z.files:
+            out["r10"] = z["prob_r10"].astype(float)
     return out
 
 
@@ -178,10 +183,37 @@ def informe(df):
     if not len(d):
         print("  todavía no hay días puntuados")
         return
+
+    # --- foto del acumulado de hoy ------------------------------------------
+    # Antes de las salidas tempranas de abajo: el histórico tiene que anotarse
+    # AUNQUE todavía no haya 3 días con mapa de producción, que es justo la
+    # fase en la que interesa ver cómo se va formando el criterio.
+    rng0 = np.random.default_rng(0)
+    hay_prod = "auc_produccion" in d and d["auc_produccion"].notna().sum() >= 3
+    mods = {}
+    for nom in ("produccion", "malla", "unico", "r10", "pareja"):
+        if f"auc_{nom}" not in d or not d[f"auc_{nom}"].notna().sum():
+            continue
+        s_ = d.dropna(subset=[f"auc_{nom}"])
+        r = {"n_dias": int(len(s_)), "auc": float(s_[f"auc_{nom}"].mean()),
+             "pctl": float(s_[f"pctl_{nom}"].mean())}
+        if nom != "produccion" and hay_prod:
+            s2 = s_.dropna(subset=["auc_produccion"])
+            if len(s2) >= 3:
+                da = (s2[f"auc_{nom}"] - s2["auc_produccion"]).values
+                b = da[rng0.integers(0, len(da), (5000, len(da)))].mean(1)
+                r["dif_vs_prod"] = float(da.mean())
+                r["ic95"] = [float(np.percentile(b, 2.5)),
+                             float(np.percentile(b, 97.5))]
+                r["dias_gana"] = float((da > 0).mean())
+        mods[nom] = r
+    historico.anotar("effis", mods,
+                     n_positivos=int(d["celdas_quemadas"].sum())
+                     if "celdas_quemadas" in d else None)
     dp = d.dropna(subset=["pctl_produccion"]) if "pctl_produccion" in d else d.iloc[0:0]
     if len(dp) < 3:
         print("  sin días con mapa de producción: solo tabla de medias")
-        for nom in ("malla", "unico", "pareja"):
+        for nom in ("malla", "unico", "r10", "pareja"):
             if f"auc_{nom}" in d:
                 print(f"    {nom:8s} pctl {d[f'pctl_{nom}'].mean():5.1f} · "
                       f"AUC {d[f'auc_{nom}'].mean():.3f} · {d[f'auc_{nom}'].notna().sum()} días")
@@ -207,13 +239,13 @@ def informe(df):
     # cuadra con la diferencia emparejada de abajo (mediana de medianas puede
     # salir con el signo contrario y no es lo que se contrasta).
     print(f"{'mapa':<14}{'pctl medio/día':>16}{'AUC medio':>12}{'n días':>8}")
-    for nom in ("produccion", "malla", "unico", "pareja"):
+    for nom in ("produccion", "malla", "unico", "r10", "pareja"):
         if f"pctl_{nom}" in d:
             print(f"{nom:<14}{d[f'pctl_{nom}'].mean():>16.1f}"
                   f"{d[f'auc_{nom}'].mean():>12.3f}{d[f'pctl_{nom}'].notna().sum():>8}")
     # los candidatos EFFIS contra producción, solo en los días en que existen
     extra = {}
-    for nom in ("unico", "pareja"):
+    for nom in ("unico", "r10", "pareja"):
         if f"auc_{nom}" in d and d[f"auc_{nom}"].notna().sum() >= 3:
             s_ = d.dropna(subset=[f"auc_{nom}"])
             da = (s_[f"auc_{nom}"] - s_["auc_produccion"]).values

@@ -40,6 +40,7 @@ import xarray as xr
 from pyproj import Transformer
 
 import config
+import historico
 from comparar_julio2026 import auc
 
 RAG = "/home/charredgem/Desktop/Master/TFM-RAG"
@@ -152,6 +153,10 @@ def mapas(fecha):
     if d:
         z = np.load(d)
         out["unico"], out["pareja"] = z["prob_unico"].astype(float), z["prob_pareja"].astype(float)
+        # r10 solo existe en los mapas del 31/08/2026 en adelante; los días
+        # anteriores se quedan sin él y el juez los salta sin romperse.
+        if "prob_r10" in z.files:
+            out["r10"] = z["prob_r10"].astype(float)
     return out
 
 
@@ -225,7 +230,7 @@ def main():
     rng = np.random.default_rng(0)
     R = {"dias": int(len(nuevo)), "incidentes": int(nuevo.n_incidentes.sum())}
     print(f"\n== MITECO acumulado · {len(nuevo)} días · {int(nuevo.n_incidentes.sum())} incidentes ==")
-    for nom in ("produccion", "malla", "unico", "pareja"):
+    for nom in ("produccion", "malla", "unico", "r10", "pareja"):
         if f"auc10_{nom}" not in nuevo:
             continue
         s = nuevo.dropna(subset=[f"auc10_{nom}"])
@@ -245,6 +250,14 @@ def main():
               + (f" · Δprod {r['dif_vs_prod']:+.3f} [{r['ic95'][0]:+.3f}, {r['ic95'][1]:+.3f}]"
                  if "dif_vs_prod" in r else ""))
     json.dump(R, open(config.salida("veredicto_miteco.json"), "w"), indent=1, ensure_ascii=False)
+    # foto del acumulado de hoy, que el JSON de arriba se sobrescribe
+    historico.anotar("miteco",
+                     {n: {"n_dias": r["n_dias"], "auc": r["auc10"],
+                          "auc25": r["auc25"], "pctl": r["pctl10"],
+                          "dif_vs_prod": r.get("dif_vs_prod"),
+                          "ic95": r.get("ic95")}
+                      for n, r in R.items() if isinstance(r, dict)},
+                     n_positivos=R["incidentes"])
 
 
 if __name__ == "__main__":

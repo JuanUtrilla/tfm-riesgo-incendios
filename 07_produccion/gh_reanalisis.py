@@ -31,6 +31,25 @@ from malla_02_descarga import a_diario, abre, pide_mes
 ACUM = config.salida("era5land_diario.nc")
 
 
+def comprobar(f, fin):
+    """El acumulado tiene que llegar a D−6 SIN huecos, o parar en rojo.
+
+    Antes se comprobaba solo que el paso terminase. Si el CDS devuelve el mes
+    a medias, el script salía en verde y la cadena construía los mapas del día
+    sobre un reanálisis con hueco, en silencio: el fallo no se ve en el mapa,
+    se ve semanas después en el juez. Un reanálisis corto es peor que un paso
+    en rojo, porque el rojo se arregla y el hueco se publica. (31/08/2026,
+    tras quedarse el acumulado en el 15-ago por una incidencia de estado.)
+    """
+    falta = pd.date_range(f.min(), fin, freq="D").difference(f)
+    if len(falta):
+        raise SystemExit(
+            f"ERROR: el reanálisis no llega a D−6 ({fin.date()}) o tiene "
+            f"huecos: faltan {len(falta)} días, del {falta.min().date()} al "
+            f"{falta.max().date()}. Los mapas del día saldrían con un hueco y "
+            f"nadie lo notaría.")
+
+
 def main():
     hoy = pd.Timestamp.now("UTC").tz_localize(None).normalize()
     fin = hoy - pd.Timedelta(days=6)
@@ -41,7 +60,9 @@ def main():
     print(f"acumulado hasta {acum_fin.date() if acum_fin is not None else '—'} · "
           f"CDS pide {ini_mes:%Y-%m} días 1..{fin.day}", flush=True)
     if acum_fin is not None and acum_fin >= fin:
-        print("  nada que hacer: el acumulado ya llega a D−6"); return
+        print("  nada que hacer: el acumulado ya llega a D−6")
+        comprobar(pd.to_datetime(acum["fecha"].values), fin)
+        return
     ruta = pide_mes(ini_mes.year, ini_mes.month, dias)
     nuevo = a_diario(abre(ruta))
     dim = [d for d in nuevo.dims if d not in ("latitude", "longitude")][0]
@@ -57,6 +78,14 @@ def main():
     os.replace(ACUM + ".tmp", ACUM)
     f = pd.to_datetime(out["fecha"].values)
     print(f"  era5land_diario.nc: {f.min().date()} → {f.max().date()} ({len(f)} días)")
+    # Comprobar la COBERTURA, no solo que el paso terminó. Si el CDS devuelve
+    # el mes a medias, hasta ahora el script salía en verde y la cadena
+    # construía los mapas del día sobre un reanálisis con hueco, en silencio:
+    # el fallo no se ve en el mapa, se ve semanas después en el juez. Un
+    # reanálisis corto es peor que un paso en rojo, porque el rojo se arregla
+    # y el hueco se publica. (31/08/2026, tras quedarse el acumulado en el
+    # 15-ago por una incidencia de estado.)
+    comprobar(f, fin)
     # el horario del mes en curso no hace falta más
     import shutil
     shutil.rmtree(ruta + "_x", ignore_errors=True)
