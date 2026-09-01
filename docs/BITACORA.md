@@ -335,3 +335,58 @@ fuga seria, y los tres únicos rasgos concurrentes (`lst`, `ndvi`, `swi010`, del
 día D) pesan entre el 2,1 % y el 7,5 % del *gain* según el modelo, **la misma
 proporción en todos**, así que no sesgan ninguna comparación pero obligan a
 presentar los números del mismo día como cota superior.
+
+## 01/09/2026 — Archivar las entradas para poder juzgar modelos que aún no existen
+
+La cadena diaria guardaba sus **salidas** y tiraba sus **entradas**. Cada
+`.npz` de `salida/mapas_diarios/` contiene un único array —`prob`, 920×1188 en
+`float16`—: la probabilidad ya calculada por el modelo que se sirvió ese día.
+Con eso se puede repuntuar *ese* mapa cuando llega el perímetro de EFFIS, pero
+no se puede puntuar un modelo distinto, porque las 46 variables de ese día no
+están en ninguna parte.
+
+Y las entradas irrepetibles se perdían. `malla_02b_ifs.py` escribe la pasada del
+día en `salida/ifs_malla_<fecha>.parquet`, pero ese patrón no figuraba en la
+lista `DIARIO` de `gh_estado.py`, así que no subía al Release y moría con el
+runner de Actions. La API de previsión de Open-Meteo solo sirve la pasada
+vigente: el pronóstico emitido el 27 de agosto para el 27 de agosto no se puede
+volver a pedir. Lo mismo con el NRT de FIRMS, cuyo archivo está reprocesado.
+
+El mecanismo para aprovecharlas ya existía y estaba escrito hace semanas:
+`dos_riesgo_hoy.py --pasada <fecha>` sustituye la descarga por la lectura de
+`ifs_malla_<fecha>.parquet` (`dos_riesgo_hoy.py:91-93`) y reejecuta la cadena
+entera —`series_nodos`, `meteo_dia`, las 46 variables, el *scoring*— como si
+fuera ese día. Faltaba únicamente el fichero.
+
+**Lo hecho.** El paso de respaldo del workflow copia ahora también
+`ifs_malla_<fecha>.parquet` y `_firms/nrt_<fecha>.csv` al artefacto que ya
+existía, con 60 días de retención: unos 270 KB al día. Se hizo ahí y no en
+`DIARIO` para no tocar `gh_estado.py`, que va sellado por md5 en
+`PROCEDENCIA.md`. Y se pincharon las versiones de `requirements_gh.txt`, que no
+fijaba ninguna: archivar la entrada no sirve de nada si dentro de seis meses el
+mismo dato pasa por otro XGBoost y no se puede atribuir el cambio.
+
+**El hueco del 15 de agosto al 1 de septiembre.** Es recuperable, al contrario
+de lo que parecía: `historical-forecast-api.open-meteo.com` sirve las pasadas
+archivadas tal y como se emitieron, y es de donde salió `ifs_historico.parquet`
+del retro justo. Se descargó el rango 08-ago → 02-sep en los 5.605 nodos —26
+días, 145.730 filas, 477 KB, sin un solo 429— y vive fuera de los repositorios,
+en `archivo_ifs/`.
+
+**Qué vale y qué no.** La API histórica devuelve una serie continua por nodo, no
+la pasada de un día: los ficheros por fecha salen de cortar `[F-7, F+1]`, con
+las mismas columnas que espera `--pasada`. Para D y D+1 es previsión archivada
+de verdad; para el tramo pasado es «lo mejor disponible a poco plazo», que es
+también lo que devolvía `past_days=7` en la cadena viva. Es una reconstrucción
+fiel en lo que importa, no un byte a byte. El archivo exacto empieza el
+01/09/2026.
+
+**Y una distinción que conviene no perder.** Un modelo puntuado a posteriori
+sobre entradas archivadas no vale lo mismo que uno sellado antes del día: con
+la temporada guardada se pueden probar veinte variantes hasta que una gane, y
+el intervalo de confianza de la ganadora deja de significar lo que dice. El
+archivo es un banco de pruebas y una herramienta de auditoría —sin las cachés
+de junio y julio la fuga de FIRMS no se habría podido demostrar—; el veredicto
+lo siguen firmando los tres jueces en vivo sobre candidatos comprometidos de
+antemano, que es por lo que `donde_dia_effis_r10` se puso a servir el 31/08 en
+lugar de limitarse a medirlo en retro.

@@ -115,3 +115,84 @@ cuando la temporada cierre y la cadena pueda mudarse aquí.
 4. **Septiembre**: qué se hace con la cadena diaria al cerrar la temporada, y
    si entonces se aplica el arreglo del viento (`np.minimum` → `np.fmin`) que
    está sellado a propósito — ver [`LIMITACIONES.md`](LIMITACIONES.md) §1.
+
+---
+
+# Actualización del 01/09/2026 — el archivo de entradas
+
+## Lo que se cerró hoy
+
+- **`dos_20`…`dos_24` entran al repositorio** (`06_comparacion` los cuatro de
+  evaluación, `05_iteracion2/57_ablaciones` la auditoría de fugas), copia
+  literal con md5. Cierra el pendiente que tenía `TRAZABILIDAD.md` y la marca
+  roja de `seccion_modelo.tex`. La memoria ya no cita ninguna cifra cuyo código
+  se quede fuera.
+- **La sección de modelado gana el análisis exploratorio y la ingeniería de
+  variables** (§1.2 y §1.3, 7 páginas) con dos figuras nuevas generadas por
+  código, `f7_prevalencia` y `f8_normalizacion`.
+- **La cadena archiva sus entradas irrepetibles**: el artefacto diario se lleva
+  ahora `ifs_malla_<fecha>.parquet` y el NRT de FIRMS, ~270 KB/día.
+- **`requirements_gh.txt` pinchado** en `TFM_fuego_malla` con las versiones de
+  la corrida que produjo los veredictos publicados.
+- **Hueco 08-ago → 02-sep recuperado** de la API histórica de Open-Meteo, en
+  `archivo_ifs/`, fuera de los repositorios.
+
+## Lo que queda, por orden de lo que más cambia la impresión
+
+### 1. El replay nunca se ha ejecutado de punta a punta
+
+`dos_riesgo_hoy.py --pasada <fecha>` está escrito y el archivo ya existe, pero
+**no se ha corrido ni una sola vez con estos ficheros**. Hasta que no se haga,
+que el archivo «sirve para evaluar otros modelos» es una expectativa razonada,
+no un hecho comprobado. Falta cortar la serie continua en ficheros por pasada
+—`[F-7, F+1]`, mismas columnas—, colocarlos donde `ruta_cache` los busca y
+reproducir un día del que ya se conozca el mapa servido, comparándolo con el
+`.npz` guardado. Si el mapa reproducido no se parece al servido, el archivo no
+vale para lo que se pretende y hay que saberlo ahora.
+
+**Coste:** una tarde. **Bloquea:** todo lo demás de esta lista.
+
+### 2. El archivo vive en un artefacto de 60 días, no en un sitio permanente
+
+El respaldo diario caduca. Para que la temporada 2026 siga siendo replayable
+dentro de un año hay que llevar `ifs_malla_*.parquet` y `_firms/` a la lista
+`DIARIO` de `gh_estado.py`, que los subiría al Release. Tiene un coste
+explícito: `gh_estado.py` está sellado por md5 en `PROCEDENCIA.md` y habría que
+reindexarlo. La alternativa es bajar el artefacto a mano cada pocas semanas,
+que funciona hasta que alguien se olvida.
+
+**Decisión pendiente**, no tarea.
+
+### 3. Se puede archivar la temporada entera, y probablemente convenga
+
+Hoy el archivo cubre 08-ago → 02-sep. La API histórica permite bajar hacia
+atrás sin más límite que la cuota: 5.605 nodos × 1 unidad por tramo de 14 días,
+contra 10.000 al día. La temporada completa desde el 25 de mayo (D-7 del 1 de
+junio) son ocho tramos, unas 45.000 unidades: **cuatro o cinco noches** con el
+descargador reanudable, que cede el turno a la cadena viva. En disco no llega a
+3 MB. Es el complemento natural de `mapas_2026` del USB, que tiene 74 días de
+mapas ya puntuados de junio y julio pero ninguna de sus entradas.
+
+Con eso, cualquier modelo futuro podría medirse sobre la temporada completa en
+condiciones de servicio, y no solo sobre las tres últimas semanas.
+
+### 4. Los modelos evaluados en sombra necesitan su propia tabla
+
+`historico_veredictos.csv` y `veredicto_estaciones.csv` solo admiten días con
+mapa operativo, por la regla de no contaminar el juez con retro. Un modelo
+reevaluado sobre el archivo **no puede escribir ahí**. Hace falta un fichero
+aparte y que la memoria diga con claridad cuál es cuál: el archivo explora, la
+cadena en vivo decide.
+
+### 5. Correcciones menores ya identificadas
+
+- `TRAZABILIDAD.md` habla de «cuatro días de mapa perdidos, 28-31/08». En el
+  Release el salto va del **26-ago al 1-sep**: son **cinco**, el 27 también.
+- Sigue abierto reejecutar `dos_18_ratio` sobre 2026 (el JSON es del 23/08,
+  anterior a la corrección de la fuga).
+- El punto 1 de esta lista —`environment.yml` en este repositorio— sigue
+  abierto. Lo pinchado hoy es el entorno de la cadena en `TFM_fuego_malla`, que
+  es otro fichero y otro repositorio.
+- El cron de las 03:13 lleva días saliendo con 5-6 h de retraso; el 01/09 se
+  lanzó la corrida a mano y luego entró la programada, duplicando la cadena
+  entera (~75 min de cuota y dos pasadas de Open-Meteo el mismo día).
