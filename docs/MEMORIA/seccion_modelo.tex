@@ -285,10 +285,9 @@ una. Además de la regla de ventanas estrictas, se auditó cada variable compara
 su desplazamiento en la celda que arde el día $D$ contra un anillo de control.
 Tres de las 46 ---NDVI, temperatura de superficie y humedad
 superficial--- resultaron concurrentes: el satélite ya ve la firma del incendio el
-mismo día. \marca{[PENDIENTE: esta auditoría y el panel derecho de la
-figura~\ref{fig:f6} salen de \var{dos\_24} y \var{dos\_23}, que hoy viven en
-\var{TFM\_fuego\_malla} y no en el repositorio definitivo; decidir si entran o
-retirar las dos afirmaciones.]}
+mismo día. La prueba está automatizada en
+\var{dos\_24\_auditoria\_fugas.py} y acompaña a esta memoria en el repositorio,
+igual que la comprobación de desfase de \var{dos\_23\_vispera.py}.
 Pesan el 4,6\,\% de la importancia del modelo único y no sesgan la
 comparación, porque ambas iteraciones comparten receta, pero inflan los valores
 absolutos de toda evaluación del mismo día. Se detectó además que la interfaz de

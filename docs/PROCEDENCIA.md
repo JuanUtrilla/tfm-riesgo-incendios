@@ -257,15 +257,16 @@ en `TFM_fuego`.
 |---|---|---|
 | `dos_14_cortes.py` | TFM_fuego_malla | `015bf04c` |
 
-### `05_iteracion2/57_ablaciones` — 3 ficheros
+### `05_iteracion2/57_ablaciones` — 4 ficheros
 
 | Fichero | Origen | md5 |
 |---|---|---|
 | `dos_08_verano.py` | TFM_fuego_malla | `49ee55c8` |
 | `dos_17_capa_quemado.py` | TFM_fuego_malla | `24f36389` |
 | `dos_18_ratio.py` | TFM_fuego_malla | `efa65daa` |
+| `dos_24_auditoria_fugas.py` | TFM_fuego_malla | `a7b165fa` |
 
-### `06_comparacion` — 7 ficheros
+### `06_comparacion` — 11 ficheros
 
 | Fichero | Origen | md5 |
 |---|---|---|
@@ -276,6 +277,10 @@ en `TFM_fuego`.
 | `dos_09_temporada2026.py` | TFM_fuego_malla | `845e98ec` |
 | `dos_11_miteco.py` | TFM_fuego_malla | `ea381a5d` |
 | `dos_19_veredicto.py` | TFM_fuego_malla | `4de2f9cb` |
+| `dos_20_aciertos.py` | TFM_fuego_malla | `b44b6946` |
+| `dos_21_hectareas.py` | TFM_fuego_malla | `caef566d` |
+| `dos_22_ventana.py` | TFM_fuego_malla | `31b5d7c0` |
+| `dos_23_vispera.py` | TFM_fuego_malla | `1dd0e6be` |
 
 ### `07_produccion` — 13 ficheros
 
@@ -294,6 +299,31 @@ en `TFM_fuego`.
 | `puntuar_effis.py` | TFM_fuego_malla | `2d17322d` |
 | `redibujar.py` | TFM_fuego_malla | `29bddbe7` |
 | `riesgo_hoy.py` | TFM_fuego_malla | `5cc7b58c` |
+
+## Actualización del 01/09/2026 — entran `dos_20`…`dos_24`
+
+Faltaban los cinco. La memoria ya citaba dos de sus salidas —el 4,6 % de
+importancia concurrente de `dos_24_auditoria_fugas.json` y la curva de desfase
+de `dos_23_vispera.json`— sin que el código que las produce viajara con el
+repositorio, que es exactamente lo que este documento existe para impedir.
+
+  · `dos_20_aciertos.py`, `dos_21_hectareas.py`, `dos_22_ventana.py`,
+    `dos_23_vispera.py` → `06_comparacion`, junto a `dos_09`, `dos_11` y
+    `dos_19`, que es donde vive la evaluación de la temporada 2026.
+  · `dos_24_auditoria_fugas.py` → `05_iteracion2/57_ablaciones`, con `dos_17`
+    y `dos_18`.
+
+No son ejecutables con `muestras/`: necesitan el cubo IberFire y el disco de
+expansión, igual que los diez scripts de `05_iteracion2` que ya estaban aquí.
+Se incluyen por trazabilidad número→script, no como demostración.
+
+Dos dependencias que ahora quedan cerradas dentro del repositorio:
+`dos_23_vispera.py` importa `CLASES` y `verdad_por_dia` de `dos_21_hectareas.py`,
+y `dos_24_auditoria_fugas.py` importa `FULL` de `dos_05_modelos.py`, que ya
+estaba en `05_iteracion2/55_train`.
+
+Siguen siendo copias literales: los md5 de las cinco copias coinciden con los
+de los originales en `TFM_fuego_malla`.
 
 ## Actualización del 31/08/2026 — corrección de una fuga
 

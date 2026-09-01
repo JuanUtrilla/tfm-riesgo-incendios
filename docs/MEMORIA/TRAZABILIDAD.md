@@ -53,7 +53,7 @@ sección da por zanjada por su cuenta; todas las demás quedan marcadas abajo.
 | Split train 2015-2022 / val 2023 / test 2024; 2026 externo | `dos_12_muestrear_effis.py:49` |
 | Banco `eval_dia`: 1.000 celdas al azar por día + hasta 60 EFFIS | `dos_12_muestrear_effis.py:51,120-134` |
 | El modelo único usa las mismas 46 variables (`FULL`) | `dos_05_modelos.py:76`; `05_iteracion2/55_train/dos_13_modelos_effis.py:83-85` |
-| Tres variables concurrentes (NDVI, LST, humedad superficial), 4,6 % del gain | `M/salida/dos_24_auditoria_fugas.json` (`modelos[0].pct_gain_concurrente` = 4,62; detalle «lst 1,9 %; ndvi 1,6 %; swi010 1,2 %») |
+| Tres variables concurrentes (NDVI, LST, humedad superficial), 4,6 % del gain | `05_iteracion2/57_ablaciones/dos_24_auditoria_fugas.py` → `M/salida/dos_24_auditoria_fugas.json` (`modelos[0].pct_gain_concurrente` = 4,62; detalle «lst 1,9 %; ndvi 1,6 %; swi010 1,2 %») |
 | Al servir, esas capas se sustituyen por climatología mensual 2020-24 | `07_produccion/riesgo_hoy.py:187` (`mensual()`) |
 | Fuga de FIRMS: la API cuenta 5 días hacia adelante; corregida el 31/08/2026 | `06_comparacion/comparar_rankings.py:74,77-102` (`VENTANA_FIRMS` y docstring de `firms_dia`); `docs/BITACORA.md:293-312` |
 | Producción y entrenamiento estaban limpios | `extraer_features_historia.py:117`; `07_produccion/riesgo_hoy.py` (llama sin fecha) |
@@ -77,7 +77,7 @@ sección da por zanjada por su cuenta; todas las demás quedan marcadas abajo.
 | FIRMS aporta +0,036 | `M/salida/dos_09_ventana7.log:463,467`: prod 0,647 frente a `prod_sin_firms` 0,611 |
 | Gain del único: 29,2 % `n_fuegos_10km_mismomes_hist`, 14,3 % CLC, 5,8 % pendiente | `figs/f6_gain.json`, calculado por `figs/scripts/f6_donde_mira.py` desde `muestras/modelos/donde_dia_effis.ubj` |
 | Gain de producción: 20,5 % `fwi_anom_sigma` | ídem, desde `muestras/modelos/xgb_v2_prototipo.ubj` |
-| Curva de desfase del top-2 % | `M/salida/dos_23_vispera.json`, filas con `k = 0.02` |
+| Curva de desfase del top-2 % | `06_comparacion/dos_23_vispera.py` → `M/salida/dos_23_vispera.json`, filas con `k = 0.02` |
 
 ## Limitaciones
 
@@ -103,11 +103,14 @@ dato.
   cuatro autorregresivas intra-celda; lo que no consta es con qué partición y con
   qué etiqueta se entrenó. El texto evita afirmarlo. Si el tribunal pregunta por
   el entrenamiento del grupo de control, hace falta esa respuesta.
-- **[PENDIENTE: `dos_20`…`dos_24` no están en el repositorio definitivo]** — La
-  figura F6b y la cifra del 4,6 % de gain concurrente salen de
-  `M/salida/dos_23_vispera.json` y `dos_24_auditoria_fugas.json`, cuyos scripts
-  viven en `TFM_fuego_malla` y no en `tfm-riesgo-incendios`. O entran en el repo
-  definitivo, o esas dos afirmaciones deberían retirarse de la memoria.
+- **[RESUELTO el 01/09/2026: `dos_20`…`dos_24` ya están en el repositorio]** —
+  La figura F6b y la cifra del 4,6 % de gain concurrente salen de
+  `dos_23_vispera.json` y `dos_24_auditoria_fugas.json`. Los cinco scripts se
+  copiaron con sus md5 a `06_comparacion` (`dos_20`, `dos_21`, `dos_22`,
+  `dos_23`) y a `05_iteracion2/57_ablaciones` (`dos_24`); ver la actualización
+  del 01/09/2026 en `docs/PROCEDENCIA.md`. Como los diez scripts de la
+  iteración 2 que ya estaban, necesitan el cubo y el disco de expansión: entran
+  por trazabilidad, no como demostración ejecutable.
 - **[PENDIENTE: reejecutar `dos_18_ratio` sobre 2026]** — ver la nota de la tabla
   de evaluación. Hoy la escalera del ratio en 2026 solo existe como líneas de log.
 - **[PENDIENTE: racional del tope de 30 positivos y del radio de 50 km]** — los
@@ -154,7 +157,7 @@ Okabe-Ito. Desde `docs/MEMORIA/figs/scripts/`:
 | F3 `f3_separacion.png` | `02_eda/figuras/eda_resumen.log` | dentro del repo definitivo |
 | F4 `f4_metrica_ciega.png` | `M/salida/dos_05_metricas.json` | |
 | F5 `f5_temporada2026.png` | `M/salida/dos_09_temporada2026.csv` + `dos_19_veredicto.json` | La banda se recalcula con la misma receta que `dos_19` (bootstrap de días, N=2000, semilla 42); la anotación del último día se lee del JSON sellado para que texto y figura no se separen por el sorteo del bootstrap (recálculo local: +0,1117 [+0,0746, +0,1538] frente a +0,1117 [+0,0745, +0,1509] guardado) |
-| F6 `f6_donde_mira.png` | `muestras/modelos/*.ubj` + `M/salida/dos_23_vispera.json`; escribe `figs/f6_gain.json` | ver la marca [PENDIENTE] sobre `dos_23` |
+| F6 `f6_donde_mira.png` | `muestras/modelos/*.ubj` + `M/salida/dos_23_vispera.json`; escribe `figs/f6_gain.json` | el script que produce ese JSON es `06_comparacion/dos_23_vispera.py`, en el repositorio desde el 01/09/2026 |
 
 Los scripts leen `TFM_fuego_malla` a través de la variable de entorno
 `TFM_MALLA` (por defecto, la carpeta hermana del repositorio). Si esos artefactos
