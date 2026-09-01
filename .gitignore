@@ -55,3 +55,13 @@ datos/
 
 # excepción: las figuras del EDA son parte del capítulo, no una salida
 !02_eda/figuras/*.png
+
+# --- LaTeX: artefactos de compilación ---------------------------------------
+# El .tex y el .pdf de la memoria SÍ entran (son el entregable); lo que genera
+# pdflatex en cada pasada, no. El .log ya lo cubre la regla de arriba.
+*.aux
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz

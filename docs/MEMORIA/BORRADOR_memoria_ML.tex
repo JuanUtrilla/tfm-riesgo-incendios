@@ -1,0 +1,373 @@
+% Memoria - bloque de Machine Learning. VERSION AJUSTADA A 7 PAGINAS.
+% Compilar: pdflatex BORRADOR_memoria_ML.tex  (dos pasadas)
+% El borrador de trabajo completo, con el material del que sale este recorte,
+% esta en BORRADOR_memoria_ML.md
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\refname}{Referencias}
+\usepackage{lmodern}
+\usepackage[margin=2.1cm,top=1.8cm,bottom=1.8cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{capt-of}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figuras/}{../../02_eda/figuras/}}
+\captionsetup{font=footnotesize,labelfont=bf,skip=3pt}
+\setlist{nosep,leftmargin=1.2em}
+\renewcommand{\arraystretch}{1.06}
+\setlength{\parskip}{0.25em}
+\setlength{\emergencystretch}{3em}
+\sloppy
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\var}[1]{\texttt{\footnotesize #1}}
+
+% Marcas de borrador. Version final: \renewcommand{\pdte}[1]{} y \renewcommand{\fig}[2]{}
+\newcommand{\pdte}[1]{{\color{red}\footnotesize\textbf{[PDTE]} #1}}
+\newcommand{\fig}[2]{{\color{blue}\footnotesize$\blacktriangleright$ \textbf{#1} --- #2\par}}
+
+\title{\vspace{-1.4cm}\large\bfseries Modelado predictivo del riesgo diario de incendio\\[-0.2em]
+\normalsize\mdseries Bloque de aprendizaje automatico}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-1.8cm}
+
+\section{Datos}
+
+Nueve fuentes heterogeneas convertidas en una fila de 46 variables por celda y dia. Lo que cambia
+entre las dos iteraciones del trabajo no son los datos: es que se toma como positivo, que como
+negativo y que como verdad.
+
+\begin{center}\footnotesize
+\begin{tabular}{@{}L{2.2cm}L{4.6cm}L{9.4cm}@{}}
+\toprule
+\textbf{Fuente} & \textbf{Que aporta} & \textbf{Detalle} \\
+\midrule
+\textbf{IberFire} (cubo) & 45 de las 46 variables & NetCDF de 30,3\,GB, 261 variables, EPSG:3035, 1.188$\times$920 celdas de 1\,km (\textbf{498.530} peninsulares), 2007--2024. Tekniker/UPV-EHU, arXiv:2505.00837, CC-BY 4.0 \\
+\textbf{EGIF} (Civio) & Etiqueta de la iteracion 1 & \textbf{19.561} igniciones 2015--2020 con coordenadas, punto y no perimetro. \emph{Incompleto desde 2021} (888/226/23 registros): fija la ventana temporal \\
+\textbf{EFFIS} & Etiqueta de la iteracion 2 y juez & Celda quemada $\geq$5\,ha, diaria. Ciego a lo pequeno; situa el fuego en el perimetro \\
+\textbf{ERA5-Land} & La meteorologia al servir & $\sim$9\,km sobre 5.605 nodos, mas prevision IFS para D y D$+$1. Al entrenar entra via cubo \\
+\textbf{FIRMS} (VIIRS) & 2 variables de entorno & $\sim$256.000 detecciones 2015--24, ventana [D$-$7, D$-$1] y radio 50\,km. Nunca el dia D: seria circular \\
+\midrule
+WGLC, AEMET, MITECO, extra & Rayos, meteo del prototipo, juez D$+$1, carreteras y ganaderia & \\
+\bottomrule
+\end{tabular}
+\captionof{table}{Las fuentes y su papel. Fichas completas en \var{docs/FUENTES\_DATOS\_DETALLE.md}.}
+\end{center}
+
+Dentro del cubo, la meteorologia es ERA5-Land remuestreado a 1\,km por vecino mas proximo; la
+vegetacion, Copernicus CLMS; el terreno, EU-DEM; el uso del suelo, CORINE. \textbf{Dos avisos
+condicionan todo lo demas:} el FWI del cubo son \textbf{las 13 UTC} (servirlo a otra hora introduce
+un factor $\sim$2), y \textbf{ERA5-Land llueve de mas} ---$+$8,00\,mm en 30 dias frente a AEMET---,
+de donde se propaga un FWI diez puntos mas bajo. Por eso entrenar y servir con la misma fuente
+importa tanto.
+
+\section{Analisis exploratorio}
+
+Cada resultado de este capitulo justifica una decision posterior, y uno de ellos anticipa el
+problema entero del trabajo.
+
+\textbf{Las dos etiquetas no son la misma cosa.} Solo el 2,6\,\% de los incendios EGIF de
+5--25\,ha tienen \var{is\_fire}$=$1 ese dia en su celda; el 34\,\% de los de 100--500\,ha y el
+59\,\% de los de $>$500\,ha. Y su estacionalidad difiere: en EGIF \textbf{el 38\,\% del ano va de
+febrero a abril}, mientras EFFIS se concentra en julio y agosto $\to$ \emph{justifica no entrenar
+solo con verano}. La causa es humana en el \textbf{97\,\%} (intencionado 68\,\%, negligencia
+12\,\%, rayo 2,4\,\%): la cota superior honesta de cualquier modelo meteorologico.
+
+\textbf{La prevalencia real es el numero que lo cambia todo.} Celdas-dia con fuego por 100.000
+sobre las 498.530 celdas: 0,40 en 2018, 3,08 en 2020, \textbf{14,16 en 2022}, 1,82 en 2024 ---es
+decir, \textbf{2--6 por 100.000 en un verano normal frente al 25\,\% de positivos que el conjunto
+de la iteracion 1 tiene por construccion: cinco ordenes de magnitud}. Medido en el capitulo 2 y no
+en el 5: el analisis exploratorio ya contenia el diagnostico que costo un ciclo entero entender.
+El fuego ademas se concentra: solo el 2,97\,\% de las celdas tuvo alguna ignicion en 2015--20.
+
+\textbf{La etiqueta persiste y la senal esta autocorrelada.} $P(\text{fuego en }t{+}1\mid
+\text{fuego en }t)=0{,}51$; a los 7 dias 0,04. \var{is\_fire} marca dias ardiendo, no igniciones
+$\to$ la evaluacion usa \var{primer\_dia}. Moran's I del EFFIS por celda es \textbf{0,81} a 1\,km
+(perimetros contiguos del mismo fuego), y \textbf{partir al azar en vez de por bloques de 100\,km
+infla el AUC en $+$0,036} $\to$ ninguna particion del trabajo es aleatoria.
+
+\textbf{Un mapa estatico ya llega lejos.} Un XGBoost por celda, sin mirar el dia, alcanza AUC
+\textbf{0,82--0,84} y su decil superior concentra el \textbf{54--60\,\%} de las igniciones del ano.
+Cualquier modelo que no contenga esa informacion parte perdiendo.
+
+\textbf{Y las estaticas no separan nada.} En el \emph{train} de la iteracion 1, la mediana de
+\var{popdens} es \textbf{9,67 en positivos y 9,67 en negativos}; la de \var{dist\_carreteras}, 0,63
+y 0,63. No es un defecto de los datos: es aritmetica del diseno. Con pseudo-ausencias tomadas de la
+misma celda, las variables de la celda son identicas a los dos lados y \emph{no pueden}
+discriminar. Lo que si separa es el peligro relativo: \var{fwi\_pctl\_local} 84,33 frente a 47,00.
+
+\fig{Figuras 2.1--2.4}{ciclo anual; distribuciones por clase; correlaciones; normalizacion local.
+Ya generadas en \var{02\_eda/figuras/}.}
+
+\section{Variables e ingenieria}
+
+Las 46 variables se reparten en meteorologia y peligro (21), vegetacion (4), estaticas de la celda
+(12), historial de fuego (5), fuego activo y rayos (4) y calendario (4).
+
+\textbf{Las ventanas moviles son 7, 15 y 30 dias}, y \textbf{todas son [D$-$w, D$-$1], excluyendo
+el dia D}: regla anti-fuga sin excepcion. A 7 dias, \var{precip\_7d}, \var{fwi\_med\_7d},
+\var{fwi\_max\_7d} y las medias de \var{rh\_min}, \var{t2m\_max} y \var{viento\_max}; a 15,
+\var{precip\_15d} y \var{fwi\_med\_15d}; a 30, \var{precip\_30d}, \var{fwi\_med\_30d} y
+\var{ndvi\_med\_30d}. El combustible tiene memoria, y las ventanas son las que la capturan. Se
+derivan ademas \var{vpd\_max} (Magnus, sobre \var{t2m\_max} y \var{rh\_min}) y
+\var{dias\_sin\_lluvia} (racha con precipitacion $<$1\,mm, tope 120).
+
+\textbf{La normalizacion local del peligro es la aportacion propia.} Un FWI de 15 es ``moderado''
+en la escala EFFIS, pero en Galicia (mediano 3--14) es un dia excepcionalmente seco y en el
+Mediterraneo (38--41) uno normal de mayo: el umbral fijo \textbf{penaliza a las zonas humedas},
+que son justo donde mas arde. Con una climatologia del FWI por (celda, mes) calculada
+\textbf{solo con 2008--2014} ---anterior al conjunto, sin fuga--- se derivan
+\var{fwi\_pctl\_local} y \var{fwi\_anom\_sigma}. Las comunidades atlanticas arden con FWI absoluto
+3--14 y las mediterraneas con 38--41, pero \textbf{el percentil local converge a 73--92 en todas}.
+
+\begin{center}\footnotesize
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+\textbf{Modelo (test 2020, prevalencia 26,28\,\%)} & \textbf{AUC-PR} & \textbf{AUC-ROC} & \textbf{n} \\
+\midrule
+A --- FWI absoluto como \emph{score}, sin ML & 0,488 & 0,729 & 1 \\
+B --- XGBoost solo-FWI & 0,491 & 0,736 & 1 \\
+C --- XGBoost meteo $+$ FWI (con ventanas) & 0,716 & 0,882 & 21 \\
+\textbf{D --- XGBoost completo} & \textbf{0,843} & \textbf{0,931} & 50 \\
+\bottomrule
+\end{tabular}
+\captionof{table}{Escalera de lineas base: cada peldano de complejidad, justificado con su medida.}
+\end{center}
+
+\textbf{El salto grande no es del FWI al aprendizaje automatico} (B apenas mejora sobre A): es de
+meteorologia puntual a meteorologia con ventanas ($+$0,23), y de ahi a incorporar historial,
+estaticas y calendario ($+$0,13). Tres ablaciones que conviene reportar por honestidad: el
+calendario solo (mes, dia del ano, festivo, comunidad) ya da 0,476 ---\emph{parte del rendimiento
+es ``cuando y donde'', no fisica de combustible}---; calendario mas FWI local alcanza el 89\,\% del
+AUC-PR completo con seis columnas; y combinar FWI absoluto y local (0,710) rinde \textbf{$+$0,042}
+sobre el absoluto solo (0,668), luego la normalizacion local es complementaria y no sustitutiva.
+
+En SHAP domina \var{n\_fuegos\_10km\_mismomes\_hist} (0,612), y entre las meteorologicas puras
+\textbf{\var{fwi\_anom\_sigma} (0,516) supera al FWI absoluto (0,278)}: el modelo prioriza la
+normalizacion local. \textbf{Cuatro variables autorregresivas se eliminan de produccion} porque con
+pseudo-ausencias de celda fija el incendio del positivo entra en el historial de los negativos
+posteriores de esa celda, y el modelo podria aprender orden temporal en vez de fisica. Coste
+medido y aceptado: AUC-PR 0,843 $\to$ 0,828.
+
+\section{Entrenamiento}
+
+Clasificacion binaria supervisada sobre la unidad muestral \textbf{(celda de 1\,km $\times$ dia)}:
+probabilidad de que ese dia se \emph{inicie} un incendio en esa celda. Se predice la ignicion, no
+la propagacion ni la severidad. Positivos: EGIF 2015--2020. \textbf{Pseudo-ausencias 1:3} ---no
+existe un registro de ``dias sin incendio'', hay que construirlos--- dentro del rango 1:1--1:10 de
+la literatura (Barbet-Massin \emph{et al.}, 2012), tomando \textbf{la misma celda} en otras fechas.
+Split temporal congelado antes de extraer ninguna variable: train 2015--2018 / val 2019 /
+test 2020.
+
+\textbf{Algoritmo:} XGBoost, elegido por datos tabulares, variables heterogeneas, interacciones no
+lineales y robustez a la falta de escalado. \textbf{Preprocesado que no se hace, y por que:} sin
+escalado, winsorizacion, imputacion ni SMOTE, y \textbf{sin \var{scale\_pos\_weight}} ---la salida
+se quiere como probabilidad, asi que se conserva la prevalencia de diseno y se corrige con
+calibracion isotonica ajustada en validacion (van den Goorbergh \emph{et al.}, 2022).
+
+\begin{center}\footnotesize
+\begin{tabular}{@{}lrL{4.0cm}rr@{}}
+\toprule
+\textbf{Hiperparametro} & \textbf{Base} & \textbf{Procedencia} & \textbf{Espacio Optuna} & \textbf{Optimo} \\
+\midrule
+\var{learning\_rate}    & 0,05 & Valor conservador     & [0,01--0,15] log & 0,0170 \\
+\var{max\_depth}        & 6    & Por defecto           & [4--10]          & 10 \\
+\var{min\_child\_weight}& 5    & Sobre el defecto (1)  & [1--30]          & 3 \\
+\var{subsample}         & 0,9  & Rango habitual        & [0,6--1,0]       & 0,892 \\
+\var{colsample\_bytree} & 0,8  & Rango habitual        & [0,5--1,0]       & 0,503 \\
+\var{reg\_lambda}       & 1,0  & Por defecto           & [0,1--20] log    & 0,716 \\
+\var{gamma}             & ---  & ---                   & [0--5]           & 0,0106 \\
+\var{n\_estimators}     & 3000 & Tope; lo decide el \emph{early stopping} (paciencia 100) & & \\
+\bottomrule
+\end{tabular}
+\captionof{table}{Hiperparametros: procedencia de cada valor y busqueda bayesiana.}
+\end{center}
+
+\textbf{El numero de arboles no se elige a mano}: sale del \emph{early stopping} sobre el AUC-PR de
+validacion (v1 489, v2 de produccion 240, v3 590, v4 732).
+\pdte{el \var{.ubj} de v4 contiene 832 arboles frente a los 732 de su metadata: verificar cual se
+sirve.}
+
+\textbf{La busqueda propia y su resultado, que es la parte interesante.} Optuna con muestreador
+TPE, \textbf{40 \emph{trials}}, objetivo AUC-PR sobre la validacion de 2019 y el test de 2020
+intacto. El mejor \emph{trial} da \textbf{0,8666} frente a \textbf{0,8647} de la configuracion
+base: una ganancia de \textbf{$+$0,0019}. El presupuesto fue corto a proposito, bajo la hipotesis
+previa de que \emph{el retorno esta en las variables y no en el ajuste}; el experimento la confirma.
+\textbf{En este problema el tuning es irrelevante frente al diseno del conjunto de entrenamiento},
+que es justamente la tesis de los dos capitulos siguientes.
+
+Se arrastran las dos configuraciones y se elige en validacion. La ajustada gana $+$0,0014 de AUC-PR
+\ldots{} y \textbf{multiplica por $\sim$13 el tamano del modelo (11\,MB frente a 840\,KB)} al pasar
+\var{max\_depth} de 6 a 10. Como el fichero viaja en el repositorio que ejecuta la cadena diaria en
+GitHub Actions, se produce tambien una variante ligera con los parametros base: una milesima de
+AUC-PR no compensa trece veces el peso. La seleccion de hiperparametros, del numero de arboles y
+del umbral de alerta se hace \textbf{siempre en validacion}; el test se toca una vez. Se anade una
+\textbf{validacion cruzada espacial} (\var{GroupKFold} por bloque de 100\,km) para medir
+generalizacion a zonas no vistas.
+
+\section{Evaluacion del primer modelo, y el diagnostico}
+
+\textbf{En test, las metricas son buenas:} AUC-ROC \textbf{0,931} y AUC-PR 0,843 (v1/v2, test 2020);
+0,891 [0,864, 0,914] en la version v4 sobre test 2022. Un control con las etiquetas barajadas al
+azar da AUC-PR 0,231 $\approx$ prevalencia base, lo que descarta fuga de informacion.
+\textbf{Advertencia obligatoria:} ese AUC-PR \emph{no es comparable con la literatura}, porque
+corresponde a una prevalencia de diseno del 26,28\,\% frente a una prevalencia real del orden de
+$10^{-5}$ (\S2). Solo el AUC-ROC admite comparacion aproximada.
+
+\textbf{En operacion, el mismo modelo rinde 0,56--0,64.} La distancia entre 0,89 y 0,64 es el
+verdadero objeto de este trabajo. Se persiguieron \textbf{tres explicaciones, en este orden, y las
+dos primeras se descartaron con numeros} ---esa es la razon de que la tercera sea creible.
+
+\textbf{(a) ?`Esta mal medido?} No. Cinco \emph{scores} compitieron contra tres verdades-terreno
+independientes (focos FIRMS, perimetros EFFIS y partes del MITECO) sobre 20 dias sellados, y
+ninguna diferencia resulto significativa. De paso corrigio un error propio: la linea base dura no
+es el FWI crudo sino \textbf{el percentil local}, y al acumular dias subio de 0,540 a \textbf{0,702}
+mientras el modelo apenas se movia. La conclusion anterior ---``el modelo bate al FWI'', con dos o
+tres dias de muestra--- era un artefacto del tamano muestral.
+
+\textbf{(b) ?`Es la meteorologia?} No, o no basta. Es la hipotesis mas plausible y hubo que
+agotarla: 24 \emph{scripts} midiendo el desplazamiento de fuente entre ERA5-Land y AEMET variable a
+variable. Salieron dos cosas firmes ---la precipitacion no coincide ($+$8,00\,mm/30 dias) y la
+climatologia del percentil cruzaba fuentes, saturando la variable (12,6\,\% de las filas en
+percentil $\geq$99,9 en produccion frente al 1,0\,\% en entrenamiento)--- pero ninguna explica el
+hueco.
+
+\textbf{(c) ?`Es el desajuste train/serve?} Tampoco. La ablacion de los \emph{proxis} que usa
+produccion ---satelite sustituido por climatologia mensual, rayos servidos a cero--- cuesta
+\textbf{$-$0,0045} de AUC en test. De regalo: las cinco variables satelitales no aportan nada ni
+siendo reales.
+
+\textbf{(d) Es la especificacion.} Dos medidas, y con ellas el trabajo cambia de direccion:
+\begin{itemize}
+\item El \textbf{98,8\,\%} de las celdas del conjunto tenia exactamente un 25\,\% de positivos. El
+modelo no podia aprender que celda es mas peligrosa que otra: \textbf{solo que dia lo es}.
+\item El \textbf{AUC caso-control de los dos disenos es identico (0,92)}, y el \textbf{AUC dentro
+del dia los separa (0,744 frente a 0,828)}. \textbf{La metrica de desarrollo era ciega a la
+diferencia que importaba.}
+\end{itemize}
+
+No es un problema de ajuste. \textbf{La pregunta que se entreno ---``?`es hoy peligroso en esta
+celda?''--- no es la que se evalua en operacion ---``?`cual de las 498.530 celdas arde hoy?''.} Y la
+evidencia estaba a la vista desde el capitulo 2: la prevalencia cinco ordenes de magnitud por
+encima de la real, y las variables de la celda con mediana identica en positivos y negativos.
+
+\section{Segunda iteracion: reentrenar cambiando la pregunta}
+
+\textbf{Dos cambios, y nada mas.} Los negativos pasan de ser \emph{la misma celda en otros dias} a
+\textbf{otras celdas el mismo dia}, y la etiqueta pasa de la ignicion EGIF a la \textbf{superficie
+quemada EFFIS} (\var{is\_fire} del cubo). \textbf{Las 46 variables son las mismas a proposito}: si
+algo mejora, no puede atribuirse a informacion nueva. Los hiperparametros tambien se heredan
+literalmente, por la misma razon ---asi la diferencia medida es del diseno muestral y no de un
+ajuste distinto.
+
+Positivos: primer dia EFFIS, con tope de 30 por dia $\times$ bloque de 100\,km para que un episodio
+grande no domine. Split: train 2015--2022 / val 2023 / test 2024, con 2026 como conjunto externo;
+\emph{early stopping} en 2023, que para en \textbf{441 arboles}.
+
+\textbf{La ablacion del ratio de pseudo-ausencias.} El 1:3 venia heredado de la literatura y nunca
+se habia justificado con datos propios. Se barre la escalera 1:3 $\to$ 1:10 $\to$ 1:30 $\to$ 1:60
+$\to$ 1:100 sobre \textbf{los mismos positivos y con los 441 arboles congelados} ---con mas
+negativos cambia la prevalencia de la validacion y el \emph{early stopping} pararia en otro punto,
+de modo que la comparacion mediria el ratio \emph{y} el numero de arboles a la vez.
+
+El optimo es interior, en \textbf{1:10--1:30}; desde 1:60 empeora (1:100 pierde $-$0,013 en 2026).
+Pero la ganancia en AUC medio ($+$0,006 a $+$0,017) \textbf{es del orden del ruido del sorteo de
+negativos} (0,005, medido re-sorteando la misma receta), asi que no se vende como mejora. Lo que
+si mejora de forma consistente es el fuego grande: el \textbf{percentil ponderado por hectareas
+sube de 81,7 a 87,6--87,9}. Es el resultado que justifica servir el 1:10.
+
+Otras dos ablaciones, ambas negativas y las dos utiles: \textbf{entrenar solo con verano empeora el
+DONDE}, coherente con el 38\,\% de igniciones de febrero a abril del capitulo 2; y \textbf{anadir
+una capa de ``ya quemado'' cuesta $-$0,02}, porque la etiqueta EFFIS penaliza bajar el riesgo sobre
+la cicatriz reciente.
+
+De aqui salen tres modelos: el \textbf{unico} (\var{donde\_dia\_effis}, las 46 variables con
+muestreo del mismo dia), el \textbf{donde} (una fila por celda, sin meteorologia: su mapa es el
+mismo todos los dias) y el \textbf{cuando} (solo las 29 dinamicas servibles); la \textbf{pareja} es
+el producto de los dos ultimos.
+
+\fig{Figura 6.1}{AUC y percentil ponderado por hectareas frente al ratio, con la banda de ruido del
+sorteo superpuesta.}
+
+\section{Evaluacion del segundo ciclo}
+
+\textbf{En validacion y test.} AUC \emph{dentro del dia} sobre el banco de evaluacion (celdas EFFIS
+de primer dia contra 1.000 celdas al azar del mismo dia), con IC95 por \emph{bootstrap} de dias:
+
+\begin{center}\footnotesize
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Modelo} & \textbf{Val 2023} (37 d, 223 pos.) & \textbf{Test 2024} (72 d, 943 pos.) \\
+\midrule
+Produccion (\var{xgb\_v2\_prototipo}) & 0,723 & 0,792 \\
+\textbf{Unico} \var{donde\_dia\_effis} & \textbf{0,836} ($\Delta$ $+$0,113 [$+$0,051, $+$0,176]) & \textbf{0,809} ($\Delta$ $+$0,017 [$-$0,024, $+$0,063]) \\
+\var{cuando\_effis} & 0,628 & 0,687 \\
+\var{fwi\_pctl\_local} (base sin ML) & 0,680 & 0,636 \\
+\bottomrule
+\end{tabular}
+\captionof{table}{AUC dentro del dia en validacion y test.}
+\end{center}
+
+Hay que leerlo con honestidad, y da un argumento mejor que esconderlo: en 2023 el unico gana con
+claridad y su intervalo no toca el cero, pero \textbf{en test 2024 la ventaja se encoge a $+$0,017 y
+el intervalo lo cruza}. 2024 fue un ano tranquilo ---1,82 celdas-dia por 100.000 frente a las 14,16
+de 2022--- y 72 dias con 943 positivos no bastan para separar dos modelos que se llevan dos
+centesimas. La conclusion metodologica es que \textbf{el test de 2024 no tiene potencia
+suficiente}: un modelo de riesgo se juzga en la temporada, no en un conjunto reservado.
+
+\textbf{En la temporada 2026, externa y sellada}, el unico da \textbf{AUC medio 0,751 frente a
+0,644} de produccion ---$\Delta$ \textbf{$+$0,106} IC [$+$0,067, $+$0,148], ganando el 70\,\% de los
+dias---, y la variante \textbf{1:10 llega a 0,758} ($\Delta$ $+$0,114 [$+$0,074, $+$0,154], 73\,\%
+de los dias) con el mejor percentil ponderado por hectareas. La pareja se queda en 0,702.
+
+\textbf{Prevision contra prevision}, el unico experimento sin retrovisor para nadie (19 dias):
+ranking sellado 0,568, \textbf{unico 0,605} ($\Delta$ $+$0,036, gana 14/19 dias), malla 0,547. Por
+celda, 0,755 frente a 0,669. Es la primera vez que el modelo nuevo bate a produccion \textbf{por
+estacion}, la geometria donde siempre perdia.
+
+\textbf{Validacion prospectiva.} Sellado el modelo, se puntua dia a dia hacia delante contra tres
+jueces que no intervinieron en el entrenamiento: EFFIS (perimetros, 45 dias de latencia), MITECO
+(parte diario D$+$1) y el ranking por estacion meteorologica del sistema en produccion.
+\pdte{actualizar a la fecha de cierre.}
+
+\textbf{Limitaciones.} La probabilidad \emph{ordena, pero no es una probabilidad real}: esta
+referida a la prevalencia de diseno. Ninguna etiqueta de validacion coincide con la de
+entrenamiento. Los intervalos de la validacion prospectiva son anchos. Persiste un desajuste
+train/serve conocido: cuatro variables de vegetacion del dia se sustituyen al servir por
+climatologia mensual, y pesan el 5,5\,\% del \emph{gain}. Y se documentan dias de fallo con
+incendios sin senal meteorologica previa: el limite de un modelo alimentado por meteorologia cuando
+la causa es humana e inmediata en el 97\,\% de los casos.
+
+\fig{Figuras 7.1--7.2}{distribucion diaria de $\Delta$AUC con su intervalo; mapa nacional de riesgo
+de un dia con incendio, con los focos reales superpuestos \emph{a posteriori}.}
+
+\section{Repositorio y conclusion}
+
+El trabajo se acompana de un repositorio con el arbol espejo de estos capitulos, trazabilidad de
+cada cifra al \emph{script} que la produce, y muestras que permiten ejecutar la rama de servicio sin
+el cubo. Contiene ademas \textbf{mas figuras y mas analisis de los que caben aqui}: el exploratorio
+completo, las ablaciones enteras y los mapas diarios.
+
+La leccion del trabajo no es que modelo gana, sino que \textbf{una \emph{target} mal alineada con la
+pregunta de produccion produce metricas excelentes y un sistema inutil}. El primer ciclo era
+metodologicamente correcto ---particion temporal congelada, control anti-fuga, calibracion,
+validacion cruzada espacial--- y aun asi no servia. Lo que lo arreglo no fue un algoritmo mejor ni
+mas hiperparametros ---el ajuste bayesiano aporto $+$0,0019---, sino \textbf{volver a formular la
+unidad muestral} para que la pregunta entrenada fuese la pregunta evaluada.
+
+\end{document}
