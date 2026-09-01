@@ -196,3 +196,100 @@ cadena en vivo decide.
 - El cron de las 03:13 lleva días saliendo con 5-6 h de retraso; el 01/09 se
   lanzó la corrida a mano y luego entró la programada, duplicando la cadena
   entera (~75 min de cuota y dos pasadas de Open-Meteo el mismo día).
+
+---
+
+# Plan del 02/09/2026 — congelar las cifras (y por qué)
+
+## El diagnóstico
+
+La sensación de que «los números cambian todo el rato» tiene causas concretas y
+enumerables, no es deriva:
+
+1. **La fuga de FIRMS** (corregida el 31/08) relanzó toda la evaluación
+   retrospectiva de golpe. Evento único e irreversible: las cifras limpias son
+   las finales, y `dos_24_auditoria_fugas.py` vigila que no haya otra.
+2. **Dos corridas paralelas conviven sin oficial declarada**: ventana FIRMS de
+   5 días (prod 0,644 · único 0,751 · 1:10 0,758) y de 7 (0,647 · 0,752 ·
+   0,759). No es un número que cambia: son dos experimentos sin bautizar.
+3. **Documentos con cifras muertas sin purgar** citándose unos a otros.
+4. Lo que cambia **porque debe**: los tres jueces en vivo, hasta mediados de
+   septiembre.
+
+Lo demás está congelado y tiene fuente de verdad:
+
+| Bloque | Fuente de verdad | Estado |
+|---|---|---|
+| Iteración 1 (train/val/test) | `T/dataset/metricas_v1.json`, `metricas_v4.json` | congelado desde julio/agosto |
+| Iteración 2 (test 2024) | `M/salida/dos_13_metricas.json` | congelado |
+| Retro 2026 (74 días, 1-jun→15-ago) | `dos_09_temporada2026.json` + `dos_19_veredicto.json` (31/08) | congelado post-fuga; la ventana no crece |
+| Modelo servido | `.ubj` con md5 + `33_train/verificar_v2.py` | congelado |
+| Jueces en vivo | `historico_veredictos.csv` y compañía | el ÚNICO que se mueve, por diseño |
+
+Comprobado el 01/09: el `seccion_modelo.tex` clava contra los artefactos casi
+al tercer decimal (ICs de `dos_19`, escalera del ratio de `dos_09_ventana7.log`,
+los tres concurrentes de `dos_24`). Los números no bailan; los documentos
+llevan retraso unos respecto a otros.
+
+## Las tres tareas del día
+
+1. **Declarar la ventana 7 como juego oficial** (es la que leen `dos_19`, el
+   README y `TRAZABILIDAD.md`). La de 5 pasa a ser explícitamente «la ablación
+   del desajuste train/serve» y nunca una cifra citada suelta.
+2. **Pasada de purga**: buscar toda cifra con fuga o de ventana 5 en los `.md`
+   y corregirla o marcarla «(obsoleta, ver X)». Puntos ya localizados:
+   - `docs/BITACORA.md` §6 y `docs/LIMITACIONES.md` §4: citan el
+     «81,7 → 87,6-87,9» por hectáreas (con fuga). Limpio: 79,8 (único 1:3) →
+     81,9 (1:10), de `dos_09_ventana7.log:480-483`.
+   - `docs/CONTEXTO_SECCION_MODELO.md`: usa el juego de ventana 5 entero.
+   - `docs/TRAZABILIDAD.md`: «cuatro días de mapa perdidos 28-31/08» → son
+     **cinco** (27-31/08; en el Release el salto va del 26-ago al 1-sep).
+3. **Sellar por escrito**: una línea al principio de `TRAZABILIDAD.md` —
+   «cifras selladas el 31/08/2026 tras la corrección de la fuga; solo la
+   sección de jueces en vivo se actualiza hasta el cierre de septiembre». A
+   partir de ahí, un número que no coincida con esa tabla es un error del
+   documento, no una duda sobre el resultado.
+
+## Cambios pendientes en `docs/MEMORIA/seccion_modelo.tex` (revisión del 01/09)
+
+- **Error sustantivo (L211-213)**: «Obtiene 0,8906 … y con ese número se puso
+  en producción». Lo servido es `xgb_v2_prototipo` (v1 sin las 4
+  autorregresivas contaminadas, AUC-PR 0,828 vs 0,843, 15-jul), NO el v4 del
+  0,8906, que se midió en agosto y nunca se desplegó. La historia verdadera
+  refuerza el hilo: es el primer aviso de que el muestreo se colaba en el
+  modelo (`03_iteracion1/MODELO_B_BITACORA.md` §16 y `verificar_v2.py`).
+- **Matiz en fig. 1 y tabla T1**: «las mismas 46» vale para el servido; la
+  iteración 1 entrenó con 50. Nota al pie citando `verificar_v2.py`.
+- Erratas: L201 «se puntuan» → «puntúan»; L401 «se público» → «se publicó».
+- Faltan de §5 (esqueleto del plan): el bug sellado del viento (16,3 % de
+  estaciones-día) y los cinco días de mapa perdidos (+ decidir si se cuenta el
+  21-ago regenerado, ver abajo).
+- Dos cifras por anclar a su línea de log: el 76,2 de producción en percentil
+  por hectáreas y el 0,004 de ruido del sorteo (otra fuente decía 0,005).
+
+## En paralelo: las descargas de 2025 y el replay
+
+- **EFFIS 2025: hecho** (01/09). `~/Desktop/Master/archivo_ifs/
+  effis_ba_2025_ES.geojson`, 1.359 perímetros ES del año completo, 65 ≥500 ha.
+  Capa anual `ms:modis.ba.poly.2025` del WFS, misma consulta probada del repo.
+- **IFS verano 2025: descargando.** `archivo_ifs/bajar_ifs_2025.py`
+  (25-may→01-nov 2025, 5.605 nodos × 12 tramos ≈ 67.260 unidades) →
+  `ifs_archivo_2025.parquet`. Al cierre del 01/09 iba por el 18 % y esperaba
+  cuota (429); reanuda solo tras medianoche UTC y cede el paso a la cadena.
+  Revisar: `tail archivo_ifs/bajar_2025.log` y `pgrep -af bajar_ifs_2025`;
+  si murió, relanzar (es reanudable por nodo). Estimación: 2-3 días.
+- **El replay quedó verificado el 01/09** (`archivo_ifs/verificar_replay.py`,
+  resultados en `archivo_ifs/replay_21ago/`): corre de punta a punta con tres
+  parches (reanálisis truncado a D−7, `firms_nrt` sustituido por `firms_dia`
+  —ignora `--pasada` y pediría FIRMS de hoy—, respaldo/restauración de
+  salidas). La estática clava 1,0000; las dinámicas ~0,96 de Spearman pero
+  **solo 65-74 % de solape en el top-2 %** entre dos replays con estados de
+  entrada ligeramente distintos: un modelo evaluado en replay se compara con
+  otro replay, nunca se mezcla con la serie servida.
+- **Hallazgo pendiente de decisión**: el mapa del 21-ago del Release NO es el
+  operativo — es una regeneración del 31/08 (única con `prob_r10`; la huella
+  es `_firms/nrt_2026-08-31.csv`) que el `push --base` del incidente subió.
+  Los días 20 y 22-26 sí son originales. Como `puntuar_effis` recalcula con
+  todos los días, el juez puntuará ese mapa retro cuando lleguen sus
+  perímetros: excluir el día, recuperar el original del USB Expansion
+  (congelado el 21/08), o documentarlo.
