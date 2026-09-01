@@ -13,7 +13,7 @@ demuestra que no coincide con la pregunta operativa.
 
 - **Positivo**: una ignición registrada en EGIF, en su celda y su fecha.
 - **Negativo**: **la misma celda en otros días** (caso-control temporal).
-- **Features**: 46, del cubo IberFire.
+- **Features**: 46 en el modelo servido (la lista canónica son 50 — ver abajo).
 - **Modelo**: XGBoost.
 
 ## El orden
@@ -53,6 +53,24 @@ sirviéndose: ranking nacional por estación (`ranking_diario.py`) y mapas D0/D1
 de AEMET. El modelo que corre ahí es **`xgb_v2_prototipo`** — ni v3 ni v4, que
 se entrenaron y se midieron pero nunca se desplegaron, para no romper la serie
 sellada a mitad de temporada.
+
+### De dónde sale `xgb_v2_prototipo` (46 features, no 50)
+
+Ningún script de este repositorio lo entrena, y no es un descuido de la copia:
+fue un **reentrenamiento interactivo del 15-jul-2026** que no se versionó. Su
+racional está escrito y cuantificado en [`MODELO_B_BITACORA.md`](MODELO_B_BITACORA.md)
+§16: las cuatro autorregresivas intra-celda acumulativas (`n_fuegos_1km_hist`,
+`n_fuegos_1km_90d`, `n_fuegos_10km_90d`, `n_fuegos_10km_365d`) arrastran un
+artefacto del muestreo caso-control con celda fija —el incendio del positivo
+entra en el historial de los negativos posteriores de su propia celda, y el
+modelo aprende orden temporal (+0,92 log-odds por `n_fuegos_1km_hist=0` en
+pleno Madrid urbano)—, así que se reentrenó v1 sin ellas: AUC-PR 0,828 frente
+a 0,843, «coste pequeño, modelo honesto para producción».
+[`33_train/verificar_v2.py`](33_train/verificar_v2.py) comprueba con las
+muestras que las 46 del JSON servido son exactamente las 50 canónicas
+(`features.FULL`) menos esas cuatro, y que su orden coincide con el que lleva
+dentro el `.ubj`. Es, además, el primer aviso de la tesis: el diseño del
+muestreo ya se estaba colando en el modelo.
 
 ## Y entonces se midió
 

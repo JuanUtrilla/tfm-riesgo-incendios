@@ -38,6 +38,8 @@ datos hace falta ejecutarlo.
 | 0,231 | Etiquetas barajadas ≈ azar: no hay fuga de datos | `03_iteracion1/33_train/entrenar_modelo.py` | ídem | disco |
 | +0,042 | Ablación FWI absoluto vs percentil local — la contribución del TFM | `03_iteracion1/35_ablaciones/ablacion_features.py` | `dataset/ablaciones_v1.json` | disco |
 | +0,007 | Lo que aportó el tuning bayesiano (40 trials) | `03_iteracion1/33_train/tuning_optuna.py` | `dataset/optuna.json` | disco |
+| 46 = 50 − 4 | `xgb_v2_prototipo` (el modelo SERVIDO) es v1 sin las 4 autorregresivas intra-celda contaminadas por el muestreo misma-celda | `03_iteracion1/33_train/verificar_v2.py` | `muestras/modelos/xgb_v2_prototipo_features.json` | muestra |
+| 0,828 (−0,015 vs 0,843) | AUC-PR de ese reentrenamiento del 15/07 — interactivo, sin script versionado; la decisión y su racional, en la bitácora | [`03_iteracion1/MODELO_B_BITACORA.md`](../03_iteracion1/MODELO_B_BITACORA.md) §16 | ídem | — |
 
 ## Capítulo 4 · La bisagra
 

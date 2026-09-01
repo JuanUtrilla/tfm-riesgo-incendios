@@ -105,6 +105,16 @@ en `TFM_fuego`.
 |---|---|---|
 | `eda_dataset.py` | TFM_fuego | `64f1d307` |
 
+### `03_iteracion1` — 1 fichero (copia del 01/09/2026)
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `MODELO_B_BITACORA.md` | TFM_fuego | `0f668a23` |
+
+La bitácora de la iteración 1 (779 líneas, 14/07→11/08): es la única
+procedencia escrita de `xgb_v2_prototipo`, el modelo servido en producción,
+cuyo reentrenamiento (§16) fue interactivo y no dejó script.
+
 ### `03_iteracion1/31_muestreo` — 4 ficheros
 
 | Fichero | Origen | md5 |
@@ -121,11 +131,12 @@ en `TFM_fuego`.
 | `extraer_features_historia.py` | TFM_fuego | `e321ddac` |
 | `extraer_features_historia_v4.py` | TFM_fuego | `7f95377a` |
 
-### `03_iteracion1/33_train` — 5 ficheros
+### `03_iteracion1/33_train` — 6 ficheros
 
 | Fichero | Origen | md5 |
 |---|---|---|
 | `entrenar_modelo.py` | TFM_fuego | `447554b0` |
+| `verificar_v2.py` | escrito para este repositorio (01/09/2026) | — |
 | `entrenar_modelo_v3.py` | TFM_fuego | `4ded7410` |
 | `entrenar_modelo_v4.py` | TFM_fuego | `bdc1c692` |
 | `modelo_nativo_estacion.py` | TFM_fuego | `a477be3b` |
