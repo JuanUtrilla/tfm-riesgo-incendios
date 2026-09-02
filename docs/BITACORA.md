@@ -239,10 +239,14 @@ justificado. Tres de los cuatro son resultados negativos:
 
 El ratio merece una nota, porque es donde se aprendió a leer los números con
 cuidado: la ganancia en **AUC medio** (+0,006 a +0,017) es del orden del **ruido
-del sorteo de negativos** (0,005, medido re-sorteando la misma receta). Lo que
+del sorteo de negativos** (0,004, medido re-sorteando la misma receta:
+0,752 frente a 0,748 en 2026, `dos_09_ventana7.log`; 0,809 frente a 0,804 en
+test 2024, `dos_18_ratio.json`). Lo que
 sí mejora de forma consistente es el **fuego grande**: el percentil ponderado
-por hectáreas pasa de **81,7 a 87,6-87,9**. Esa es la métrica que importa
-operativamente, y la que se reporta.
+por hectáreas pasa de **79,8 (1:3) a 81,9 (1:10)** y 80,6 (1:30)
+(`dos_09_ventana7.log`, cifras limpias del 31/08/2026; la corrida original
+del 23/08 decía 81,7 → 87,6-87,9, inflada por la fuga de FIRMS de la entrada
+§8). Esa es la métrica que importa operativamente, y la que se reporta.
 
 ---
 

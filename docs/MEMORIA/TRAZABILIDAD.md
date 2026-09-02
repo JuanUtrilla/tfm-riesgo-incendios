@@ -117,7 +117,7 @@ dato.
   dos parámetros están en el código (`dos_12_muestrear_effis.py:47` y el nombre
   `frp_max_50km_7d`) pero no tienen justificación escrita en ningún sitio. El
   texto los describe sin justificarlos.
-- **[PENDIENTE: hueco de los cuatro días de mapa perdidos, 28-31/08/2026]** — no
+- **[PENDIENTE: hueco de los cinco días de mapa perdidos, 27-31/08/2026]** — no
   se menciona en la sección porque pertenece al capítulo de producción y jueces;
   tampoco está todavía en `docs/LIMITACIONES.md`.
 - **[CITA NECESARIA: IberFire]** — el cubo se describe sin cita. La referencia

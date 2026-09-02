@@ -4,6 +4,15 @@ Esta tabla es la que permite comprobar el trabajo. Para cada cifra que aparece
 en la memoria: qué script la produjo, en qué fichero quedó escrita y con qué
 datos hace falta ejecutarlo.
 
+> **Cifras selladas el 31/08/2026**, tras corregir la fuga de futuro de FIRMS
+> y relanzar la evaluación retrospectiva. El juego oficial es el de **ventana
+> FIRMS de 7 días** (`dos_09_temporada2026.json`, que es lo que lee `dos_19`);
+> la corrida con ventana de 5 (`dos_09_ventana5.json`) es solo la ablación del
+> desajuste train/serve. Solo la sección «Capítulo 7 · Producción y jueces» se
+> actualiza hasta el cierre de septiembre. A partir de aquí, un número que no
+> coincida con esta tabla es un error del documento, no una duda sobre el
+> resultado.
+
 **Cómo leer la columna «Se ejecuta con»:**
 
 - **muestra** — corre con `muestras/` recién clonado el repo.
@@ -96,7 +105,7 @@ datos hace falta ejecutarlo.
 | p30/p90/p98 | Los cortes BAJO/MODERADO/ALTO/EXTREMO | `05_iteracion2/56_calibracion/dos_14_cortes.py` | `dos_14_cortes.json` | disco |
 | **1:10-1:30** óptimo · 0,759 en 2026 | La escalera del ratio de negativos | `05_iteracion2/57_ablaciones/dos_18_ratio.py` | `dos_18_ratio.json` | disco |
 | **79,5 → 81,9-80,6** | Percentil ponderado por hectáreas: lo que sí mejora | ídem | ídem | disco |
-| 0,005 | El **ruido del sorteo de negativos**, midiendo el mismo diseño otra vez | ídem | ídem | disco |
+| 0,004 | El **ruido del sorteo de negativos**, midiendo el mismo diseño otra vez (0,752 vs 0,748 en 2026; 0,809 vs 0,804 en test 2024) | ídem | ídem | disco |
 | entrenar solo verano: peor | Resultado negativo | `05_iteracion2/57_ablaciones/dos_08_verano.py` | `dos_08_verano.json` | disco |
 | −0,02 | La capa «ya quemado» empeora | `05_iteracion2/57_ablaciones/dos_17_capa_quemado.py` | `dos_17_capa_quemado.csv/json` | disco |
 

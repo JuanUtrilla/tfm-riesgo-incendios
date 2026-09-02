@@ -198,7 +198,7 @@ suceso* (`M/dos_24_auditoria_fugas.py`, `M/salida/dos_24_auditoria_fugas.json`).
 5. **Sin `environment.yml` ni `requirements.txt`**, ninguna cifra es
    reejecutable tal cual. Es el hueco que `docs/PENDIENTE.md` §1 marca como el
    más grave, y sigue abierto.
-6. **Cuatro días de mapa diario (28-31/08) perdidos** y decididos como no
+6. **Cinco días de mapa diario (27-31/08) perdidos** y decididos como no
    reconstruibles: esos días no podrán puntuarse cuando lleguen sus perímetros
    EFFIS. No está escrito en `LIMITACIONES.md` todavía.
 
@@ -399,7 +399,7 @@ Ordenadas por impacto en la calidad del texto.
 7. **¿Qué norma de citas exige la universidad y hay normativa sobre uso de
    IA?** Sigue sin constar en ningún repositorio, y condiciona el formato de la
    sección entera.
-8. **¿Se documenta el hueco de los cuatro días de mapa perdidos (28-31/08) en
+8. **¿Se documenta el hueco de los cinco días de mapa perdidos (27-31/08) en
    la memoria, o solo en el repositorio?** Afecta a cuántos días podrá puntuar
    el juez EFFIS en septiembre.
 

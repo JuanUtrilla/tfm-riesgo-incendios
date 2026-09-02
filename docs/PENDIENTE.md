@@ -233,6 +233,11 @@ llevan retraso unos respecto a otros.
 
 ## Las tres tareas del día
 
+> **Hecho el 02/09/2026** (las tres, más los cambios del `.tex` de abajo salvo
+> la decisión sobre el 21-ago). El ruido del sorteo quedó anclado en **0,004**
+> (`dos_18_ratio.json` 2024 y `dos_09_ventana7.log` 2026); el 76,2 de producción
+> por hectáreas es `pctl_ponderado_ha` de `dos_09_temporada2026.json`.
+
 1. **Declarar la ventana 7 como juego oficial** (es la que leen `dos_19`, el
    README y `TRAZABILIDAD.md`). La de 5 pasa a ser explícitamente «la ablación
    del desajuste train/serve» y nunca una cifra citada suelta.

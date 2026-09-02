@@ -79,10 +79,12 @@ lo que daría la operación, no la operación.
 
 ## 4. El ruido del sorteo de negativos es del orden de las diferencias medidas
 
-Re-sortear los negativos con la misma receta mueve el AUC medio **0,005**. Varias
+Re-sortear los negativos con la misma receta mueve el AUC medio **0,004**
+(0,752 → 0,748 en 2026; 0,809 → 0,804 en test 2024). Varias
 de las diferencias entre configuraciones caen dentro de ese margen, y por eso no
 se reportan como mejoras: en la ablación del ratio, lo que sí se sostiene es el
-percentil ponderado por hectáreas (81,7 → 87,6), no el AUC medio.
+percentil ponderado por hectáreas (79,8 → 81,9 con ratio 1:10, cifras limpias
+del 31/08/2026; la corrida con fuga decía 81,7 → 87,6), no el AUC medio.
 
 ---
 

@@ -180,23 +180,29 @@ fuentes.
 - Alternativa evaluada y descartada: la **pareja DÓNDE × CUÁNDO** (dos modelos
   multiplicados) frente al **modelo único** con muestreo dónde.
 
-### Evaluación (cifras limpias del 31/08/2026)
+### Evaluación (cifras limpias del 31/08/2026, ventana FIRMS de 7 días — el juego oficial)
 
 | comparación (temporada 2026) | AUC | Δ vs producción | IC95 | días ganados |
 |---|---|---|---|---|
-| producción (iteración 1) | 0,644 | — | — | — |
-| **único `donde_dia_effis`** | **0,751** | +0,106 | [+0,067, +0,148] | 70 % |
-| **único, negativos 1:10** | **0,758** | +0,114 | [+0,074, +0,154] | 73 % |
-| pareja DÓNDE × CUÁNDO | 0,702 | — | — | — |
+| producción (iteración 1) | 0,647 | — | — | — |
+| **único `donde_dia_effis`** | **0,752** | +0,105 | [+0,067, +0,146] | 70 % |
+| **único, negativos 1:10** | **0,759** | +0,112 | [+0,074, +0,151] | 76 % |
+| pareja DÓNDE × CUÁNDO | 0,705 | +0,058 | [+0,027, +0,090] | 64 % |
+
+Fuente: `dos_09_temporada2026.json` (ventana 7) y `dos_19_veredicto.json`.
+Existe una corrida gemela con ventana de 5 días (`dos_09_ventana5.json`:
+0,644 · 0,751 · 0,758 · 0,702) que es solo la ablación del desajuste
+train/serve y no se cita suelta.
 
 - **Ablación del ratio de negativos** (`dos_18`): óptimo interior en 1:10-1:30;
   a partir de 1:60 empeora. La ganancia en AUC medio (+0,006 a +0,017) es del
-  orden del ruido del sorteo de negativos (0,005, medido re-sorteando); lo que
+  orden del ruido del sorteo de negativos (0,004, medido re-sorteando); lo que
   sí mejora consistentemente es el fuego grande: percentil ponderado por
-  hectáreas 81,7 → 87,6-87,9.
-- **Ablación FIRMS:** aporta menos de lo que se creía (+0,033, no +0,126) y en
-  la punta del ranking producción *con* FIRMS es peor que sin ella (top-2 %:
-  11,1 % de hectáreas frente a 19,4 %). Hipótesis viva: el radio de 50 km
+  hectáreas 79,8 (1:3) → 81,9 (1:10), `dos_09_ventana7.log`.
+- **Ablación FIRMS:** aporta menos de lo que se creía (+0,036, no +0,126:
+  producción 0,647 con FIRMS, 0,611 sin ella) y en la punta del ranking
+  producción *con* FIRMS es peor que sin ella (top-2 %: 13,0 % de hectáreas
+  frente a 19,4 %; con ventana de 5 días, 11,1 %). Hipótesis viva: el radio de 50 km
   arrastra la punta hacia lo ya quemado en vez de hacia la ignición nueva.
 - **Entrenar solo con verano** pierde en el DÓNDE (`dos_08`).
 - **Comparación justa previsión-contra-previsión** (`comparar_rankings_justo`,
@@ -215,7 +221,7 @@ fuentes.
   afectada** y el **entrenamiento estaba limpio** (`extraer_features_historia.py:117`
   usa `(vf_d >= d-7) & (vf_d < d)`); solo se materializó en la evaluación
   retrospectiva, que se relanzó entera. El arreglo *refuerza* la tesis: la
-  ventaja del segundo modelo pasa de +0,037 (rozando el cero) a +0,106.
+  ventaja del segundo modelo pasa de +0,037 (rozando el cero) a +0,105.
 - **Firma del fuego en el día D.** En el cubo, la celda que arde el día D ya
   trae ese mismo día la señal del incendio: ΔNDVI (D − D−1) = −0,0312 frente a
   −0,0033 en el control; ΔLST +0,91 K frente a +0,02 K. Pesan el **5,5 % del
@@ -225,7 +231,8 @@ fuentes.
   plana 2020-24.
 - **Desajuste de ventana FIRMS:** se entrenó con [D−7, D−1] y la tubería de
   servicio pedía 5 días. Medido: corregirlo da +0,003 de AUC — ruido.
-- **Cuatro días de mapas perdidos** (28-31/08/2026) por un incidente de
+- **Cinco días de mapas perdidos** (27-31/08/2026; en el Release el salto va
+  del 26-ago al 1-sep) por un incidente de
   publicación de estado; reconstruirlos exigía ~56.000 unidades de Open-Meteo
   compitiendo con la cadena viva. Decidido no hacerlo y documentar el hueco.
 
