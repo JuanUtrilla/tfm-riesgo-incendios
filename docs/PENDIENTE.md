@@ -277,6 +277,25 @@ llevan retraso unos respecto a otros.
 - Dos cifras por anclar a su línea de log: el 76,2 de producción en percentil
   por hectáreas y el 0,004 de ruido del sorteo (otra fuente decía 0,005).
 
+## Decisiones del capítulo 7 (tomadas el 02/09/2026 por la noche)
+
+1. **Mapa del 21-ago regenerado → buscar el original en el USB Expansion**
+   (copia congelada del 21/08). Tarea del fin de semana del 5-6/09: conectar el
+   Expansion, buscar `mapas_diarios/dos_riesgo_2026-08-21.npz` y
+   `riesgo_hoy_2026-08-21.npz` (originales, sin `prob_r10`, mtime del 21/08),
+   comprobar md5 distinto del regenerado, restaurarlos en el Release con
+   `gh_estado.py` (¡NUNCA `--base`!) y anotar en TRAZABILIDAD. Si no están:
+   **excluir el día** del juez EFFIS y documentarlo.
+2. **Bug del viento (np.minimum→np.fmin) → sellado hasta el cierre.** Producción
+   no se toca hasta que los jueces cierren a mediados de septiembre; el efecto
+   (16,3 % de estaciones-día, `docs/LIMITACIONES.md` §1) se cuantifica en un
+   anexo y se corrige después, con la serie ya cerrada.
+3. **Producto propuesto → dos capas.** Capa 1, el «si»: aviso nacional del día
+   con la pareja (o el cuándo) y umbral absoluto (`docs/REPLAY_SI.md`). Capa 2,
+   el «dónde»: ranking por percentiles del único 1:10, mostrado solo cuando la
+   capa 1 está encendida. El único no puede hacer de «si» por construcción
+   (negativos del mismo día) y se dice.
+
 ## Replay de las temporadas 2025 y 2026 (plan del 02/09/2026, pendiente de datos)
 
 **Objetivo.** Los modelos que los jueces en vivo señalen como mejores a
