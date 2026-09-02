@@ -36,7 +36,7 @@ autorregresivas): 240/240 árboles idénticos, mejor iteración 139, AUC-PR de
 validación 0,8528 y de test 0,828 con 140 árboles. Fuera del alcance, por
 diseño: la temporada 2026 (`dos_09`), cuya verdad EFFIS se reescribe a diario.
 
-## Prerregistro del replay 2025/2026 (escrito el 02/09/2026 a las 18:20, ANTES de correr nada)
+## Prerregistro del replay 2025/2026 (escrito el 02/09/2026 a las 18:10 (commit ed7931f), ANTES de correr nada)
 
 **Modelos (6, todos entrenados con datos ≤ 2024):** producción sobre la malla
 (`xgb_v2_prototipo`, EGIF) · único 1:3 (`donde_dia_effis`) · único 1:10
