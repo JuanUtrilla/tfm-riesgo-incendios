@@ -23,6 +23,19 @@ datos hace falta ejecutarlo.
 
 ---
 
+## Reproducción verificada (02/09/2026)
+
+Todos los entrenamientos citados se reejecutaron en copia aislada desde sus
+parquets sellados, con `environment.yml` (xgboost 3.2.0), y se compararon con
+los artefactos originales: **cero discrepancias en todas las métricas y `.ubj`
+idénticos por md5** para v1 (50 métricas), v4 (39 + 46 metadatos), `dos_05`
+(645), `dos_13` (144) y `dos_18` (111, los cinco modelos de la escalera). El
+modelo servido, `xgb_v2_prototipo`, que no tenía script, se reconstruye con
+`03_iteracion1/33_train/reconstruir_v2.py` (receta de v1 sin las cuatro
+autorregresivas): 240/240 árboles idénticos, mejor iteración 139, AUC-PR de
+validación 0,8528 y de test 0,828 con 140 árboles. Fuera del alcance, por
+diseño: la temporada 2026 (`dos_09`), cuya verdad EFFIS se reescribe a diario.
+
 ## Capítulo 2 · Análisis exploratorio
 
 | Número | Qué es | Script | Salida | Se ejecuta con |

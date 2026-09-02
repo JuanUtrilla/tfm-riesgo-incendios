@@ -233,6 +233,11 @@ llevan retraso unos respecto a otros.
 
 ## Las tres tareas del día
 
+> **Reproducción verificada el 02/09/2026**: v1, v4, dos_05, dos_13 y dos_18
+> reentrenados en copia aislada, cero discrepancias y `.ubj` idénticos;
+> `xgb_v2_prototipo` reconstruido árbol a árbol (`reconstruir_v2.py`);
+> `environment.yml` añadido desde el conda `tfm_fuego`. Ver TRAZABILIDAD.md.
+
 > **Hecho el 02/09/2026** (las tres, más los cambios del `.tex` de abajo salvo
 > la decisión sobre el 21-ago). El ruido del sorteo quedó anclado en **0,004**
 > (`dos_18_ratio.json` 2024 y `dos_09_ventana7.log` 2026); el 76,2 de producción
