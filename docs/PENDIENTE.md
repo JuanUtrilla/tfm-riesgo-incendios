@@ -322,6 +322,17 @@ resto desde el portátil. FIRMS 2026 es NRT (el archivo estándar aún no cubre
 artefactos de Actions expiran a 90 días y el NRT de FIRMS a pocos meses, por
 eso está todo en disco y en el USB.
 
+**Pasos 2 y 3 HECHOS el 02/09/2026** (`~/Desktop/Master/archivo_ifs/replay_dia.py`,
+detalle en `archivo_ifs/README_replay.md`): el replay de un día corre de punta
+a punta con las dos condiciones sobre un sandbox (copia de los .py con salida
+propia, sin tocar los repos), lee ERA5-Land de `era5land_diario_2025.nc`
+(agregado de los meses del CDS con la `a_diario` de la cadena) y FIRMS de los
+parquets, y puntúa contra EFFIS. **15 segundos por día** en el portátil, no 40
+minutos: 640 corridas ≈ 3 h. Medido: 2025-08-13 (878 celdas, 57.527 ha) prod
+0,827 / único 0,856 / r10 0,828 / pareja 0,892 con IFS; 0,811 / 0,875 / 0,855 /
+0,891 con reanálisis. 2026-08-21 contra el mapa del Release: Spearman 0,93-0,94.
+Queda el bucle de temporada y esperar a los jueces.
+
 **Trabajo que queda.** Adaptar `archivo_ifs/verificar_replay.py` (los tres
 parches: truncar reanálisis a D−7, `firms_dia` con los parquets de archivo en
 vez de la API, respaldar/restaurar salidas) para leer ERA5-Land de
