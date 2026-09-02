@@ -360,6 +360,16 @@ Resultados completos en `docs/REPLAY_VEREDICTO.md` (tablas prerregistradas) y
   días tienen fuego (86/92): el «si» se mide de verdad en invierno, que no hay.
   Pendiente: calibrar en 2015-2024 (exige ~1.200 mapas diarios desde el cubo).
 
+- **Precisión de la punta** (`docs/REPLAY_PRECISION.md`, calculada a posteriori,
+  NO prerregistrada): la tasa base es 0,01 % de celdas-día quemadas. En el top-2 %
+  del mapa arde el 0,10-0,13 % de las celdas en 2025 (lift ×11-14: prod ×10,6,
+  únicos ×12-13, pareja ×13,7) y hay una celda quemada a ≤10 km en el 2-3 %; en
+  2026 baja a 0,04-0,06 % (prod ×5,7 > únicos ×4) y ≤10 km 1,6-1,8 %. Días en que
+  alguna celda del top-2 % ardió: 2025 r10 74, único 69, prod 66 de 138; 2026 r10
+  44, único 42, prod 39 de 86. Lectura: aún en el 2 % más alto, 999 de cada 1.000
+  celdas no arden ese día; el producto es un ranking de vigilancia, no una alarma
+  por celda.
+
 **Trabajo que queda.** Adaptar `archivo_ifs/verificar_replay.py` (los tres
 parches: truncar reanálisis a D−7, `firms_dia` con los parquets de archivo en
 vez de la API, respaldar/restaurar salidas) para leer ERA5-Land de
