@@ -377,6 +377,15 @@ Resultados completos en `docs/REPLAY_VEREDICTO.md` (tablas prerregistradas) y
   radios, en las dos temporadas). La precisión del top-2 % sube de 0,1 % a
   1,6-1,7 % a 6 km. La tolerancia no rescata a producción ni castiga a los únicos.
 
+- **Cobertura con tolerancia** (`docs/REPLAY_COBERTURA.md`, a posteriori): se dilata
+  el TOP del modelo a R km y se mide qué % de celdas quemadas e incendios quedan a
+  ≤R km de alguna celda del top, junto al % de España que cubre el top dilatado
+  (= lo que acertaría el azar). 2025, top-2 % a 6 km: único 1:10 cubre el 44 % de
+  los incendios con el 10 % del territorio; producción el 29 % con el 6,6 %; a
+  igual territorio (~5 %): r10 33 % a 2 km vs prod 27 % a 4 km. La dilatación
+  cubre más España con los únicos (top más disperso) que con producción (top
+  más compacto): comparar siempre a igual % de España, no a igual radio.
+
 **Trabajo que queda.** Adaptar `archivo_ifs/verificar_replay.py` (los tres
 parches: truncar reanálisis a D−7, `firms_dia` con los parquets de archivo en
 vez de la API, respaldar/restaurar salidas) para leer ERA5-Land de
