@@ -64,6 +64,18 @@ los veranos 2015-2024 (calibrado en el cubo), aplicado igual todos los días; se
 evalúa con TODOS los días, también los de cero fuego (tabla aviso × fuego). El
 único queda fuera por construcción (negativos del mismo día).
 
+**Resultado del replay (02/09/2026 20:10, tras el prerregistro):** ver
+[`REPLAY_VEREDICTO.md`](REPLAY_VEREDICTO.md) y [`REPLAY_SI.md`](REPLAY_SI.md).
+Scripts: `~/Desktop/Master/archivo_ifs/replay_{dia,temporada,verdad,veredicto,figuras,si}.py`
+(pendiente copiarlos al repo); salidas `archivo_ifs/replay/` (md5 en `MD5_replay.txt`).
+
+| Número | Qué es | Script | Salida | Se ejecuta con |
+|---|---|---|---|---|
+| **0,806 · 0,807 · 0,794** vs 0,743 (2025, IFS) | Único 1:3, único 1:10 y pareja contra producción-malla en la temporada 2025 completa, en condiciones de servicio; Δ +0,063 [+0,026, +0,102] | `replay_temporada.py` + `replay_veredicto.py` | `replay_2025_ifs.csv`, `replay_veredicto.json` | archivo |
+| 0,757 · 0,762 · 0,716 vs 0,658 (2026, IFS) | Lo mismo en 2026 completo (cobertura, no prueba) | ídem | `replay_2026_ifs.csv` | archivo |
+| −0,004…+0,001 | Coste de la previsión: AUC con IFS − con reanálisis, IC cruzan el cero | ídem | `replay_veredicto.json` | archivo |
+| 32 % · 26-29 % · 22 % (2025) / 6-7 % vs 11,5 % (2026) | Hectáreas capturadas en el top-2 % del mapa: pareja, únicos, producción | ídem | ídem | archivo |
+
 ## Capítulo 2 · Análisis exploratorio
 
 | Número | Qué es | Script | Salida | Se ejecuta con |

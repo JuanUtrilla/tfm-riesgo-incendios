@@ -333,6 +333,33 @@ minutos: 640 corridas ≈ 3 h. Medido: 2025-08-13 (878 celdas, 57.527 ha) prod
 0,891 con reanálisis. 2026-08-21 contra el mapa del Release: Spearman 0,93-0,94.
 Queda el bucle de temporada y esperar a los jueces.
 
+**REPLAY EJECUTADO el 02/09/2026 (18:13→20:10, 4 corridas, 640 días, 0 fallos
+reales; los 6 del 25-30 may en IFS y el 1-nov en reanálisis son de rango).**
+Resultados completos en `docs/REPLAY_VEREDICTO.md` (tablas prerregistradas) y
+`docs/REPLAY_SI.md`; figuras y CSV por día en `archivo_ifs/replay/` (md5 en
+`replay/MD5_replay.txt`; copia en el USB). Lectura, en el orden del prerregistro:
+- **2025 IFS (confirmación fuera de muestra, 138 días con fuego):** único 1:3
+  **0,806** y único 1:10 **0,807** frente a producción-malla 0,743, Δ +0,063
+  [+0,026, +0,102] y +0,064 [+0,027, +0,101], ganan el 60 % de los días; pareja
+  0,794 (+0,051 [+0,024, +0,079]). Dónde solo empata con producción (0,744);
+  cuándo solo pierde (0,686). Regla del prerregistro: los tres candidatos
+  cumplen «IC que no toca el de producción»; único 1:10 es el mayor AUC.
+- **2026 IFS completo (cobertura, 86 días):** 0,757 / 0,762 / 0,716 frente a
+  0,658 (Δ +0,10 [+0,06, +0,14]); coincide con `dos_19` (0,759 vs 0,647).
+- **Coste de la previsión = cero:** AUC con IFS − AUC con reanálisis entre
+  −0,004 y +0,001 en 2025 y 2026, todos los IC cruzan el cero.
+- **La punta (top-2 % del mapa):** en 2025 pareja 32 % de ha, únicos 26-29 %,
+  producción 22 %; en 2026 producción 11,5 % y únicos 6-7 %. Los candidatos
+  ordenan mejor el conjunto y en 2026 peor la punta. PENDIENTE entender por qué
+  (hipótesis viva: radio FIRMS de 50 km arrastra hacia lo ya quemado).
+- **«Si» (umbral absoluto p98 de jun-ago 2025):** con aviso = ≥2 % de celdas
+  sobre umbral, en 2026 pareja avisa 35 días (33 con fuego, 26 de 58 con
+  incendio ≥100 ha), cuándo 21, producción 11, FWI clim ≥p90 solo 1. En sep-oct
+  2025 nadie avisa (ni el FWI). Spearman fracción~ha 0,6 en calibración, 0,3-0,4
+  fuera. Primera cifra; el criterio de aviso es tosco y en verano casi todos los
+  días tienen fuego (86/92): el «si» se mide de verdad en invierno, que no hay.
+  Pendiente: calibrar en 2015-2024 (exige ~1.200 mapas diarios desde el cubo).
+
 **Trabajo que queda.** Adaptar `archivo_ifs/verificar_replay.py` (los tres
 parches: truncar reanálisis a D−7, `firms_dia` con los parquets de archivo en
 vez de la API, respaldar/restaurar salidas) para leer ERA5-Land de
