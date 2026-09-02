@@ -36,6 +36,34 @@ autorregresivas): 240/240 árboles idénticos, mejor iteración 139, AUC-PR de
 validación 0,8528 y de test 0,828 con 140 árboles. Fuera del alcance, por
 diseño: la temporada 2026 (`dos_09`), cuya verdad EFFIS se reescribe a diario.
 
+## Prerregistro del replay 2025/2026 (escrito el 02/09/2026 a las 18:20, ANTES de correr nada)
+
+**Modelos (6, todos entrenados con datos ≤ 2024):** producción sobre la malla
+(`xgb_v2_prototipo`, EGIF) · único 1:3 (`donde_dia_effis`) · único 1:10
+(`donde_dia_effis_r10`) · pareja (`donde_effis_c` × `cuando`, EGIF) · dónde solo
+(`donde_effis_c`) · cuándo solo (`cuando`). Fuera: producción con datos AEMET
+(no replicable), v3/v4, los EGIF de dos_05, r30-r100.
+
+**Temporadas y condiciones:** 2025 (25-may→01-nov) y 2026 (25-may→ último día con
+reanálisis D−7 disponible), cada una con IFS (servicio) y reanálisis del día
+(cota superior). Entradas: `archivo_ifs/` (md5 en `MD5_archivo_replay.txt`).
+
+**Métrica principal:** AUC medio por día (días con ≥1 celda EFFIS quemada, EFFIS
+= perímetros con FIREDATE ese día), IC95 por bootstrap de días (2.000, semilla
+42), diferencia contra producción-malla. **Operativas:** captura en el 2 % más
+alto (celdas, hectáreas, incendios ≥100 ha con alguna celda), percentil mediano
+y ponderado por hectáreas.
+
+**Regla:** se reportan los seis siempre. «Mejor» = mayor AUC medio en 2025 con IC
+que no toque el de producción. 2026 completo es cobertura, no prueba. Ningún
+resultado de 2025 cambia el conjunto de modelos ni las métricas.
+
+**Pregunta secundaria («si», no «dónde»):** para producción, cuándo y pareja,
+umbral absoluto = probabilidad que deja de media el 2 % de celdas por encima en
+los veranos 2015-2024 (calibrado en el cubo), aplicado igual todos los días; se
+evalúa con TODOS los días, también los de cero fuego (tabla aviso × fuego). El
+único queda fuera por construcción (negativos del mismo día).
+
 ## Capítulo 2 · Análisis exploratorio
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
