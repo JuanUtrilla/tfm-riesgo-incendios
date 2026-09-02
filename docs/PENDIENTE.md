@@ -370,6 +370,13 @@ Resultados completos en `docs/REPLAY_VEREDICTO.md` (tablas prerregistradas) y
   celdas no arden ese día; el producto es un ranking de vigilancia, no una alarma
   por celda.
 
+- **Tolerancia espacial** (`docs/REPLAY_RADIO.md`, a posteriori): verdad dilatada
+  a 2/4/6 km. El AUC BAJA para todos al crecer el radio (2025: único 0,806→0,758,
+  prod 0,743→0,719) porque el anillo añade positivos difíciles, y el orden entre
+  modelos NO cambia (únicos > pareja > producción > dónde > cuándo a todos los
+  radios, en las dos temporadas). La precisión del top-2 % sube de 0,1 % a
+  1,6-1,7 % a 6 km. La tolerancia no rescata a producción ni castiga a los únicos.
+
 **Trabajo que queda.** Adaptar `archivo_ifs/verificar_replay.py` (los tres
 parches: truncar reanálisis a D−7, `firms_dia` con los parquets de archivo en
 vez de la API, respaldar/restaurar salidas) para leer ERA5-Land de
