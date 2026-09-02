@@ -277,6 +277,50 @@ llevan retraso unos respecto a otros.
 - Dos cifras por anclar a su línea de log: el 76,2 de producción en percentil
   por hectáreas y el 0,004 de ruido del sorteo (otra fuente decía 0,005).
 
+## Replay de las temporadas 2025 y 2026 (plan del 02/09/2026, pendiente de datos)
+
+**Objetivo.** Los modelos que los jueces en vivo señalen como mejores a
+mediados de septiembre se evalúan sobre la temporada 2025 entera y sobre la
+2026 completa desde el 25 de mayo, en condiciones de servicio: reanálisis
+hasta D−7, previsión IFS para D−6…D+1, focos FIRMS anteriores a D, verdad
+EFFIS. Es «como haber tenido la cadena corriendo el año pasado», con tres
+diferencias que hay que escribir: (1) el archivo de Open-Meteo guarda cada
+día con su previsión de menor antelación, no la pasada emitida esa mañana
+(medido el 21-ago: Spearman 0,96, solape 65-74 % en el top-2 %); (2) el replay
+no reproduce los fallos operativos (días perdidos); (3) solo hay juez EFFIS (y
+MITECO si se reconstruye de los partes históricos); no hay juez por estación.
+
+**Cómo se lee.** Jueces en vivo 2026 = la prueba sellada, la que decide.
+Replay 2025 = confirmación fuera de muestra (ningún modelo entrenó con 2025 ni
+2026; nadie ha mirado 2025). Replay 2026 completo = cobertura de toda la
+temporada con la misma metodología, NO una prueba independiente (los jueces
+que eligieron puntúan esos mismos días). Elegir con 2026 en vivo, confirmar
+con 2025; no elegir sobre 2025. Replay se compara con replay, nunca con la
+serie servida.
+
+**Dos condiciones por modelo.** Con IFS (servicio) y con ERA5-Land del propio
+día (cota superior, como `dos_09`); la resta mide el coste de la previsión.
+Etiquetas: producción es EGIF; únicos 1:3 y 1:10 son EFFIS; la pareja es
+mixta (dónde EFFIS × cuándo EGIF). Con juez EFFIS los únicos juegan en casa.
+
+**Datos, todos fuera de los repos en `~/Desktop/Master/archivo_ifs/`:**
+
+| Pieza | 2025 | 2026 |
+|---|---|---|
+| IFS archivado (`ifs_archivo_2025.parquet`) | descargando, ~1 día | 08-ago→02-sep hecho; 25-may→07-ago repartido: repo `ifs-descarga-remota` (otro PC / Actions / portátil) |
+| ERA5-Land horario (`era5land_cds/`) | may-nov 2025 desde CDS, en curso | may-jul en `TFM_fuego/malla_data/_cds`; ago-sep al cierre |
+| FIRMS (`firms_2025/`, `firms_2026/`) | **hecho**: 46.356 focos VIIRS SP, año completo | **hecho**: 19.664 focos VIIRS NRT, 01-may→02-sep |
+| EFFIS (`effis_ba_2025_ES.geojson`) | **hecho**, 1.359 perímetros | GeoJSON de temporada de la cadena |
+
+**Trabajo que queda.** Adaptar `archivo_ifs/verificar_replay.py` (los tres
+parches: truncar reanálisis a D−7, `firms_dia` con los parquets de archivo en
+vez de la API, respaldar/restaurar salidas) para leer ERA5-Land de
+`era5land_cds/` y FIRMS de los parquets; medir un día en local (en Actions son
+~40 min/día) antes de lanzar ~160 días × 2 temporadas × 2 condiciones; MITECO
+2025 desde los partes históricos de TFM-RAG si se quiere segundo juez.
+Salida: un `replay_<temporada>_<condicion>.csv` por corrida + veredicto con
+bootstrap por días como `dos_19`.
+
 ## En paralelo: las descargas de 2025 y el replay
 
 - **EFFIS 2025: hecho** (01/09). `~/Desktop/Master/archivo_ifs/
