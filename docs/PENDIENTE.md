@@ -303,14 +303,24 @@ día (cota superior, como `dos_09`); la resta mide el coste de la previsión.
 Etiquetas: producción es EGIF; únicos 1:3 y 1:10 son EFFIS; la pareja es
 mixta (dónde EFFIS × cuándo EGIF). Con juez EFFIS los únicos juegan en casa.
 
-**Datos, todos fuera de los repos en `~/Desktop/Master/archivo_ifs/`:**
+**Datos: TODOS descargados el 02/09/2026**, fuera de los repos en
+`~/Desktop/Master/archivo_ifs/` y copiados al USB en
+`TFM_fuego_expansion/archivo_replay/` (md5 en `archivo_ifs/MD5_archivo_replay.txt`):
 
 | Pieza | 2025 | 2026 |
 |---|---|---|
-| IFS archivado (`ifs_archivo_2025.parquet`) | descargando, ~1 día | 08-ago→02-sep hecho; 25-may→07-ago repartido: repo `ifs-descarga-remota` (otro PC / Actions / portátil) |
-| ERA5-Land horario (`era5land_cds/`) | may-nov 2025 desde CDS, en curso | may-jul en `TFM_fuego/malla_data/_cds`; ago-sep al cierre |
-| FIRMS (`firms_2025/`, `firms_2026/`) | **hecho**: 46.356 focos VIIRS SP, año completo | **hecho**: 19.664 focos VIIRS NRT, 01-may→02-sep |
-| EFFIS (`effis_ba_2025_ES.geojson`) | **hecho**, 1.359 perímetros | GeoJSON de temporada de la cadena |
+| IFS archivado (Open-Meteo, `ecmwf_ifs025`, diario) | `ifs_archivo_2025.parquet`: 5.605 nodos, 25-may→01-nov (161 días), md5 `24abb9fa` | `ifs_archivo_2026.parquet`: 5.605 nodos, 25-may→02-sep (101 días), md5 `06641f5b` |
+| ERA5-Land horario (CDS) | `era5land_cds/era5land_2025MM.nc`, may→nov, 7 meses, ~60 MB cada uno | may→jul en `TFM_fuego/malla_data/_cds`; ago-sep al cierre de temporada |
+| FIRMS (VIIRS SNPP) | `firms_2025/firms_iberia_2025.parquet`: 46.356 focos SP, año completo, md5 `83974076` | `firms_2026/firms_iberia_2026.parquet`: 19.664 focos NRT, 01-may→02-sep, md5 `a8c6b593` |
+| EFFIS (verdad) | `effis_ba_2025_ES.geojson`: 1.359 perímetros, md5 `82058d7c` | GeoJSON de temporada de la cadena (crece a diario) |
+
+Procedencia del IFS: 2026 25-may→07-ago y 2025 nodos 3.200-5.604 se bajaron
+desde GitHub Actions con el repo privado `JuanUtrilla/ifs-descarga-remota`
+(script por partes, sin credenciales, un runner por parte, ningún 429); el
+resto desde el portátil. FIRMS 2026 es NRT (el archivo estándar aún no cubre
+2026); FIRMS 2025 es SP, como el de entrenamiento. La caducidad manda: los
+artefactos de Actions expiran a 90 días y el NRT de FIRMS a pocos meses, por
+eso está todo en disco y en el USB.
 
 **Trabajo que queda.** Adaptar `archivo_ifs/verificar_replay.py` (los tres
 parches: truncar reanálisis a D−7, `firms_dia` con los parquets de archivo en
