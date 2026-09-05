@@ -146,23 +146,51 @@ SERVICIO a propósito, así que sus números son válidos para lo que se sirve.
 `auditoria_train_serve.py` no detecta esto: compara valores, no geometrías ni
 ventanas temporales. Ampliarlo está en `PENDIENTE.md`.
 
-## 9. La calibración por celda infrapredice en julio (05/09/2026)
+## 9. La probabilidad por celda no es calibrable en valor absoluto (05/09/2026)
 
-Con calibración estratificada por mes (`dos_29_calibra_estacional.py`), el error
-típico en la punta es de **1,8×**. Pero **julio infrapredice por 7×** (0,88 %
-contra 6,22 % observado), y es el mes que concentra más superficie quemada.
+Con calibración estratificada por mes (`dos_29_calibra_estacional.py`) el error
+típico en la punta es de **1,8×**, y en julio parecía llegar a 7×. La primera
+redacción de esta sección atribuía ese 7× a que la ventana de calibración
+2015-2021 no contenía ningún año extremo, y proponía como arreglo recalibrar
+sobre **ventana móvil**.
 
-Causa identificada: la ventana de calibración **2015-2021 no contiene ningún año
-extremo**, y el periodo de evaluación sí — 2022 aporta por sí solo más celdas
-quemadas en dos años (6.500) que los siete de calibración juntos (5.695).
+**Se probó (`dos_31_ventana_movil.py`) y la hipótesis es falsa.** Calibrando con
+los K años anteriores a cada año evaluado, el error en jun-sep va **al revés**
+de lo previsto:
 
-Arreglo pendiente y **no hecho**: recalibrar sobre **ventana móvil reciente** en
-vez de un bloque fijo. El mismo problema explica la infrapredicción en los
-deciles medios de `dos_28`.
+| modelo | 3 años | 5 años | 7 años | todo lo anterior |
+|---|---|---|---|---|
+| **r10** | 0,947 | 0,576 | 0,487 | **0,453** |
+| prod | 0,790 | 0,665 | 0,623 | **0,517** |
 
-Consecuencia para la memoria: se puede publicar el rango de la punta
-(0,3 % en diciembre a 10 % en julio) y el techo (1,6 %), pero **no dar el número
-de julio como exacto**.
+Cuanta menos historia, peor. En julio de 2022 el error empeora de 6,4× a 8,9×.
+
+La causa real es otra. La tasa observada en el top 0,2 % de **julio**, año a año:
+
+| 2015 | 2018 | 2021 | 2022 | 2023 | 2024 |
+|---|---|---|---|---|---|
+| 1,13 % | 0,03 % | 0,80 % | **12,76 %** | **0,00 %** | 0,07 % |
+
+Mediana **0,53 %**. El julio de 2022 está 24 veces por encima; el de 2023 es
+cero. Ninguna curva puntuación→probabilidad puede seguir eso, porque **la
+variación no vive en la puntuación de la celda: vive en la intensidad del día y
+del año**. El «7× de julio» era, además, un artefacto de promediar 2022 con el
+resto: contra la mediana de julio, la calibración acierta dentro de un factor 2.
+
+**Consecuencia, y cierra el círculo con el diseño del producto.** La
+descomposición correcta no es una curva sino dos factores:
+
+    P(arde la celda) = P(hoy es día grande) × P(esta celda | día grande)
+
+que es el **producto de dos capas** al que se llega por otro camino en
+`56_calibracion/README.md`. La calibración por celda es válida para el **orden**
+y para la **magnitud típica** («EXTREMO es 1 de cada 1.000», techo 1,6 %); el
+nivel concreto del día lo tiene que poner la capa «si».
+
+Para la memoria: se puede publicar el rango de la punta (0,3 % en diciembre a
+10 % en julio) y el techo, pero **no un valor absoluto por celda y día** como si
+fuera una probabilidad calibrada de precisión. Calibrar el segundo factor
+condicionado a día grande, y multiplicar, es trabajo futuro.
 
 ## 10. El bootstrap iid estrecha los intervalos un 35 % (05/09/2026)
 

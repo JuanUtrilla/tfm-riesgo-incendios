@@ -27,6 +27,7 @@ base, días de cero fuego incluidos.
 | `dos_27_escala_absoluta.py` | Cortes en la escala de puntuación, leídos de la climatología |
 | `dos_28_calibra_celda.py` | Probabilidad por celda (isotónica sobre el censo) |
 | `dos_29_calibra_estacional.py` | La misma, estratificada por mes |
+| `dos_31_ventana_movil.py` | ¿Ayuda calibrar con los K años anteriores? (no) |
 
 Todos comparten partición: **calibración 2015-2021 · validación 2022-2023 ·
 test 2024**. El umbral se elige solo en calibración.
@@ -40,6 +41,7 @@ python 05_iteracion2/56_calibracion/dos_26_calibra_si.py
 python 05_iteracion2/56_calibracion/dos_27_escala_absoluta.py
 python 05_iteracion2/56_calibracion/dos_28_calibra_celda.py
 python 05_iteracion2/56_calibracion/dos_29_calibra_estacional.py
+python 05_iteracion2/56_calibracion/dos_31_ventana_movil.py
 ```
 
 `dos_25` necesita el cubo IberFire (`TFM_DATOS`) y deja un checkpoint atómico:
@@ -96,9 +98,14 @@ probabilidad de arder es del 0,3 %»*.
 - **La calibración beta no vale por celda**: sin restricción da coeficiente
   negativo en −log(1−s), no es monótona y hunde la cola alta (la celda máxima
   salía con 0,000 %). Se usa isotónica, monótona por construcción.
-- **Julio infrapredice por 7×** incluso con calibración por mes (0,88 % contra
-  6,22 % real). La ventana 2015-2021 no contiene ningún año extremo y el periodo
-  de evaluación sí (2022). Arreglo pendiente: ventana móvil.
+- **La probabilidad por celda no es calibrable en valor absoluto.** Se probó la
+  ventana móvil (`dos_31`) y **empeora**: en jun-sep el error va de 0,453 con
+  toda la historia a 0,947 con tres años. La razón es que la punta de julio va
+  del **0,00 % (2023) al 12,76 % (2022)**, mediana 0,53 %: esa variación no está
+  en la puntuación de la celda, está en la intensidad del año. La descomposición
+  correcta son dos factores, `P(día grande) × P(celda | día grande)`, que es el
+  producto de dos capas. La calibración sirve para el orden y la magnitud típica,
+  no para un valor absoluto por celda y día.
 - **El bootstrap iid estrecha los intervalos un 35 %** frente al de bloques de
   14 días. Afecta a cómo se leen los IC del resto de la memoria.
 

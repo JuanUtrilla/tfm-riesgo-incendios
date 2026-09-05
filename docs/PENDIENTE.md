@@ -478,3 +478,31 @@ prerregistro del r10), `LIMITACIONES.md` (§8, §9, §10) y
 `dos_riesgo_hoy.py` (`CORTES_PCTL`), el bug del viento, la ventana FIRMS de la
 cadena viva y el modelo servido. Todo lo de hoy es **evidencia para decidir**,
 no un cambio de producto.
+
+### Actualización del 05/09/2026 (tarde)
+
+**Hecho:**
+- Los 14 scripts del replay y sus descargas, incorporados (10 en
+  `06_comparacion`, 4 en `01_datos`). Cierra el pendiente n.º 2.
+- `dos_31_ventana_movil.py`: la ventana móvil **no funciona**, y el diagnóstico
+  de `LIMITACIONES.md` §9 estaba equivocado. Sección reescrita. Cierra el
+  pendiente n.º 3, con resultado negativo.
+- `docs/MEMORIA/seccion_modelo.tex`: subsección nueva «De la ordenación a la
+  probabilidad» (dos regímenes, el aviso de día, el significado del rojo, los
+  dos resultados negativos). El documento pasa de 7 a 9 páginas y compila sin
+  errores. Cifras verificadas contra `dos_26_calibracion.csv` y
+  `dos_27_bandas.csv`.
+
+**Bloqueado por hardware:**
+- El mapa del 21-ago. **El disco Expansion no está montado** (solo se ve
+  `3D97-F226`). Hay que conectarlo físicamente para buscar el original; si no
+  aparece, excluir el día del juez EFFIS.
+
+**Sigue pendiente:**
+- Calibrar el segundo factor condicionado a día grande y multiplicar
+  (`LIMITACIONES.md` §9): es la continuación natural del resultado negativo.
+- Decidir sobre caja/radio (§8) tras el cierre de los jueces.
+- Ampliar `auditoria_train_serve.py` (geometrías y ventanas temporales).
+- Fase 4 del «si»: modelo día-nacional directo.
+- Anomalía de la punta 2026.
+- `malla_data/` (1,1 GB) fuera del `.gitignore` de `TFM_fuego`.

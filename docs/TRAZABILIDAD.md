@@ -182,6 +182,8 @@ Partición fija en los cuatro scripts: **calibración 2015-2021 · validación
 | beta descartada | La beta da coeficiente **negativo** en −log(1−s) y no es monótona (techo 0,000 %); se usa isotónica | ídem | `dos_28_beta.json` | cubo |
 | **0,28 % → 10,36 %** | Probabilidad de la peor celda, de diciembre a julio (factor 37) | `05_iteracion2/56_calibracion/dos_29_calibra_estacional.py` | `dos_29_punta.csv` | cubo |
 | 1,8× contra 2,4× | Error típico de la calibración por mes contra la global; en julio, 7× contra 52× | ídem | ídem | cubo |
+| 0,453 (todo) contra **0,947** (3 años) | **Ventana móvil: hipótesis refutada.** Cuanta menos historia, peor | `05_iteracion2/56_calibracion/dos_31_ventana_movil.py` | `dos_31_ventanas.csv` | cubo |
+| 0,00 % → **12,76 %** | La punta de julio, año a año (mediana 0,53 %): la variación no está en la puntuación de la celda sino en la intensidad del año | ídem | ídem | cubo |
 | entrenar solo verano: peor | Resultado negativo | `05_iteracion2/57_ablaciones/dos_08_verano.py` | `dos_08_verano.json` | disco |
 | −0,02 | La capa «ya quemado» empeora | `05_iteracion2/57_ablaciones/dos_17_capa_quemado.py` | `dos_17_capa_quemado.csv/json` | disco |
 

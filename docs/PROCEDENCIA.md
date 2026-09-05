@@ -370,7 +370,7 @@ producían estos resultados (`git status` de `TFM_fuego_malla` y de este repo
 quedó vacío toda la jornada). Su bitácora, con los md5 antes y después de cada
 arreglo, está en `calibracion_si/BITACORA.md`.
 
-### `05_iteracion2/56_calibracion` — 5 ficheros nuevos
+### `05_iteracion2/56_calibracion` — 6 ficheros nuevos
 
 | Fichero | Origen | md5 |
 |---|---|---|
@@ -379,6 +379,7 @@ arreglo, está en `calibracion_si/BITACORA.md`.
 | `dos_27_escala_absoluta.py` | C | `c0cd7a9b` |
 | `dos_28_calibra_celda.py` | C | `76d1b90f` |
 | `dos_29_calibra_estacional.py` | C | `2a8c2340` |
+| `dos_31_ventana_movil.py` | C | `63f6e93c` |
 
 ### `05_iteracion2/57_ablaciones` — 1 fichero nuevo
 
@@ -404,3 +405,51 @@ scripts del replay original (`archivo_ifs/replay_*.py`) siguen **pendientes** de
 incorporar; ver `PENDIENTE.md`.
 
 El principio no cambia: copias literales, y el hash permite comprobarlo.
+
+---
+
+## Incorporación del 05/09/2026 (2) — el replay de 2025 y 2026
+
+Catorce ficheros más, con **otro origen**:
+
+Origen **A** = `~/Desktop/Master/archivo_ifs/`, el directorio de trabajo del
+replay, fuera de todo repositorio (los datos que maneja —IFS archivado de dos
+temporadas, ERA5-Land, FIRMS, EFFIS— pesan decenas de GB y nunca han estado en
+git). Cierra el pendiente «copiar los 9 scripts del replay al repo».
+
+### `06_comparacion` — 10 ficheros nuevos
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `replay_dia.py` | A | `2a060518` |
+| `replay_temporada.py` | A | `29d666ba` |
+| `replay_verdad.py` | A | `79bbf76b` |
+| `replay_veredicto.py` | A | `60bd15e2` |
+| `replay_figuras.py` | A | `ab2e227d` |
+| `replay_si.py` | A | `18e0d3c0` |
+| `replay_precision.py` | A | `71288dea` |
+| `replay_radio.py` | A | `15a6c6a6` |
+| `replay_cobertura.py` | A | `9cf54e1c` |
+| `verificar_replay.py` | A | `3aa798d4` |
+
+### `01_datos` — 4 ficheros nuevos
+
+| Fichero | Destino | Origen | md5 |
+|---|---|---|---|
+| `bajar_ifs_2025.py` | `01_datos/ifs` | A | `7ba0d828` |
+| `rellenar_ifs.py` | `01_datos/ifs` | A | `2f16da70` |
+| `bajar_effis_2025.py` | `01_datos/effis` | A | `bc046172` |
+| `bajar_era5land_2025.py` | `01_datos/era5land` | A | `11cdd482` |
+
+**Salvedad de ejecución, importante.** Estos scripts **no corren desde el árbol
+del repositorio**. `replay_dia.py` calcula `AQUI` desde su propia ubicación y
+espera encontrar al lado un `sandbox_replay/` (copia de los `.py` de
+`TFM_fuego_malla`) y los ficheros de entrada (`ifs_archivo_<año>.parquet`,
+`era5land_diario_<año>.nc`, los parquets de FIRMS, los GeoJSON de EFFIS). Aquí
+están **como evidencia de qué código produjo los números**, que es el propósito
+de este repositorio, no como una copia ejecutable. Para reproducirlos hay que
+situarlos en un directorio con esas entradas, como describe
+`README_replay.md` en `archivo_ifs/`.
+
+No se han adaptado las rutas por la misma razón que en el resto del repositorio:
+tocarlas rompería el vínculo entre el código y el resultado publicado.

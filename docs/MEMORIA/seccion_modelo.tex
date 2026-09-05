@@ -406,6 +406,139 @@ apoya el modelo en el territorio y menos en el día concreto.}
 \label{fig:f6}
 \end{center}
 
+\subsection{De la ordenación a la probabilidad}
+
+Todo lo anterior mide capacidad de \emph{ordenar}: el AUC no cambia si se aplica
+una transformación monótona a la puntuación. Un mapa operativo, en cambio, no se
+lee como un orden. El sistema en producción pinta cuatro niveles con los
+percentiles del día ---\var{CORTES\_PCTL = [30, 90, 98]}---, de modo que el
+2\,\% superior aparece en rojo \emph{todos los días por construcción}: un martes
+de febrero recibe tanto rojo como el 15 de agosto. Bajo ese mismo color, la
+puntuación absoluta del percentil~98 de un día de invierno varía entre 0,032 y
+0,965. El color, tal como está definido, no informa de nada.
+
+Para atacarlo se puntuaron los cinco modelos sobre los 3.653 días de 2015--2024
+del cubo, guardando un histograma diario de 4.096 clases por modelo y la
+puntuación exacta de las 64.088 celdas-día que ardieron. La partición se fija en
+calibración 2015--2021, validación 2022--2023 y prueba 2024, y el umbral se
+elige únicamente en calibración.
+
+\subsubsection*{Dos regímenes de incendio, no uno}
+
+La primera comprobación desmiente la premisa de partida. La estacionalidad
+española no es un verano peligroso y un invierno inerte: entre noviembre y marzo
+hay fuego el 33,9\,\% de los días, y marzo ---con 149 días de 310--- se acerca a
+septiembre. La diferencia es \emph{dónde}. En diciembre-abril, el 85,6\,\% de las
+celdas quemadas cae en el noroeste peninsular (Galicia, Asturias, Cantabria,
+León y Zamora), que es el 14,4\,\% del territorio; en junio-septiembre, el
+40,7\,\%. Es la temporada de quemas pastorales, gobernada por la ignición y no
+por la sequía. La estadística oficial del EGIF lo corrobora por una vía
+independiente: marzo es el mes con más incendios del año, 10.471 entre 2008 y
+2024, por delante de agosto (6.170).
+
+\subsubsection*{El aviso de día funciona en invierno y no en verano}
+
+Definido el objetivo como día grande ---al menos cinco celdas de primer día, es
+decir unas 500\,ha---, y calibrada la probabilidad con el método beta de
+Kull et al. (2017) por régimen, la habilidad se separa de forma nítida
+(Tabla~\ref{tab:si}). En invierno-primavera los cinco modelos superan a la
+climatología del día del año con intervalo que excluye el cero; en verano los
+cinco intervalos lo cruzan. La lectura correcta no es que el aviso sea peor en
+verano, sino que \emph{no se distingue} de la estacionalidad: en julio ya se sabe
+que es día de riesgo sin necesidad de modelo.
+
+\begin{table}[htbp]\centering\footnotesize
+\caption{Aviso de día, prueba 2024. BSS contra la climatología del día del año e
+índice SEDI, con intervalo al 95\,\% por remuestreo.}
+\label{tab:si}
+\begin{tabular}{llcc}
+\toprule
+Régimen & Modelo & BSS [IC 95\,\%] & SEDI \\
+\midrule
+Invierno-primavera & producción & $+0{,}258$ [$+0{,}189$, $+0{,}328$] & 0,815 \\
+Invierno-primavera & único 1:10 & $+0{,}297$ [$+0{,}198$, $+0{,}381$] & 0,794 \\
+Invierno-primavera & pareja     & $+0{,}181$ [$+0{,}109$, $+0{,}255$] & 0,764 \\
+\midrule
+Verano & producción & $-0{,}076$ [$-0{,}183$, $+0{,}032$] & 0,506 \\
+Verano & único 1:10 & $-0{,}107$ [$-0{,}230$, $+0{,}022$] & 0,368 \\
+Verano & pareja     & $-0{,}086$ [$-0{,}207$, $+0{,}034$] & 0,399 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Un solo umbral sirve para todo el año: los umbrales estimados por régimen se
+separan entre un 8 y un 18\,\% en la escala de puntuación, y el umbral único
+iguala o mejora al específico en ocho de los diez casos de prueba. Los dos
+regímenes se distinguen en dónde arde y en la frecuencia base, no en el nivel de
+puntuación que hay que exigir.
+
+\subsubsection*{Qué significa el rojo}
+
+Sustituyendo los percentiles del día por cortes leídos de la distribución
+climatológica de 2015--2024, el color adquiere por fin un contenido medible
+(Tabla~\ref{tab:bandas}). El nivel extremo corresponde a una probabilidad de
+quema de 0,126\,\% ---una celda de cada ochocientas---, treinta y seis veces la
+frecuencia base; y el nivel bajo, que cubre el 30\,\% del territorio, acumuló
+cinco celdas quemadas en diez años. Calibrada la probabilidad por celda con
+regresión isotónica sobre el censo completo, la celda peor clasificada que llega
+a existir en toda la serie no supera el 1,6\,\%. Es, por tanto, un instrumento de
+vigilancia y priorización, no un pronóstico de que una celda vaya a arder.
+
+\begin{table}[htbp]\centering\footnotesize
+\caption{Significado de cada nivel con cortes absolutos, modelo único 1:10.
+Frecuencia observada de quema sobre 365 millones de celdas-día.}
+\label{tab:bandas}
+\begin{tabular}{lrrrr}
+\toprule
+Nivel & \% territorio & Celdas quemadas & Frecuencia & Factor \\
+\midrule
+Bajo     & 30,1 & 5      & 0,0000\,\% & 0,0 \\
+Moderado & 59,9 & 1.062  & 0,0005\,\% & 0,1 \\
+Alto     & 8,0  & 2.682  & 0,0092\,\% & 2,6 \\
+Extremo  & 2,0  & 9.148  & 0,1259\,\% & 35,6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La escala absoluta, sin embargo, no basta por sí sola. Con ella, el modelo único
+no tiene \emph{ni un solo día sin rojo} en diez años: la componente de dónde está
+dominada por variables estáticas ---usos del suelo, historia de fuego,
+pendiente--- y las mismas celdas superan el corte en enero y en agosto. El mapa
+no puede apagarse solo. Encadenándolo al aviso de día, en cambio, el 44\,\% de
+las jornadas de invierno quedan sin nivel extremo perdiendo únicamente el
+6,2\,\% de los días grandes. La arquitectura en dos capas deja de ser una
+preferencia de diseño y pasa a ser una necesidad demostrada.
+
+\subsubsection*{Dos resultados negativos}
+
+El primero acota qué se puede publicar. La punta del ranking varía mucho con el
+mes ---del 0,28\,\% en diciembre al 10,36\,\% en julio, un factor 37--- y una
+calibración estratificada por mes la sigue con un error típico de 1,8 veces,
+frente a 2,4 de una curva única. Pero calibrar con los años inmediatamente
+anteriores en lugar de con toda la historia, que parecía el remedio natural,
+\emph{empeora} el resultado de forma monótona: en junio-septiembre el error pasa
+de 0,45 usando toda la serie a 0,95 usando tres años. La razón es que la
+frecuencia observada en la punta de julio oscila entre el 0,00\,\% de 2023 y el
+12,76\,\% de 2022, con mediana 0,53\,\%, y esa variación no reside en la
+puntuación de la celda sino en la intensidad de la temporada. La descomposición
+correcta es un producto de dos factores, $P(\text{día grande})\times P(\text{celda}\mid\text{día grande})$,
+que devuelve exactamente a la arquitectura de dos capas; calibrar el segundo
+factor condicionado queda como trabajo futuro.
+
+El segundo cierra una duda razonable sobre la partición. El modelo servido se
+entrena con 2015--2022 y reserva 2023 y 2024, de modo que ignora dos años de
+datos. Reentrenado con la serie completa ---un 32\,\% más de positivos--- y
+medido sobre las 224 jornadas de 2025 y 2026 reconstruidas con previsión
+archivada, la ganancia es de $+0{,}0033$ de AUC con intervalo
+$[-0{,}0042, +0{,}0104]$: indistinguible de cero, y gana el 54,5\,\% de los días.
+El experimento se registró antes de ejecutarse, y su validez descansa en dos
+controles: la réplica del modelo servido lo reproduce con diferencia máxima nula,
+y los cuatro modelos no modificados devuelven las mismas cifras que la
+evaluación original en los 224 días. La conclusión es que el modelo está saturado
+de datos y que la partición actual, que conserva una prueba honesta reservada,
+no cuesta rendimiento. Para situarlo: la distancia entre este modelo y producción
+($+0{,}079$) es veinticuatro veces mayor que lo que aporta reentrenar con todo.
+
 \subsection{Limitaciones y trabajo posterior}
 
 La limitación de fondo es que la ventaja se demuestra en evaluación
