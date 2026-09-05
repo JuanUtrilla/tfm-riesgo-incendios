@@ -520,10 +520,16 @@ anteriores en lugar de con toda la historia, que parecía el remedio natural,
 de 0,45 usando toda la serie a 0,95 usando tres años. La razón es que la
 frecuencia observada en la punta de julio oscila entre el 0,00\,\% de 2023 y el
 12,76\,\% de 2022, con mediana 0,53\,\%, y esa variación no reside en la
-puntuación de la celda sino en la intensidad de la temporada. La descomposición
-correcta es un producto de dos factores, $P(\text{día grande})\times P(\text{celda}\mid\text{día grande})$,
-que devuelve exactamente a la arquitectura de dos capas; calibrar el segundo
-factor condicionado queda como trabajo futuro.
+puntuación de la celda sino en la intensidad de la temporada. Se probaron tres remedios ---estratificar por
+mes, acortar la ventana y descomponer en el producto
+$P(\text{día grande})\times P(\text{celda}\mid\text{día grande})$--- y los tres
+fallan por la misma razón: condicionada a día grande, la punta de julio de 2022
+alcanza el 14,95\,\% frente a un máximo de 2,05\,\% en los años de calibración,
+siete veces por encima. No es un problema de esquema de calibración sino de
+extrapolación. Lo que se sostiene es que la probabilidad por celda está bien
+calibrada en condiciones típicas ---contra la mediana de julio, 0,53\,\%, el
+modelo dice en torno al 0,9\,\%--- y que en una temporada de récord se queda
+corta en un orden de magnitud; declararlo es más útil que ocultarlo.
 
 El segundo cierra una duda razonable sobre la partición. El modelo servido se
 entrena con 2015--2022 y reserva 2023 y 2024, de modo que ignora dos años de

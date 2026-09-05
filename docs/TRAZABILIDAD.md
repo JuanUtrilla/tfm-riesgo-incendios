@@ -184,6 +184,12 @@ Partición fija en los cuatro scripts: **calibración 2015-2021 · validación
 | 1,8× contra 2,4× | Error típico de la calibración por mes contra la global; en julio, 7× contra 52× | ídem | ídem | cubo |
 | 0,453 (todo) contra **0,947** (3 años) | **Ventana móvil: hipótesis refutada.** Cuanta menos historia, peor | `05_iteracion2/56_calibracion/dos_31_ventana_movil.py` | `dos_31_ventanas.csv` | cubo |
 | 0,00 % → **12,76 %** | La punta de julio, año a año (mediana 0,53 %): la variación no está en la puntuación de la celda sino en la intensidad del año | ídem | ídem | cubo |
+| 1,7× contra **3,4×** | El **producto de dos capas empeora**: hereda la infraconfianza del «si» y la multiplica | `05_iteracion2/56_calibracion/dos_32_producto_dos_capas.py` | `dos_32_punta.csv` | cubo |
+| 2,05 % contra **14,95 %** | Julio 2022 condicionado a día grande, contra el máximo de calibración: **7× fuera del envolvente**. No es calibración, es extrapolación | ídem | ídem | cubo |
+| 11,5 % → **4,8 %** | **La «anomalía de la punta 2026» es UN día** (23-jul, 21.348 ha): quitándolo, el orden vuelve al de 2025 | `06_comparacion/dos_33_anomalia_punta.py` | `dos_33_sensibilidad.csv` | replay |
+| [1,6, 27,1] contra [2,9, 14,7] | Los IC de producción y r10 en la punta de 2026 **se solapan por completo** | ídem | ídem | replay |
+| **1,391** contra 1,404 teórico | Caja/círculo a 10 km medido sobre la misma rejilla; a 50 km, 1,300 contra 1,299 | `05_iteracion2/57_ablaciones/dos_34_auditoria_geometria.py` | `dos_34_geometria.csv` | cubo |
+| Spearman 0,92-0,98 | El desajuste caja/radio es de **escala, no de orden**: por eso el AUC apenas se resiente | ídem | ídem | cubo |
 | entrenar solo verano: peor | Resultado negativo | `05_iteracion2/57_ablaciones/dos_08_verano.py` | `dos_08_verano.json` | disco |
 | −0,02 | La capa «ya quemado» empeora | `05_iteracion2/57_ablaciones/dos_17_capa_quemado.py` | `dos_17_capa_quemado.csv/json` | disco |
 

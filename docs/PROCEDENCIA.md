@@ -370,7 +370,7 @@ producían estos resultados (`git status` de `TFM_fuego_malla` y de este repo
 quedó vacío toda la jornada). Su bitácora, con los md5 antes y después de cada
 arreglo, está en `calibracion_si/BITACORA.md`.
 
-### `05_iteracion2/56_calibracion` — 6 ficheros nuevos
+### `05_iteracion2/56_calibracion` — 7 ficheros nuevos
 
 | Fichero | Origen | md5 |
 |---|---|---|
@@ -380,12 +380,14 @@ arreglo, está en `calibracion_si/BITACORA.md`.
 | `dos_28_calibra_celda.py` | C | `76d1b90f` |
 | `dos_29_calibra_estacional.py` | C | `2a8c2340` |
 | `dos_31_ventana_movil.py` | C | `63f6e93c` |
+| `dos_32_producto_dos_capas.py` | C | `65eee377` |
 
-### `05_iteracion2/57_ablaciones` — 1 fichero nuevo
+### `05_iteracion2/57_ablaciones` — 2 ficheros nuevos
 
 | Fichero | Origen | md5 |
 |---|---|---|
 | `dos_30_r10_todo.py` | C | `5eef1cb0` |
+| `dos_34_auditoria_geometria.py` | C | `0b6c998a` |
 
 ### `06_comparacion` — 2 ficheros nuevos
 
@@ -417,7 +419,7 @@ replay, fuera de todo repositorio (los datos que maneja —IFS archivado de dos
 temporadas, ERA5-Land, FIRMS, EFFIS— pesan decenas de GB y nunca han estado en
 git). Cierra el pendiente «copiar los 9 scripts del replay al repo».
 
-### `06_comparacion` — 10 ficheros nuevos
+### `06_comparacion` — 11 ficheros nuevos
 
 | Fichero | Origen | md5 |
 |---|---|---|
@@ -431,6 +433,7 @@ git). Cierra el pendiente «copiar los 9 scripts del replay al repo».
 | `replay_radio.py` | A | `15a6c6a6` |
 | `replay_cobertura.py` | A | `9cf54e1c` |
 | `verificar_replay.py` | A | `3aa798d4` |
+| `dos_33_anomalia_punta.py` | C | `6fe5559f` |
 
 ### `01_datos` — 4 ficheros nuevos
 

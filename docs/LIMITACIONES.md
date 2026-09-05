@@ -143,8 +143,26 @@ razón que el bug del viento (§1): tocar `riesgo_hoy.py` a mitad de temporada
 rompe la serie sellada. La calibración de `56_calibracion` replica el camino de
 SERVICIO a propósito, así que sus números son válidos para lo que se sirve.
 
-`auditoria_train_serve.py` no detecta esto: compara valores, no geometrías ni
-ventanas temporales. Ampliarlo está en `PENDIENTE.md`.
+**Confirmado por una vía independiente** (`dos_34_auditoria_geometria.py`,
+05/09/2026). En lugar de ejecutar las dos ramas, se aplican las **dos
+geometrías a la misma rejilla de entrada** (la de EGIF mismo-mes, la variable de
+mayor ganancia del modelo). Los cocientes medidos clavan los teóricos:
+
+| radio | caja | círculo | cociente teórico | **medido** | Spearman |
+|---|---|---|---|---|---|
+| 10 km | 441 km² | 314 km² | 1,404 | **1,391** | 0,924 |
+| 50 km | 10.201 km² | 7.854 km² | 1,299 | **1,300** | 0,980 |
+
+Dos consecuencias. La primera: la geometría explica por sí sola un factor
+1,39× del 1,50× observado en `n_fuegos_10km_mismomes_hist`; el resto procede de
+otras diferencias entre las dos ramas. La segunda, y más importante: el
+desajuste es **de escala, no de orden** —la correlación de rangos es 0,92-0,98—,
+lo que explica que el AUC apenas se resienta. Lo que se desplaza es el valor que
+ve el árbol, y con él la posición relativa de los cortes aprendidos.
+
+`auditoria_train_serve.py` no detecta esto porque compara valores, no geometrías
+ni ventanas temporales, y está sellado. `dos_34_auditoria_geometria.py` cubre el
+hueco sin modificarlo.
 
 ## 9. La probabilidad por celda no es calibrable en valor absoluto (05/09/2026)
 
@@ -177,20 +195,33 @@ variación no vive en la puntuación de la celda: vive en la intensidad del día
 del año**. El «7× de julio» era, además, un artefacto de promediar 2022 con el
 resto: contra la mediana de julio, la calibración acierta dentro de un factor 2.
 
-**Consecuencia, y cierra el círculo con el diseño del producto.** La
-descomposición correcta no es una curva sino dos factores:
+**El producto de dos capas tampoco lo arregla, y se ha probado.** La
+descomposición `P(día grande) × P(celda | día grande)`, con el primer factor de
+`dos_26` y el segundo ajustado solo con días grandes
+(`dos_32_producto_dos_capas.py`), **empeora**: en jun-sep el error típico pasa de
+1,7× (incondicional) a 3,4×. El producto hereda la infraconfianza de la capa
+«si» y la multiplica por la de la capa «dónde»; los dos errores se componen en
+lugar de cancelarse.
 
-    P(arde la celda) = P(hoy es día grande) × P(esta celda | día grande)
+**La causa real es que 2022 está fuera del envolvente histórico.** Tasa en la
+punta de julio condicionada a día grande: máximo 2,05 % en los años de
+calibración (2015-2021), contra **14,95 % en julio de 2022**, siete veces por
+encima. Ninguna calibración ajustada con 2015-2021 puede producir ese número, y
+por eso fallan igual los tres intentos: por mes (`dos_29`), ventana móvil
+(`dos_31`) y producto de dos capas (`dos_32`). No es un problema de esquema de
+calibración: **es extrapolación, no calibración**.
 
-que es el **producto de dos capas** al que se llega por otro camino en
-`56_calibracion/README.md`. La calibración por celda es válida para el **orden**
-y para la **magnitud típica** («EXTREMO es 1 de cada 1.000», techo 1,6 %); el
-nivel concreto del día lo tiene que poner la capa «si».
+Lo que se sostiene, y es lo que debe ir a la memoria:
 
-Para la memoria: se puede publicar el rango de la punta (0,3 % en diciembre a
-10 % en julio) y el techo, pero **no un valor absoluto por celda y día** como si
-fuera una probabilidad calibrada de precisión. Calibrar el segundo factor
-condicionado a día grande, y multiplicar, es trabajo futuro.
+- La probabilidad por celda está **bien calibrada en condiciones típicas**:
+  contra la mediana de julio (0,53 %) el modelo dice ~0,9 %, dentro de un
+  factor 2.
+- La calibración es válida para el **orden** y la **magnitud típica**
+  («extremo es 1 de cada 1.000», techo 1,6 %).
+- **No puede anticipar una temporada récord**, y en un año extremo la
+  probabilidad servida se queda corta en un orden de magnitud. Es una limitación
+  del planteamiento —calibrar sobre el pasado—, no un defecto corregible con más
+  ingeniería, y conviene declararla porque es operativamente relevante.
 
 ## 10. El bootstrap iid estrecha los intervalos un 35 % (05/09/2026)
 

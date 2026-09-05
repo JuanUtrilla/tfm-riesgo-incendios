@@ -506,3 +506,24 @@ no un cambio de producto.
 - Fase 4 del «si»: modelo día-nacional directo.
 - Anomalía de la punta 2026.
 - `malla_data/` (1,1 GB) fuera del `.gitignore` de `TFM_fuego`.
+
+### Actualización del 05/09/2026 (noche) — cerrados tres más
+
+- **Producto de dos capas: probado y descartado** (`dos_32`). Empeora (3,4×
+  contra 1,7×). Causa definitiva: julio de 2022 está **7× fuera del envolvente
+  histórico** incluso condicionando a día grande. `LIMITACIONES.md` §9 reescrita
+  por segunda vez: no es calibración, es extrapolación.
+- **Anomalía de la punta 2026: RESUELTA** (`dos_33`). Es **un solo día**, el
+  23-jul-2026 (21.348 ha, 8 % de la temporada), donde producción metió el 89,5 %
+  de las hectáreas en su top 2 %. Quitándolo, producción cae del 11,5 % al 4,8 %
+  y el orden vuelve al de 2025. Los IC se solapan por completo. **No hace falta
+  la hipótesis del radio de 50 km de FIRMS** para explicarlo (el hallazgo de que
+  FIRMS no ayuda en la punta es otro, y sigue en pie).
+- **Auditoría de geometría** (`dos_34`), sin tocar el `auditoria_train_serve.py`
+  sellado. Confirma caja/círculo por vía independiente: 1,391 contra 1,404
+  teórico a 10 km. Desajuste de escala, no de orden.
+- **`malla_data/` ignorado** en `TFM_fuego` (commit `3679896`, solo `.gitignore`).
+
+**Sigue pendiente:** el mapa del 21-ago (disco Expansion sin montar); decidir
+sobre caja/radio tras el cierre; la Fase 4 del «si» (modelo día-nacional, nunca
+empezada); y los 2 commits sin pushear de `TFM_fuego`.
