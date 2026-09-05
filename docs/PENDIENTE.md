@@ -440,3 +440,41 @@ bootstrap por días como `dos_19`.
   todos los días, el juez puntuará ese mapa retro cuando lleguen sus
   perímetros: excluir el día, recuperar el original del USB Expansion
   (congelado el 21/08), o documentarlo.
+
+---
+
+## Estado tras la incorporación del 05/09/2026
+
+**Incorporado hoy:** `dos_25`-`dos_29` en `05_iteracion2/56_calibracion` (con
+README), `dos_30_r10_todo.py` en `57_ablaciones`, `replay_dia_todo.py` y
+`replay_temporada_todo.py` en `06_comparacion`. Documentado en
+`PROCEDENCIA.md` (origen **C**), `TRAZABILIDAD.md` (capítulo 5 ampliado +
+prerregistro del r10), `LIMITACIONES.md` (§8, §9, §10) y
+`R10_TODOS_LOS_ANIOS.md`.
+
+### Sigue pendiente
+
+1. **Escribir los capítulos.** Nada de esto está en la memoria todavía. Va al
+   capítulo 5 (calibración) y al 7 (producto de dos capas). El material está en
+   el README de `56_calibracion` y en `R10_TODOS_LOS_ANIOS.md`.
+2. **Los 9 scripts del replay original** (`archivo_ifs/replay_*.py`) siguen sin
+   incorporar. Los dos de hoy (`replay_*_todo.py`) son copias parcheadas de dos
+   de ellos.
+3. **Recalibrar en ventana móvil** (`LIMITACIONES.md` §9): julio infrapredice 7×.
+4. **Decidir sobre caja/radio** (`LIMITACIONES.md` §8): documentar y seguir, o
+   corregir `riesgo_hoy.py` después del cierre y medir cuánto mueve el AUC.
+5. **Ampliar `auditoria_train_serve.py`**: no compara geometrías ni ventanas
+   temporales; habría cazado tanto lo de FIRMS 5/7 como lo de caja/radio.
+6. **Fase 4 del «si»** (opcional, nunca empezada): modelo día-nacional directo,
+   target «¿mañana ≥1 incendio ≥100 ha?», sin submuestreo y por tanto sin prior
+   shift.
+7. **Mapa del 21-ago**: buscar el original en el USB Expansion; si no aparece,
+   excluir el día del juez EFFIS.
+8. **Anomalía de la punta 2026**: producción cubre el 11,5 % de las hectáreas en
+   el top 2 % contra el 6-7 % de los únicos, al revés que en 2025. Sin explicar.
+
+### No tocar antes del cierre de los jueces (mediados de septiembre)
+
+`dos_riesgo_hoy.py` (`CORTES_PCTL`), el bug del viento, la ventana FIRMS de la
+cadena viva y el modelo servido. Todo lo de hoy es **evidencia para decidir**,
+no un cambio de producto.

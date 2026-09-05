@@ -394,3 +394,22 @@ de junio y julio la fuga de FIRMS no se habría podido demostrar—; el veredict
 lo siguen firmando los tres jueces en vivo sobre candidatos comprometidos de
 antemano, que es por lo que `donde_dia_effis_r10` se puso a servir el 31/08 en
 lugar de limitarse a medirlo en retro.
+
+## 05/09/2026 — Calibración incorporada
+
+Jornada entera en un banco aislado (`~/Desktop/Master/calibracion_si/`), fuera de
+todo repositorio, a petición explícita: ningún fichero de `TFM_fuego_malla` ni de
+este repo se modificó mientras se producían los resultados.
+
+Lo que salió: los dos regímenes de incendio de España; el aviso de día calibrado
+(funciona en invierno, en verano no se distingue de la climatología); la escala
+absoluta que da significado al color (EXTREMO = 0,13 %, techo 1,6 %); la
+probabilidad por celda mes a mes (0,28 % en diciembre a 10,36 % en julio); y un
+resultado negativo prerregistrado: entrenar el r10 con todos los años **no
+mejora** (+0,0033, IC [−0,0042, +0,0104]).
+
+Cuatro fallos encontrados y corregidos, todos en scripts que nunca habían
+corrido: la climatología del BSS se memorizaba a sí misma e incluía el test; el
+umbral por máximo SEDI se iba al extremo de la rejilla (3 avisos en 854 días);
+la calibración beta por celda no era monótona (techo 0,000 %) y se sustituyó por
+isotónica; `N_BOOT`/`SEED` estaban declarados y sin usar, así que no había IC.

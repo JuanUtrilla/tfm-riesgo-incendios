@@ -117,3 +117,65 @@ el modelo las necesite.
 Península peninsular únicamente: 498.530 celdas. Quedan fuera Baleares, Canarias,
 Ceuta y Melilla. El entrenamiento cubre 2015-2020 (etiquetas EGIF consolidadas) y
 la validación en operación, la temporada de 2026.
+
+## 8. Desajuste train/serve: filtro de caja contra radio circular (05/09/2026)
+
+`riesgo_hoy.py` calcula tres features con un filtro de **caja** donde el
+extractor de entrenamiento (`extraer_features_historia.py`, que usa `cKDTree`
+con «a <10 km» y «a <50 km») usa **radio circular**. Medido sobre las filas
+`eval_dia` del banco de `dos_13`:
+
+| feature | entrenamiento | servicio | ratio | corr | n |
+|---|---|---|---|---|---|
+| `n_fuegos_10km_mismomes_hist` | 2,80 | 4,06 | **1,50** | 0,971 | 245.166 |
+| `frp_max_50km_7d` | 4,79 | 5,84 | **1,54** | 0,910 | 58.308 |
+| `n_detec_50km_7d` | 2,63 | 3,41 | **1,36** | 0,952 | 58.308 |
+
+Cuadra con la geometría: caja 21×21 = 441 km² contra círculo r=10 km = 314 km²
+(1,40); caja 101×101 = 10.201 km² contra círculo r=50 km = 7.854 km² (1,30).
+
+**La cadena sirve tres variables un 36-54 % mayores que las que los modelos
+vieron al entrenar.** Afecta a producción, único, r10 y a la rama `cuando` de la
+pareja.
+
+Se documenta y **no se corrige antes del cierre de los jueces**, por la misma
+razón que el bug del viento (§1): tocar `riesgo_hoy.py` a mitad de temporada
+rompe la serie sellada. La calibración de `56_calibracion` replica el camino de
+SERVICIO a propósito, así que sus números son válidos para lo que se sirve.
+
+`auditoria_train_serve.py` no detecta esto: compara valores, no geometrías ni
+ventanas temporales. Ampliarlo está en `PENDIENTE.md`.
+
+## 9. La calibración por celda infrapredice en julio (05/09/2026)
+
+Con calibración estratificada por mes (`dos_29_calibra_estacional.py`), el error
+típico en la punta es de **1,8×**. Pero **julio infrapredice por 7×** (0,88 %
+contra 6,22 % observado), y es el mes que concentra más superficie quemada.
+
+Causa identificada: la ventana de calibración **2015-2021 no contiene ningún año
+extremo**, y el periodo de evaluación sí — 2022 aporta por sí solo más celdas
+quemadas en dos años (6.500) que los siete de calibración juntos (5.695).
+
+Arreglo pendiente y **no hecho**: recalibrar sobre **ventana móvil reciente** en
+vez de un bloque fijo. El mismo problema explica la infrapredicción en los
+deciles medios de `dos_28`.
+
+Consecuencia para la memoria: se puede publicar el rango de la punta
+(0,3 % en diciembre a 10 % en julio) y el techo (1,6 %), pero **no dar el número
+de julio como exacto**.
+
+## 10. El bootstrap iid estrecha los intervalos un 35 % (05/09/2026)
+
+Todos los IC de esta memoria usan bootstrap percentil **iid sobre días**
+(`dos_19_veredicto.py:76` y siguientes), que supone días independientes. No lo
+son: un incendio grande dura varios días y el tiempo persiste.
+
+Medido en `dos_26_calibra_si.py`, que calcula ambos: el bootstrap por **bloques
+móviles de 14 días** da intervalos de SEDI **1,35× más anchos** (mediana sobre
+las 20 filas de test).
+
+No invalida nada publicado —el orden entre modelos no cambia y los IC de
+invierno siguen excluyendo el cero también con bloques—, pero **los intervalos
+del resto de la memoria deben leerse como una cota inferior de la
+incertidumbre**, y en los casos al filo la conclusión honesta es que el
+intervalo toca el cero.

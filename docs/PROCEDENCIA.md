@@ -355,3 +355,52 @@ rehecho, con los hashes de esa fecha en vez de los del 25/08:
 
 El principio del repositorio no cambia: siguen siendo copias literales, y el
 hash permite comprobarlo. Lo que cambia es a qué fecha del original apuntan.
+
+---
+
+## Incorporación del 05/09/2026 — calibración y ablación de datos
+
+Ocho ficheros nuevos, con un **origen distinto a los tres anteriores**:
+
+Origen **C** = `~/Desktop/Master/calibracion_si/`, un banco de trabajo aislado
+fuera de todo repositorio. Se montó así a petición explícita: copia de los `.py`
+de `TFM_fuego_malla` (commit `9f92cda`) en un `sandbox/` con su propio `salida/`,
+de modo que **ni un solo fichero de los repos se modificó** mientras se
+producían estos resultados (`git status` de `TFM_fuego_malla` y de este repo
+quedó vacío toda la jornada). Su bitácora, con los md5 antes y después de cada
+arreglo, está en `calibracion_si/BITACORA.md`.
+
+### `05_iteracion2/56_calibracion` — 5 ficheros nuevos
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_25_barrido_historico.py` | C | `2721d70d` |
+| `dos_26_calibra_si.py` | C | `46bdecff` |
+| `dos_27_escala_absoluta.py` | C | `c0cd7a9b` |
+| `dos_28_calibra_celda.py` | C | `76d1b90f` |
+| `dos_29_calibra_estacional.py` | C | `2a8c2340` |
+
+### `05_iteracion2/57_ablaciones` — 1 fichero nuevo
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `dos_30_r10_todo.py` | C | `5eef1cb0` |
+
+### `06_comparacion` — 2 ficheros nuevos
+
+| Fichero | Origen | md5 |
+|---|---|---|
+| `replay_dia_todo.py` | C | `10c8a16e` |
+| `replay_temporada_todo.py` | C | `457ae2f1` |
+
+**Salvedad sobre estos dos últimos.** Son copias parcheadas de
+`archivo_ifs/replay_dia.py` y `replay_temporada.py`, y a diferencia del resto
+del repositorio **llevan rutas absolutas escritas** (`AQUI`, `SANDBOX`,
+`MODELO_NUEVO`). No se han adaptado a variables de entorno **a propósito**: son
+los que produjeron los números de `R10_TODOS_LOS_ANIOS.md`, y tocarlos rompería
+el vínculo entre el código y el resultado, que es justamente el principio de
+este repositorio. Para ejecutarlos hay que editar esas tres constantes. Los
+scripts del replay original (`archivo_ifs/replay_*.py`) siguen **pendientes** de
+incorporar; ver `PENDIENTE.md`.
+
+El principio no cambia: copias literales, y el hash permite comprobarlo.

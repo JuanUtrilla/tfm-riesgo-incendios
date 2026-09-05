@@ -159,6 +159,29 @@ Scripts: `~/Desktop/Master/archivo_ifs/replay_{dia,temporada,verdad,veredicto,fi
 | **1:10-1:30** óptimo · 0,759 en 2026 | La escalera del ratio de negativos | `05_iteracion2/57_ablaciones/dos_18_ratio.py` | `dos_18_ratio.json` | disco |
 | **79,5 → 81,9-80,6** | Percentil ponderado por hectáreas: lo que sí mejora | ídem | ídem | disco |
 | 0,004 | El **ruido del sorteo de negativos**, midiendo el mismo diseño otra vez (0,752 vs 0,748 en 2026; 0,809 vs 0,804 en test 2024) | ídem | ídem | disco |
+
+### Calibración del «si» y de la celda (05/09/2026)
+
+Partición fija en los cuatro scripts: **calibración 2015-2021 · validación
+2022-2023 · test 2024**. El umbral se elige solo en calibración.
+
+| Número | Qué es | Script | Salida | Se ejecuta con |
+|---|---|---|---|---|
+| 33,9 % · **85,6 %** en el NO | Los **dos regímenes**: días con fuego en nov-mar, y fuego de dic-abr concentrado en el noroeste (14,4 % del territorio) | `05_iteracion2/56_calibracion/dos_25_barrido_historico.py` | `dos_25_hist.npz` | cubo |
+| 3.653 × 5 × 4.096 | Histograma diario por modelo (97 bloques) y `quem`, 64.088 celdas quemadas con su puntuación | ídem | ídem | cubo |
+| **+0,297 [+0,198, +0,381]** | BSS del «si» en invierno-primavera, test 2024, r10 (los cinco modelos con IC que excluye el cero) | `05_iteracion2/56_calibracion/dos_26_calibra_si.py` | `dos_26_calibracion.csv` | cubo |
+| −0,107 [−0,230, **+0,022**] | BSS en verano: **cruza el cero**. El «si» no se distingue de la climatología en jun-sep | ídem | ídem | cubo |
+| 0,794 [0,65, 0,89] | SEDI del «si» en invierno, r10 | ídem | ídem | cubo |
+| 1,08×-1,18× | Separación de umbrales verano/invierno: **un solo umbral vale todo el año** | ídem | ídem | cubo |
+| 1,35× | Cuánto **ensancha** el bootstrap por bloques de 14 días frente al iid usado en el resto del TFM | ídem | ídem | cubo |
+| **0,1259 % · lift 35,6×** | Qué significa EXTREMO: frecuencia observada de quema en la banda | `05_iteracion2/56_calibracion/dos_27_escala_absoluta.py` | `dos_27_bandas.csv` | cubo |
+| 5 celdas en 10 años | Lo que ardió en BAJO, que es el 30 % de España | ídem | ídem | cubo |
+| 0,0 % de días sin rojo | `r10` con corte **absoluto** nunca se apaga (es estático) → hace falta la puerta del «si» | ídem | `dos_27_dias.csv` | cubo |
+| 44,0 % · **6,2 %** | Días de invierno sin rojo con la puerta puesta, y días grandes que se pierden | ídem | ídem | cubo |
+| **1,565 %** | Techo: probabilidad calibrada de la celda más roja que llega a existir (r10) | `05_iteracion2/56_calibracion/dos_28_calibra_celda.py` | `dos_28_niveles.csv` | cubo |
+| beta descartada | La beta da coeficiente **negativo** en −log(1−s) y no es monótona (techo 0,000 %); se usa isotónica | ídem | `dos_28_beta.json` | cubo |
+| **0,28 % → 10,36 %** | Probabilidad de la peor celda, de diciembre a julio (factor 37) | `05_iteracion2/56_calibracion/dos_29_calibra_estacional.py` | `dos_29_punta.csv` | cubo |
+| 1,8× contra 2,4× | Error típico de la calibración por mes contra la global; en julio, 7× contra 52× | ídem | ídem | cubo |
 | entrenar solo verano: peor | Resultado negativo | `05_iteracion2/57_ablaciones/dos_08_verano.py` | `dos_08_verano.json` | disco |
 | −0,02 | La capa «ya quemado» empeora | `05_iteracion2/57_ablaciones/dos_17_capa_quemado.py` | `dos_17_capa_quemado.csv/json` | disco |
 
@@ -184,6 +207,27 @@ Scripts: `~/Desktop/Master/archivo_ifs/replay_{dia,temporada,verdad,veredicto,fi
 | «con 17 días no se distingue del ruido» | El veredicto acumulado | `07_produccion/gh_estado.py` + `06_comparacion/dos_19_veredicto.py` | `veredicto_acumulado.json` | sellado |
 
 ---
+
+## Prerregistro: r10 con todos los años (escrito el 05/09/2026 a las 11:30 UTC, ANTES de correr nada)
+
+Hipótesis: entrenar `donde_dia_effis_r10` con 2015-**2024** en vez de
+2015-**2022** (+32 % de positivos) mejora en 2025-2026, que son externos al cubo.
+Métrica primaria fijada de antemano: **AUC medio por día** en los días del
+replay con IFS, con IC bootstrap de la diferencia pareada. Criterio de éxito:
+que el IC no toque el cero. Prerregistro íntegro en
+`calibracion_si/PRERREGISTRO_r10_todo.md`.
+
+| Número | Qué es | Script | Salida | Se ejecuta con |
+|---|---|---|---|---|
+| Δ máx 0,00e+00 · Spearman 1,000000 | `r10_base` reproduce **exactamente** el `donde_dia_effis_r10.ubj` servido | `05_iteracion2/57_ablaciones/dos_30_r10_todo.py` | `dos_30_info.json` | disco |
+| Δ máx 0,00e+00 en 224 días | Control: los 4 modelos no tocados reproducen el replay original | `06_comparacion/replay_dia_todo.py` | `replay_<año>_ifs_r10todo.csv` | archivo IFS |
+| **+0,0033 [−0,0042, +0,0104]** | Diferencia pareada de AUC, 224 días. **El IC cruza el cero: el criterio prerregistrado NO se cumple** | ídem | ídem | archivo IFS |
+| 0,7898 → 0,7931 | AUC medio, base contra todos los años. Gana el 54,5 % de días | ídem | ídem | archivo IFS |
+| +0,079 contra +0,0033 | La distancia r10→producción es **24 veces** la ganancia de reentrenar con todo | ídem | ídem | archivo IFS |
+
+Lectura: el modelo está **saturado de datos**. La partición
+`train 2015-2022 / val 2023 / test 2024` se mantiene **sin coste de
+rendimiento**, conservando un test honesto reservado.
 
 ## Los números que **no** se pueden reproducir, y por qué
 
