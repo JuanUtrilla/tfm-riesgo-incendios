@@ -221,6 +221,15 @@ Cifras a 07/09/2026 (corrida 34099321965); se actualizan al cierre.
 
 ---
 
+## Figuras de la sección divulgativa (07/09/2026)
+
+| Figura | Script | Entradas | Se ejecuta con |
+|---|---|---|---|
+| Fig. 1 diseños de muestreo | `docs/MEMORIA/figs/scripts/f2_disenios.py` | — (esquema) | muestra |
+| Fig. 2 SHAP del r10 (top: `n_fuegos_10km_mismomes_hist` 0,70, `ndvi_med_30d` 0,45, `clc_matorral` 0,37) | `f11_shap_r10.py` → `figs/f11_shap.json` | `donde_dia_effis_r10.ubj`, banco `eval_dia` de `dataset_effis.parquet` (6.000 filas, semilla 42) | disco |
+| Fig. 3 mapas del 7-ago-2026 | `f9_mapa_agosto2026.py` | `archivo_ifs/replay/2026/ifs/2026-08-07.npz`, `verdad_2026/` | archivo_ifs |
+| Fig. 4 percentil vs absoluto (13-ago y 29-oct-2025) | `f10_percentil_vs_absoluto.py` | `replay/2025/ifs/`, cortes de `dos_27_bandas.csv`, umbral 0,076 de `dos_26` | archivo_ifs |
+
 ## Prerregistro: r10 con todos los años (escrito el 05/09/2026 a las 11:30 UTC, ANTES de correr nada)
 
 Hipótesis: entrenar `donde_dia_effis_r10` con 2015-**2024** en vez de

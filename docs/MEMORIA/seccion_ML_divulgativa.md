@@ -82,10 +82,6 @@ del MITECO y contra los focos térmicos de satélite, el acierto diario del mode
 en producción estuvo entre **0,56 y 0,64**. Un índice tan simple como el
 percentil local del FWI, sin modelo, sacaba 0,70.
 
-![](figs/f1_iteraciones.png)
-
-**Figura 1.** Las dos iteraciones del trabajo y el diagnóstico que las separa. Lo que cambia entre ellas no son las fuentes ni las 46 variables, sino qué se toma como positivo, qué como negativo y contra qué verdad se valida. La iteración 1 se puso en producción y es el grupo de control contra el que se mide todo lo demás.
-
 Había tres sospechosos, y los dos primeros se descartaron con números antes de
 llegar al tercero:
 
@@ -111,6 +107,10 @@ propio banco de pruebas, los dos dan 0,92. Medidos **dentro de cada día**, que
 es como se usan, dan 0,744 y 0,828. La segunda medida es la que había que haber
 hecho desde el principio, y es la lección del trabajo.
 
+![](figs/f2_disenios.png)
+
+**Figura 1.** Los dos diseños de muestreo y el banco de evaluación, sobre la misma rejilla celda × día. (a) Iteración 1: para cada celda quemada, los negativos son *la misma celda en otros días*; el modelo solo puede aprender qué día es peligroso. (b) Iteración 2: los negativos son *otras celdas del mismo día*; el modelo aprende a comparar celdas. (c) Lo que se pide en operación: ordenar todas las celdas de un día. Solo el diseño (b) hace la misma pregunta que (c).
+
 ## 4. El segundo modelo: cambiar la pregunta, no el algoritmo
 
 La segunda versión cambia exactamente dos cosas y deja todo lo demás igual: las
@@ -133,6 +133,24 @@ orden del azar del sorteo; donde el r10 marca la diferencia es en los
 incendios grandes, que es donde importa. El detalle de esas pruebas, incluidas
 las que salieron mal (entrenar solo con verano empeora; añadir una capa de «ya
 quemado» empeora), está en el anexo B.
+
+Antes de dar por bueno un modelo conviene mirar en qué se fija, y que eso
+cuadre con lo que se sabe del fuego. La figura 2 lo muestra sobre días que el
+modelo no vio al entrenar. Lo que más pesa es el **historial**: cuántos
+incendios ha habido a 10 km en ese mismo mes en años anteriores. Después, el
+**combustible** —cuánto verdor ha acumulado la celda en el último mes, cuánto
+matorral tiene, cuánta pendiente— y el **tiempo**: humedad relativa mínima baja
+y FWI anómalo para la celda empujan hacia arriba; suelo agrícola y lluvia
+reciente, hacia abajo. Los focos térmicos de satélite y los rayos aparecen, pero
+lejos de la cabeza. Es el retrato que un técnico de extinción daría de memoria,
+con un matiz que hay que declarar: el verdor y la temperatura de superficie
+*del propio día* llevan ya parte de la firma del incendio en el cubo (pesan un
+5 % del modelo) y en servicio se sustituyen por su climatología mensual, así que
+en operación el modelo se apoya algo menos en ellas de lo que la figura sugiere.
+
+![](figs/f11_shap_r10.png)
+
+**Figura 2.** Qué mira el r10: las 15 variables de mayor peso por valores SHAP sobre 6.000 celdas-día de los veranos de 2023 y 2024, que el modelo no vio al entrenar. Izquierda, importancia media; derecha, el efecto de cada fila (a la derecha del cero, empuja el riesgo hacia arriba) con el valor de la variable en color (rojo, alto). Historial de fuego, combustible y sequedad, por ese orden.
 
 ## 5. Resultados: dos temporadas enteras, a un día vista
 
@@ -161,7 +179,7 @@ la víspera y, a posteriori, con el tiempo que realmente hizo. La diferencia es
 de −0,003, indistinguible de cero. El modelo no depende de acertar el tiempo
 al detalle; depende de saber dónde está el combustible y cuánto lleva seco.
 
-**Es un mapa para vigilar, no una alarma por celda.** Que arda una celda
+**Es un mapa para vigilar, no una alarma por celda** (figura 3). Que arda una celda
 concreta un día concreto es rarísimo: una de cada diez mil. En el 2 % más alto
 del mapa del r10 esa tasa se multiplica por doce, y si se mira a 6 km alrededor
 —la escala a la que se despliegan medios—, ese 2 % cubre el 44 % de los
@@ -170,7 +188,7 @@ con el 6,6 %. El mapa dice dónde mirar, no dónde va a arder.
 
 ![](figs/f9_mapa_agosto2026.png)
 
-**Figura 2.** El 7 de agosto de 2026 (44.672 ha quemadas, el segundo día de la temporada) según producción y según el r10, ambos en percentil del día, y la resta entre los dos en puntos de percentil. Los círculos negros son las celdas que EFFIS cartografió como quemadas ese día. El r10 sube la cornisa cantábrica y Galicia y baja el interior sur: aprendió dónde se quema territorio, no solo dónde empiezan los incendios.
+**Figura 3.** El 7 de agosto de 2026 (44.672 ha quemadas, el segundo día de la temporada) según producción y según el r10, ambos en percentil del día, y la resta entre los dos en puntos de percentil. Los círculos negros son las celdas que EFFIS cartografió como quemadas ese día. El r10 sube la cornisa cantábrica y Galicia y baja el interior sur: aprendió dónde se quema territorio, no solo dónde empiezan los incendios.
 
 Además del replay, el sistema **corre en vivo desde el 21 de agosto** en GitHub
 Actions: cada madrugada descarga la previsión, publica los mapas de ambos
@@ -204,7 +222,7 @@ rojo y solo se pierde el 6 % de los días grandes.
 
 ![](figs/f10_percentil_vs_absoluto.png)
 
-**Figura 3.** El mismo modelo (r10) pintado de dos maneras en un día de pleno verano (13 de agosto de 2025, arriba) y en uno fuera de temporada (29 de octubre de 2025, abajo). Izquierda: niveles por percentil del día, que reparten el 2 % de EXTREMO cada día sin excepción. Derecha: cortes fijos en la escala de la nota, aprendidos de diez años de historia, y el semáforo nacional: el 29 de octubre no supera el umbral y el mapa se apaga.
+**Figura 4.** El mismo modelo (r10) pintado de dos maneras en un día de pleno verano (13 de agosto de 2025, arriba) y en uno fuera de temporada (29 de octubre de 2025, abajo). Izquierda: niveles por percentil del día, que reparten el 2 % de EXTREMO cada día sin excepción. Derecha: cortes fijos en la escala de la nota, aprendidos de diez años de historia, y el semáforo nacional: el 29 de octubre no supera el umbral y el mapa se apaga.
 
 Al comprobarlo se aprendió algo que no estaba previsto. Ese semáforo, fijado
 con datos de 2015-2021, funciona sin retocar en 2025 y 2026. Pero **no tiene
@@ -285,11 +303,12 @@ Si sobra, el §5 (resultados) es el último que se recorta; §2 y §4 los primer
 4. Los jueces en vivo se citan con fecha; actualizar el párrafo al cierre.
 5. El 21-ago excluido del juez EFFIS: no se menciona en el texto, va al anexo E.
 
-**Figuras:** f1 (`figs/scripts/f1_iteraciones.py`), f9 (`f9_mapa_agosto2026.py`,
+**Figuras:** f2 (`figs/scripts/f2_disenios.py`), f11 (`f11_shap_r10.py`, SHAP del
+r10 sobre el banco `eval_dia`, lee el USB `TFM_USB`), f9 (`f9_mapa_agosto2026.py`,
 mapas del replay 2026-08-07 + verdad EFFIS) y f10 (`f10_percentil_vs_absoluto.py`,
 r10 del replay 2025-08-13 y 2025-10-29, cortes de `dos_27_bandas.csv`, umbral
-del semáforo = p98 de la pareja ≥ 0,076, escala cruda de `dos_26`). Las tres
-leen `archivo_ifs/replay/` (fuera del repo). El PDF se genera con
+del semáforo = p98 de la pareja ≥ 0,076, escala cruda de `dos_26`). f9 y f10 leen
+`archivo_ifs/replay/` (fuera del repo). El PDF se genera con
 `markdown` + `weasyprint` (sin pandoc).
 
 **Anexos referenciados:** A variables y fuentes · B ablaciones y resultados
