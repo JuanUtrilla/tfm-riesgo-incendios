@@ -1,7 +1,7 @@
 # Glosario
 
 Términos que aparecen en todo el repositorio. Las fuentes de datos están
-detalladas en [`docs/DATOS.md`](../docs/DATOS.md).
+detalladas en [`01_datos/README.md`](../01_datos/README.md).
 
 ## Fuentes
 

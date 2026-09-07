@@ -58,22 +58,30 @@ instrumento. Lo acotado:
 
 ---
 
-## 3. Tamaños de muestra: el veredicto todavía no está cerrado
+## 3. El veredicto final es a posteriori; el sellado día a día no tiene días suficientes
 
-| Juez | Acumulado a 25/08/2026 | Qué falta |
+Hay dos evaluaciones hacia adelante y no valen lo mismo:
+
+| | Replay 2025-2026 | Jueces en vivo |
 |---|---|---|
-| EFFIS | 1 día puntuado | Los 45 días de desfase de cartografiado |
-| MITECO | 3 días / 6 incidentes | Acumular temporada |
-| Por estación | 1 día / 688 estaciones / 3 positivas | Acumular temporada |
+| Días | 250 (138 + 86 con fuego) | 8-13 según juez, a 07/09/2026 |
+| Entradas | La pasada IFS de cada víspera, archivada | Las de cada día |
+| Cuándo se generó el mapa | El 02/09/2026, todos a la vez | Cada madrugada, sellado en un Release |
+| Prerregistro | Sí (`ed7931f`, antes de correr) | No hace falta: no hay grados de libertad |
+| Resultado | Δ +0,064 (2025) y +0,104 (2026), IC sin tocar el cero | Candidatos delante en EFFIS y MITECO; producción delante por estación; ningún IC excluye el cero |
 
-El veredicto acumulado dice literalmente *«mejor de media, pero con 17 días no
-se distingue del ruido»*, y así debe citarse hasta el cierre de septiembre. El
-resultado con intervalo que no toca el cero es el retrospectivo sobre la
-temporada 2026 completa (Δ +0,112, IC95 [+0,074, +0,151]); desde que se
-corrigió la fuga de FIRMS del 31/08/2026 también lo son el único 1:3
-(+0,105 [+0,067, +0,146]) y la pareja (+0,058 [+0,027, +0,090]). Sigue siendo
-un resultado RETROSPECTIVO, con reanálisis para todos: es una cota superior de
-lo que daría la operación, no la operación.
+**La decisión (06/09/2026) es que el veredicto de la memoria sale del replay**,
+porque cubre dos temporadas contra ~15 días y su protocolo estaba escrito antes
+de ejecutarlo. Su límite hay que decirlo sin disimulo: los mapas se generaron
+*después* de conocer los perímetros, aunque con las entradas de la víspera. Un
+modelo puntuado a posteriori no vale lo mismo que uno sellado antes del día,
+porque nada impide, en principio, haber elegido el conjunto de modelos o las
+métricas mirando el resultado. Lo que lo mitiga: el prerregistro, que los seis
+modelos se reportan siempre, y que el 2026 retrospectivo con reanálisis
+(Δ +0,112 [+0,074, +0,151]) y el cara a cara de 19 días previsión contra
+previsión (`comparar_rankings_justo.py`, único 0,605 vs 0,568) apuntan en la
+misma dirección. Los jueces en vivo se citan al cierre como validación
+operativa en curso, con sus intervalos.
 
 ---
 
@@ -238,3 +246,22 @@ invierno siguen excluyendo el cero también con bloques—, pero **los intervalo
 del resto de la memoria deben leerse como una cota inferior de la
 incertidumbre**, y en los casos al filo la conclusión honesta es que el
 intervalo toca el cero.
+
+---
+
+## 11. Seis días de 2026 no cuentan en el juez EFFIS (07/09/2026)
+
+- **27-31 de agosto**: el 31/08 un `gh_estado.py push --base` lanzado desde el
+  portátil con una `salida/` congelada en el 21-26/08 pisó el estado del Release
+  y se perdieron los `.npz` de mapa diario de cinco días (los veredictos
+  acumulados se recuperaron íntegros de `publicado/`). Reconstruirlos exigiría
+  IFS archivado que compite con la cadena viva; se decidió no hacerlo. El
+  `--base` ahora aborta si el diario remoto es más nuevo.
+- **21 de agosto**: el `.npz` que quedó en el Release es una regeneración del
+  31/08 (es el único con `prob_r10` y su huella FIRMS es la del 26-30/08). Se
+  buscó el original el 06/09 en el disco Expansion congelado el 21/08 a las
+  09:51 y no existe: el disco solo trae los mapas retro de ventana 5. Como
+  `puntuar_effis.py` recalcula el veredicto con todos los días, ese mapa retro
+  se puntuaría como si fuera operativo. **Se excluye y se documenta.**
+
+Ninguno de los dos afecta al replay, que no usa los mapas del Release.

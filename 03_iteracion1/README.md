@@ -59,6 +59,9 @@ sellada a mitad de temporada.
 Ningún script de este repositorio lo entrena, y no es un descuido de la copia:
 fue un **reentrenamiento interactivo del 15-jul-2026** que no se versionó. Su
 racional está escrito y cuantificado en [`MODELO_B_BITACORA.md`](MODELO_B_BITACORA.md)
+(copia literal del original, md5 en `PROCEDENCIA.md`; sus enlaces internos a
+`PROXIMOS_PASOS.md`, `DATASET_CARD.md` y `EVALUACION_DETALLADA.md` apuntan al
+repositorio original y aquí no resuelven)
 §16: las cuatro autorregresivas intra-celda acumulativas (`n_fuegos_1km_hist`,
 `n_fuegos_1km_90d`, `n_fuegos_10km_90d`, `n_fuegos_10km_365d`) arrastran un
 artefacto del muestreo caso-control con celda fija —el incendio del positivo

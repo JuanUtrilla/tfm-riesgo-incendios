@@ -413,3 +413,34 @@ corrido: la climatología del BSS se memorizaba a sí misma e incluía el test; 
 umbral por máximo SEDI se iba al extremo de la rejilla (3 avisos en 854 días);
 la calibración beta por celda no era monótona (techo 0,000 %) y se sustituyó por
 isotónica; `N_BOOT`/`SEED` estaban declarados y sin usar, así que no había IC.
+
+## 06/09/2026 — La validación es el replay
+
+Se montó el disco Expansion buscando el mapa operativo del 21-ago: no existe
+(`LIMITACIONES.md` §11). Y se tomó la decisión que cambia el eje del cierre:
+**el veredicto de la memoria es el replay de 2025 y 2026**, no los jueces en
+vivo, que llevan ~15 días y cuyos intervalos siguen cruzando el cero. Es
+defendible por tres cosas: 250 días contra 15, dos temporadas contra una, y el
+prerregistro escrito antes de correrlo. Su límite —a posteriori, no sellado—
+va escrito en la memoria. Se descarta la Fase 4 del «si» (modelo día-nacional
+directo): hay material de sobra y no aporta al argumento. Nada se tocó en
+ningún repositorio.
+
+## 07/09/2026 — Poner el repositorio en orden para la memoria
+
+Los tres jueces siguen verdes (única corrida fallida de septiembre, el 04/09,
+se repescó el mismo día). MITECO gana un día (13) y el único sigue clavado en
+0,69; EFFIS baja dos centésimas en todos; producción sigue delante por
+estación sin significación.
+
+Auditoría del repo y arreglos: `01_datos/egif/` estaba vacío (ahora README con
+la procedencia del CSV de Civio, que se bajó a mano); `06_comparacion/README`
+no mencionaba el replay, que es el veredicto; `05_iteracion2/README` no
+mencionaba la calibración; el README raíz y `LIMITACIONES.md` §3 todavía daban
+como titular el retrospectivo de 74 días; el 21-ago y los cinco días perdidos
+no estaban en `LIMITACIONES.md` (§11 nuevo); `PENDIENTE.md` era un diario de
+529 líneas (ahora estado actual + histórico compacto); `docs/MEMORIA/` no
+decía cuál de sus cinco documentos era cuál (README nuevo). Y se escribió el
+primer borrador divulgativo de la sección de la memoria conjunta
+(`docs/MEMORIA/seccion_ML_divulgativa.md`, 5 páginas): titular = replay, r10
+como modelo propuesto, producto de dos capas, límites declarados.

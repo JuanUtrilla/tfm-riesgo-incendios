@@ -51,3 +51,52 @@ de producción 0,568 · malla con el modelo de producción 0,547 · **único EFF
 0,605**, ganando 14 de 19 días. Es el único experimento sin retrovisor para
 nadie, y la primera vez que el único bate a producción POR ESTACIÓN, que es la
 geometría en la que producción juega en casa.
+
+## El replay de 2025 y 2026: el veredicto final
+
+Lo anterior compara los dos sistemas sobre 2026 con **reanálisis para todos**:
+una cota superior. El replay hace la comparación como se haría en operación:
+día a día, alimentando a los seis modelos con **la pasada IFS disponible la
+víspera** (archivada en `archivo_ifs/`, fuera del repo) y juzgando con los
+perímetros EFFIS de ese día. Dos temporadas, 250 días, protocolo prerregistrado
+en `docs/TRAZABILIDAD.md` (commit `ed7931f`, 02/09/2026 18:10) **antes** de
+ejecutar nada. Desde el 06/09/2026 es **el veredicto de la memoria**; los
+jueces en vivo del capítulo 7 se citan como validación operativa en curso.
+
+| Script | Qué hace |
+|---|---|
+| `replay_verdad.py` | La verdad EFFIS por día (celda de 1 km, primer día de cada perímetro) para 2025 y 2026 |
+| `replay_dia.py` | Un día: reanálisis truncado a D−7, IFS de archivo, FIRMS ≤ D−1, puntúa los seis modelos. ~15 s |
+| `replay_temporada.py` | El bucle de temporada, reanudable (salta los días con `.npz`) |
+| `replay_veredicto.py` | AUC medio por día, Δ vs producción, IC95 bootstrap, gana/pierde, top 2 % → `docs/REPLAY_VEREDICTO.md` |
+| `replay_si.py` | La pregunta del «si» con umbral p98 (versión previa a la calibración de `56_calibracion`) → `docs/REPLAY_SI.md` |
+| `replay_precision.py` | Precisión exacta en la punta y lift → `docs/REPLAY_PRECISION.md` (a posteriori) |
+| `replay_radio.py` | Tolerancia espacial de la verdad a 2/4/6 km → `docs/REPLAY_RADIO.md` (a posteriori) |
+| `replay_cobertura.py` | Cobertura de incendios con el top dilatado → `docs/REPLAY_COBERTURA.md` (a posteriori) |
+| `replay_figuras.py` | Las figuras del veredicto |
+| `replay_dia_todo.py`, `replay_temporada_todo.py` | Copias parcheadas para el r10 entrenado con todos los años (`docs/R10_TODOS_LOS_ANIOS.md`) |
+| `verificar_replay.py` | El verificador del 01/09: un día de replay contra el mapa operativo del Release |
+| `dos_33_anomalia_punta.py` | Por qué producción cubría más hectáreas en la punta de 2026: es un solo día (23-jul) |
+
+**Resultado** (AUC medio por día, condición IFS):
+
+| Temporada | Días con fuego | producción | único | **r10** | pareja | Δ r10 (IC95) | gana |
+|---|---|---|---|---|---|---|---|
+| 2025 | 138 | 0,743 | 0,806 | **0,807** | 0,794 | +0,064 [+0,027, +0,101] | 60 % |
+| 2026 | 86 | 0,658 | 0,757 | **0,762** | 0,716 | +0,104 [+0,065, +0,144] | 67 % |
+
+El coste de la previsión (IFS − reanálisis) es de −0,003 para todos, IC que
+cruza el cero. Tablas completas, con los seis modelos y las cuatro condiciones,
+en `docs/REPLAY_VEREDICTO.md`.
+
+**Límite, dicho sin disimulo**: los mapas se generaron el 02/09/2026 con la
+previsión de cada víspera, pero se generaron *a posteriori*, no sellados día a
+día. Está en `docs/LIMITACIONES.md` §3.
+
+## Ejecutar
+
+`dos_09`, `dos_11` y los `comparar_*` leen los mapas de la temporada del disco
+externo (`TFM_USB`). El replay necesita además `archivo_ifs/` (pasadas IFS
+2025-2026, ERA5-Land 2025, FIRMS, EFFIS 2025), que no está en el repo por
+tamaño; `docs/PROCEDENCIA.md` da sus md5. Nada de este capítulo corre con
+`muestras/`.

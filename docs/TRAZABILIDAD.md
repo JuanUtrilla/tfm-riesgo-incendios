@@ -66,8 +66,10 @@ evalúa con TODOS los días, también los de cero fuego (tabla aviso × fuego). 
 
 **Resultado del replay (02/09/2026 20:10, tras el prerregistro):** ver
 [`REPLAY_VEREDICTO.md`](REPLAY_VEREDICTO.md) y [`REPLAY_SI.md`](REPLAY_SI.md).
-Scripts: `~/Desktop/Master/archivo_ifs/replay_{dia,temporada,verdad,veredicto,figuras,si}.py`
-(pendiente copiarlos al repo); salidas `archivo_ifs/replay/` (md5 en `MD5_replay.txt`).
+Scripts: `06_comparacion/replay_*.py` (copiados con md5 el 05/09/2026, origen
+`archivo_ifs/`); salidas `archivo_ifs/replay/` y copia en el USB
+`TFM_fuego_expansion/archivo_replay/` (md5 en `MD5_replay.txt`).
+**Desde el 06/09/2026 es el veredicto de la memoria** (`LIMITACIONES.md` §3).
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
@@ -207,12 +209,15 @@ Partición fija en los cuatro scripts: **calibración 2015-2021 · validación
 
 ## Capítulo 7 · Producción y jueces
 
+Cifras a 07/09/2026 (corrida 34099321965); se actualizan al cierre.
+
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
-| pctl 39,2 / 73,5 / 90,6 | Juez EFFIS, por día | `07_produccion/puntuar_effis.py` | `puntuacion_effis.csv` | sellado |
-| 0,598 / 0,807 / 0,771 (AUC10) | Juez MITECO acumulado | `07_produccion/dos_15_veredicto_miteco.py` | `veredicto_miteco.csv/json` | sellado |
-| 0,507 / 0,572 / 0,600 / 0,607 | Juez por estación, 688 estaciones | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.csv/json` | sellado |
-| «con 17 días no se distingue del ruido» | El veredicto acumulado | `07_produccion/gh_estado.py` + `06_comparacion/dos_19_veredicto.py` | `veredicto_acumulado.json` | sellado |
+| 0,506 / 0,745 / 0,722 / 0,735 (malla, único, r10, pareja), 9 días | Juez EFFIS acumulado | `07_produccion/puntuar_effis.py` | `puntuacion_effis.csv`, `historico_veredictos.csv` | sellado |
+| 0,516 / 0,692 / 0,674 / 0,651, 13 días | Juez MITECO acumulado | `07_produccion/dos_15_veredicto_miteco.py` | `veredicto_miteco.csv/json` | sellado |
+| 0,645 producción / 0,578 / 0,571 / 0,504 / 0,594, 8 días | Juez por estación | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.csv/json` | sellado |
+| Δ único −0,074 [−0,213, +0,073] por estación | Ningún IC excluye el cero | `06_comparacion/dos_19_veredicto.py` | `veredicto_acumulado.json` | sellado |
+| 21-ago excluido; 27-31/08 sin mapa | Días que no cuentan | — | `LIMITACIONES.md` §11 | — |
 
 ---
 

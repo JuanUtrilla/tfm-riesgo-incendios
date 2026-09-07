@@ -14,9 +14,12 @@ especificación**. El muestreo y la etiqueta de entrenamiento definían la
 pregunta *«¿es hoy un día peligroso en esta celda?»*, distinta de la que se
 evalúa en operación, *«¿cuál de las 498.530 celdas arde hoy?»*. A partir de
 ese diagnóstico se rediseñó el conjunto de entrenamiento y se construyó un
-segundo sistema. Sobre la temporada 2026 el modelo único con etiqueta EFFIS
-alcanza **AUC 0,759** frente a 0,647 de producción (Δ +0,112, IC95
-[+0,074, +0,151]), ganando el 76 % de los días.
+segundo sistema. Reproducidas día a día las temporadas de **2025 y 2026** con
+la previsión disponible cada víspera (250 días, protocolo prerregistrado), el
+modelo único con etiqueta EFFIS y ratio 1:10 pasa de **0,743 a 0,807** en 2025
+(Δ +0,064, IC95 [+0,027, +0,101]) y de **0,658 a 0,762** en 2026 (Δ +0,104,
+IC95 [+0,065, +0,144]), ganando dos de cada tres días; y predecir a un día
+vista cuesta lo mismo que conocer el tiempo real (Δ −0,003, IC cruza el cero).
 
 ## Cómo se lee este repositorio
 
@@ -31,9 +34,9 @@ las cosas.
 | `03_iteracion1/` | Etiqueta EGIF, muestreo caso-control, entrenamiento y puesta en producción |
 | `04_bisagra/` | **El capítulo clave**: por qué 0,89 no medía lo que hacía falta |
 | `05_iteracion2/` | Rediseño con etiqueta EFFIS, DÓNDE × CUÁNDO, y las ablaciones |
-| `06_comparacion/` | Los dos sistemas sobre los mismos días y las mismas fuentes |
-| `07_produccion/` | La cadena diaria y los tres jueces que dan el veredicto de septiembre |
-| `docs/` | [Bitácora cronológica](docs/BITACORA.md), [trazabilidad](docs/TRAZABILIDAD.md), [limitaciones](docs/LIMITACIONES.md), [estructura](docs/ESTRUCTURA.md) y [lo que falta](docs/PENDIENTE.md) |
+| `06_comparacion/` | Los dos sistemas sobre los mismos días y las mismas fuentes, y **el replay de 2025-2026** que da el veredicto |
+| `07_produccion/` | La cadena diaria y los tres jueces en vivo (validación operativa en curso) |
+| `docs/` | [Bitácora cronológica](docs/BITACORA.md), [trazabilidad](docs/TRAZABILIDAD.md), [limitaciones](docs/LIMITACIONES.md), [veredicto del replay](docs/REPLAY_VEREDICTO.md), [estructura](docs/ESTRUCTURA.md), [lo que falta](docs/PENDIENTE.md) y [la memoria](docs/MEMORIA/README.md) |
 | `muestras/` | Recorte de julio de 2026 para ejecutar el pipeline sin descargar 44 GB |
 
 ## Por dónde empezar a leer
@@ -45,6 +48,9 @@ las cosas.
   conclusión hubo que retirar.
 - [`docs/TRAZABILIDAD.md`](docs/TRAZABILIDAD.md) — **cada número de la memoria
   con el script que lo produjo** y lo que hace falta para reejecutarlo.
+- [`docs/REPLAY_VEREDICTO.md`](docs/REPLAY_VEREDICTO.md) — **el resultado
+  final**: seis modelos, dos temporadas, dos condiciones, con su prerregistro
+  en `TRAZABILIDAD.md`.
 - [`docs/LIMITACIONES.md`](docs/LIMITACIONES.md) — lo que no cierra y lo que se
   dejó roto a propósito.
 - [`docs/ESTRUCTURA.md`](docs/ESTRUCTURA.md) — cómo está montado el repo y por
@@ -61,8 +67,15 @@ el que el pipeline se ejecuta de punta a punta en un portátil.
 
 ## Aviso sobre producción
 
-La cadena diaria que produce el veredicto de la temporada **corre en otro
-repositorio** (`tfm-fuego-malla`, GitHub Actions) y está sellada hasta el
-cierre de la temporada, en septiembre de 2026. Aquí está su código y una copia
+La cadena diaria que puntúa los modelos en vivo **corre en otro repositorio**
+(`tfm-fuego-malla`, GitHub Actions) y está sellada hasta el cierre de la
+temporada, en septiembre de 2026. Aquí está su código y una copia
 documental de su workflow con el `cron` desactivado, para que se pueda leer
 sin riesgo de alterar la comparación en curso.
+
+## Autoría
+
+Trabajo Fin de Máster, 2026. Módulo de aprendizaje automático de un sistema
+conjunto de apoyo a la gestión de incendios (predicción de riesgo, detección
+por visión y consulta de partes). Datos: IberFire (CC-BY 4.0), EGIF vía Civio
+(CC BY-SA 3.0), EFFIS y ERA5-Land (Copernicus), FIRMS (NASA), AEMET OpenData.

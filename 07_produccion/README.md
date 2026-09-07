@@ -37,16 +37,35 @@ una corta a las 13:45 para recoger el parte del MITECO.
 
 Ninguno es suficiente solo. Coincidiendo, son difíciles de discutir.
 
-## Estado a 25/08/2026
+## Estado a 07/09/2026 (corrida 34099321965)
 
-| Juez | Acumulado | Resultado |
-|---|---|---|
-| MITECO | 3 días / 6 incidentes | único **0,807** > pareja 0,771 > malla 0,598 |
-| EFFIS | 1 día (4 celdas, 122 ha) | pareja 90,6 · único 73,5 · malla 39,2 (percentil) |
-| Por estación | 1 día, 688 estaciones | pareja 0,607 · único 0,600 · malla 0,572 · producción 0,507 |
+AUC medio acumulado. «malla» es el modelo de producción servido sobre la malla
+del cubo; «producción» es el ranking real por estación del sistema en
+operación.
 
-El veredicto acumulado sigue diciendo, a propósito, *«mejor de media, pero con
-17 días no se distingue del ruido»*.
+| Juez | Acumulado | malla | único | r10 | pareja | producción |
+|---|---|---|---|---|---|---|
+| EFFIS | 9 días / 74 celdas | 0,506 | **0,745** | 0,722 (3 d) | 0,735 | — |
+| MITECO | 13 días / 34 incidentes | 0,516 | **0,692** | 0,674 (5 d) | 0,651 | — |
+| Por estación | 8 días / 65 positivas | 0,578 | 0,571 | 0,504 (3 d) | 0,594 | **0,645** |
+
+Los candidatos van por delante en EFFIS y MITECO; en el juez por estación
+producción sigue ganando y ningún intervalo excluye el cero (único: Δ −0,074,
+IC [−0,213, +0,073]). Con 8-13 días, esto es **validación operativa en curso**.
+Desde el 06/09/2026 el veredicto de la memoria no sale de aquí sino del
+**replay de 2025 y 2026** (`06_comparacion/`), que cubre 250 días. Los jueces
+siguen acumulando solos y se citan al cierre como lo que son.
+
+Fuente: `publicado/historico_veredictos.csv` del repositorio de la cadena.
+
+## Días que no cuentan, y por qué
+
+- **27-31 de agosto de 2026**: los mapas diarios se perdieron en un incidente de
+  sincronización del estado (`docs/LIMITACIONES.md` §11). No se regeneran: un
+  mapa regenerado no es el mapa sellado.
+- **21 de agosto de 2026**: el mapa que hay en el Release es una regeneración del
+  31/08, no el operativo (se buscó el original el 06/09 en el disco congelado y
+  no existe). **Se excluye del juez EFFIS** y se documenta.
 
 ## Los mapas
 
