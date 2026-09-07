@@ -8,16 +8,13 @@
 ## Lo único que bloquea la entrega: la memoria
 
 1. **La sección de ML de la memoria conjunta** (5 páginas, divulgativa).
-   Primer borrador en [`MEMORIA/seccion_ML_divulgativa.md`](MEMORIA/seccion_ML_divulgativa.md);
-   pendiente de lectura del autor. El titular es el replay
+   Primer borrador en [`MEMORIA/seccion_ML_divulgativa.md`](MEMORIA/seccion_ML_divulgativa.md)
+   (PDF al lado, 6 páginas con sus 3 figuras y 2 tablas); pendiente de lectura del autor. El titular es el replay
    (`REPLAY_VEREDICTO.md`), el modelo propuesto el r10, el producto de dos
    capas, y los límites de `LIMITACIONES.md` §3, §9 y §11 van escritos.
-2. **La figura del invierno** (percentil del día frente a escala absoluta, el
-   mismo día): no existe. Se genera con `dos_27_escala_absoluta.py` sobre un
-   día del replay.
-3. **Los anexos** (variables, ablaciones, jueces al cierre, calibración,
+2. **Los anexos** (variables, ablaciones, jueces al cierre, calibración,
    incidentes, guía del repo). El material está todo en `docs/`; es recorte.
-4. **Cerrar el párrafo de los jueces en vivo** con las cifras del último día
+3. **Cerrar el párrafo de los jueces en vivo** con las cifras del último día
    de temporada, cuando se decida parar la cadena (a mediados de septiembre).
 
 ## Decidido, y por qué

@@ -38,7 +38,7 @@ permite consultar.
 Cuatro fuentes, y conviene tener claro qué aporta cada una porque el giro del
 trabajo está en la diferencia entre dos de ellas.
 
-[TAB 1 — fuentes]
+**Tabla 1.** Las cuatro fuentes de datos y el papel de cada una. La diferencia entre EGIF (puntos de ignición) y EFFIS (perímetros quemados) es la que separa las dos iteraciones.
 
 | Fuente | Qué es | Para qué se usa |
 |---|---|---|
@@ -82,7 +82,9 @@ del MITECO y contra los focos térmicos de satélite, el acierto diario del mode
 en producción estuvo entre **0,56 y 0,64**. Un índice tan simple como el
 percentil local del FWI, sin modelo, sacaba 0,70.
 
-[FIG 1 — las dos iteraciones y la bisagra que las separa]
+![](figs/f1_iteraciones.png)
+
+**Figura 1.** Las dos iteraciones del trabajo y el diagnóstico que las separa. Lo que cambia entre ellas no son las fuentes ni las 46 variables, sino qué se toma como positivo, qué como negativo y contra qué verdad se valida. La iteración 1 se puso en producción y es el grupo de control contra el que se mide todo lo demás.
 
 Había tres sospechosos, y los dos primeros se descartaron con números antes de
 llegar al tercero:
@@ -141,7 +143,7 @@ septiembre respectivamente), alimentando a ambos con **la previsión que estaba
 disponible la víspera** y juzgándolos con los perímetros de EFFIS. El protocolo
 se escribió y se registró antes de ejecutar nada.
 
-[TAB 2 — el veredicto]
+**Tabla 2.** El veredicto del replay: acierto medio por día (AUC dentro del día) de producción y del r10, alimentados con la previsión de la víspera y juzgados con los perímetros de EFFIS. La diferencia es la media pareada día a día, con intervalo bootstrap al 95 %.
 
 | Temporada | Días con fuego | Hectáreas | Producción | r10 | Diferencia (IC 95 %) | Días que gana el r10 |
 |---|---|---|---|---|---|---|
@@ -166,7 +168,9 @@ del mapa del r10 esa tasa se multiplica por doce, y si se mira a 6 km alrededor
 incendios de 2025 vigilando el 10 % del territorio. Producción cubría el 29 %
 con el 6,6 %. El mapa dice dónde mirar, no dónde va a arder.
 
-[FIG 2 — el mismo día de agosto de 2026 según producción y según el r10, y la resta entre ambos]
+![](figs/f9_mapa_agosto2026.png)
+
+**Figura 2.** El 7 de agosto de 2026 (44.672 ha quemadas, el segundo día de la temporada) según producción y según el r10, ambos en percentil del día, y la resta entre los dos en puntos de percentil. Los círculos negros son las celdas que EFFIS cartografió como quemadas ese día. El r10 sube la cornisa cantábrica y Galicia y baja el interior sur: aprendió dónde se quema territorio, no solo dónde empiezan los incendios.
 
 Además del replay, el sistema **corre en vivo desde el 21 de agosto** en GitHub
 Actions: cada madrugada descarga la previsión, publica los mapas de ambos
@@ -198,7 +202,9 @@ historia separa los días con incendio grande, hoy no es un día de fuego y el
 mapa no se pinta. Con esa puerta, en invierno el 44 % de los días quedan sin
 rojo y solo se pierde el 6 % de los días grandes.
 
-[FIG 3 — el mismo día de invierno pintado por percentil del día y por escala absoluta]
+![](figs/f10_percentil_vs_absoluto.png)
+
+**Figura 3.** El mismo modelo (r10) pintado de dos maneras en un día de pleno verano (13 de agosto de 2025, arriba) y en uno fuera de temporada (29 de octubre de 2025, abajo). Izquierda: niveles por percentil del día, que reparten el 2 % de EXTREMO cada día sin excepción. Derecha: cortes fijos en la escala de la nota, aprendidos de diez años de historia, y el semáforo nacional: el 29 de octubre no supera el umbral y el mapa se apaga.
 
 Al comprobarlo se aprendió algo que no estaba previsto. Ese semáforo, fijado
 con datos de 2015-2021, funciona sin retocar en 2025 y 2026. Pero **no tiene
@@ -279,12 +285,12 @@ Si sobra, el §5 (resultados) es el último que se recorta; §2 y §4 los primer
 4. Los jueces en vivo se citan con fecha; actualizar el párrafo al cierre.
 5. El 21-ago excluido del juez EFFIS: no se menciona en el texto, va al anexo E.
 
-**Figuras propuestas:**
-- FIG 1: ya existe (`figs/f1_iteraciones.png`).
-- FIG 2: existe el mapa de seis paneles de `dos_riesgo_hoy.py`; recortar a tres
-  (producción, r10, resta).
-- FIG 3: nueva. Un día de invierno del replay pintado con `CORTES_PCTL` y con
-  los cortes absolutos de `dos_27`. Hay que generarla.
+**Figuras:** f1 (`figs/scripts/f1_iteraciones.py`), f9 (`f9_mapa_agosto2026.py`,
+mapas del replay 2026-08-07 + verdad EFFIS) y f10 (`f10_percentil_vs_absoluto.py`,
+r10 del replay 2025-08-13 y 2025-10-29, cortes de `dos_27_bandas.csv`, umbral
+del semáforo = p98 de la pareja ≥ 0,076, escala cruda de `dos_26`). Las tres
+leen `archivo_ifs/replay/` (fuera del repo). El PDF se genera con
+`markdown` + `weasyprint` (sin pandoc).
 
 **Anexos referenciados:** A variables y fuentes · B ablaciones y resultados
 negativos · C jueces en vivo al cierre · D calibración del semáforo (BSS/SEDI
