@@ -122,8 +122,8 @@ el modelo las necesite.
 
 ## 7. Alcance geográfico y temporal
 
-Península peninsular únicamente: 498.530 celdas. Quedan fuera Baleares, Canarias,
-Ceuta y Melilla. El entrenamiento cubre 2015-2020 (etiquetas EGIF consolidadas) y
+España peninsular y Baleares: 498.530 celdas del dominio de IberFire (unas
+8.800 en Baleares). Quedan fuera Canarias, Ceuta y Melilla. El entrenamiento cubre 2015-2020 (etiquetas EGIF consolidadas) y
 la validación en operación, la temporada de 2026.
 
 ## 8. Desajuste train/serve: filtro de caja contra radio circular (05/09/2026)

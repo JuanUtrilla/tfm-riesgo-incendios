@@ -177,7 +177,7 @@ cuyo reentrenamiento (§16) fue interactivo y no dejó script.
 | `validar_miteco.py` | TFM_fuego | `ae29060c` |
 | `validar_operativo.py` | TFM_fuego | `8934c2ba` |
 
-### `04_bisagra/42_no_es_la_meteo` — 23 ficheros
+### `04_bisagra/42_no_es_la_meteo` — 22 ficheros
 
 | Fichero | Origen | md5 |
 |---|---|---|
@@ -189,7 +189,6 @@ cuyo reentrenamiento (§16) fue interactivo y no dejó script.
 | `malla_02_vs_cubo.py` | TFM_fuego | `99a8e42d` |
 | `malla_02b_correccion.py` | TFM_fuego_malla | `d6a58bf0` |
 | `malla_02b_hibrido.py` | TFM_fuego_malla | `ddb601fe` |
-| `malla_02b_ifs.py` | TFM_fuego_malla | `c1607b2f` |
 | `malla_02b_prueba.py` | TFM_fuego_malla | `80063163` |
 | `malla_02b_reajuste.py` | TFM_fuego_malla | `0422b1cd` |
 | `malla_03_cuantiles.py` | TFM_fuego | `6cc4a23e` |
@@ -435,10 +434,11 @@ git). Cierra el pendiente «copiar los 9 scripts del replay al repo».
 | `verificar_replay.py` | A | `3aa798d4` |
 | `dos_33_anomalia_punta.py` | C | `6fe5559f` |
 
-### `01_datos` — 4 ficheros nuevos
+### `01_datos` — 5 ficheros
 
 | Fichero | Destino | Origen | md5 |
 |---|---|---|---|
+| `malla_02b_ifs.py` | `01_datos/ifs` | TFM_fuego_malla | `c1607b2f` |
 | `bajar_ifs_2025.py` | `01_datos/ifs` | A | `7ba0d828` |
 | `rellenar_ifs.py` | `01_datos/ifs` | A | `2f16da70` |
 | `bajar_effis_2025.py` | `01_datos/effis` | A | `bc046172` |
@@ -456,3 +456,16 @@ situarlos en un directorio con esas entradas, como describe
 
 No se han adaptado las rutas por la misma razón que en el resto del repositorio:
 tocarlas rompería el vínculo entre el código y el resultado publicado.
+
+## Ficheros nacidos en este repositorio
+
+No tienen fila con md5 porque no son copia de ningún otro repositorio:
+
+| Fichero | Qué es |
+|---|---|
+| `01_datos/comun/config.py`, `config_expansion.py`, `features.py`, `fwi_canadiense.py` | Los cuatro módulos compartidos, con las rutas adaptadas (ver `ESTRUCTURA.md` §2) |
+| `03_iteracion1/33_train/reconstruir_v2.py`, `verificar_v2.py` | Reconstrucción y verificación del modelo servido, escritos aquí el 01-02/09/2026 |
+| `01_datos/miteco/__init__.py` | Vacío; hace importable la carpeta |
+| `docs/MEMORIA/figs/scripts/*.py` | Los scripts que generan las figuras de la memoria |
+| `07_produccion/mapa_r10_semaforo.py` | El producto final de la cadena: escala absoluta y semáforo sobre las puntuaciones del día. Escrito aquí el 13/09/2026 |
+| `.github/workflows/mapa_diario.yml`, `requirements_gh.txt` | El workflow de la cadena diaria en este repositorio, derivado del de `tfm-fuego-malla` |

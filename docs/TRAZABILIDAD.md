@@ -97,11 +97,11 @@ Scripts: `06_comparacion/replay_*.py` (copiados con md5 el 05/09/2026, origen
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
 | **0,8906** [0,8644, 0,9136] | AUC-ROC de v4 en test 2022 — **el «0,89» de la memoria** | `03_iteracion1/33_train/entrenar_modelo_v4.py` | `dataset/metricas_v4.json` | disco |
-| 0,931 · 0,843 | AUC-ROC y AUC-PR de v1/v2 en test 2020 | `03_iteracion1/33_train/entrenar_modelo.py` | `dataset/metricas.json` | disco |
-| 0,848 ± 0,028 | GroupKFold espacial a 100 km: no colapsa fuera de zona vista | `03_iteracion1/33_train/entrenar_modelo.py` | ídem | disco |
-| 0,231 | Etiquetas barajadas ≈ azar: no hay fuga de datos | `03_iteracion1/33_train/entrenar_modelo.py` | ídem | disco |
-| +0,042 | Ablación FWI absoluto vs percentil local — la contribución del TFM | `03_iteracion1/35_ablaciones/ablacion_features.py` | `dataset/ablaciones_v1.json` | disco |
-| +0,007 | Lo que aportó el tuning bayesiano (40 trials) | `03_iteracion1/33_train/tuning_optuna.py` | `dataset/optuna.json` | disco |
+| 0,931 · 0,843 | AUC-ROC y AUC-PR de v1/v2 en test 2020 | `03_iteracion1/33_train/entrenar_modelo.py` | `dataset/metricas_v1.json` | disco |
+| 0,848 ± 0,028 | AUC-PR de v1 en GroupKFold espacial a 100 km: no colapsa fuera de zona vista | `03_iteracion1/33_train/entrenar_modelo.py` | ídem | disco |
+| 0,231 | AUC-PR con etiquetas barajadas ≈ prevalencia (0,263): no hay fuga de datos | `03_iteracion1/33_train/entrenar_modelo.py` | [`MODELO_B_BITACORA.md`](../03_iteracion1/MODELO_B_BITACORA.md) §control anti-fuga | disco |
+| +0,042 | AUC-PR que aporta añadir el percentil local al FWI absoluto (M_abs 0,668 → M_ambos 0,710) — la contribución del TFM | `03_iteracion1/35_ablaciones/ablacion_features.py` | `dataset/ablaciones_v1.json` | disco |
+| +0,007 | AUC-PR en test 2020 que aportó el tuning bayesiano (40 trials): 0,8426 → 0,8493 | `03_iteracion1/33_train/tuning_optuna.py` | `dataset/tuning_optuna_v1.json` | disco |
 | 46 = 50 − 4 | `xgb_v2_prototipo` (el modelo SERVIDO) es v1 sin las 4 autorregresivas intra-celda contaminadas por el muestreo misma-celda | `03_iteracion1/33_train/verificar_v2.py` | `muestras/modelos/xgb_v2_prototipo_features.json` | muestra |
 | 0,828 (−0,015 vs 0,843) | AUC-PR de ese reentrenamiento del 15/07 — fue interactivo, pero `reconstruir_v2.py` lo reproduce árbol a árbol (02/09/2026); la decisión y su racional, en la bitácora | `03_iteracion1/33_train/reconstruir_v2.py` · [`MODELO_B_BITACORA.md`](../03_iteracion1/MODELO_B_BITACORA.md) §16 | `xgb_v2_reconstruido.ubj` | disco |
 
@@ -209,10 +209,17 @@ Partición fija en los cuatro scripts: **calibración 2015-2021 · validación
 
 ## Capítulo 7 · Producción y jueces
 
-Cifras a 07/09/2026 (corrida 34099321965); se actualizan al cierre.
+Cifras al cierre, 13/09/2026 (corrida 34770468392 de la cadena).
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
+| 0,470 / 0,796 / 0,836 (7 d) / 0,711 (malla, único, r10, pareja), 13 días | Juez EFFIS acumulado, sin el 21-ago | `07_produccion/puntuar_effis.py` | `puntuacion_effis.csv`, `historico_veredictos.csv` | sellado |
+| 0,540 / 0,714 / 0,709 (11 d) / 0,673, 19 días / 47 incidentes | Juez MITECO acumulado | `07_produccion/dos_15_veredicto_miteco.py` | `veredicto_miteco.csv/json` | sellado |
+| 0,565 producción / 0,492 / 0,652 / 0,669 (8 d) / 0,539, 13 días / 149 positivas | Juez por estación | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.csv/json` | sellado |
+| Δ único +0,087 [−0,066, +0,253] por estación | Ningún IC excluye el cero | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.json` | sellado |
+| 21-ago excluido; 27-31/08 sin mapa | Días que no cuentan | — | `LIMITACIONES.md` §11 | — |
+
+---|---|---|---|---|
 | 0,506 / 0,745 / 0,722 / 0,735 (malla, único, r10, pareja), 9 días | Juez EFFIS acumulado | `07_produccion/puntuar_effis.py` | `puntuacion_effis.csv`, `historico_veredictos.csv` | sellado |
 | 0,516 / 0,692 / 0,674 / 0,651, 13 días | Juez MITECO acumulado | `07_produccion/dos_15_veredicto_miteco.py` | `veredicto_miteco.csv/json` | sellado |
 | 0,645 producción / 0,578 / 0,571 / 0,504 / 0,594, 8 días | Juez por estación | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.csv/json` | sellado |

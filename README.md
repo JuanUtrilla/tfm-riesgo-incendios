@@ -1,81 +1,84 @@
-# Predicción diaria de riesgo de incendio forestal en la España peninsular
+# Predicción diaria de riesgo de incendio forestal en España
 
-Repositorio definitivo del TFM. Contiene el trabajo completo: ingesta y
-tratamiento de datos, el primer modelo y su puesta en producción, el
-diagnóstico de por qué falló al medirlo en operación, el rediseño, y el
-sistema que se está validando durante la temporada de 2026.
+Este repositorio contiene el módulo de aprendizaje automático del TFM: la
+ingesta y el tratamiento de los datos, el primer modelo y su puesta en
+producción, el diagnóstico de por qué su acierto de laboratorio no se
+trasladaba a la operación, el rediseño, la evaluación sobre dos temporadas
+completas y la cadena que publica cada mañana el mapa del día.
 
-## El resultado, en un párrafo
+## El mapa de hoy
 
-El primer modelo alcanzó **AUC 0,89** en su conjunto de test y, servido a
-diario contra superficie quemada real, cayó a **0,56-0,64**. La discrepancia
-no era sobreajuste ni cambio de fuente meteorológica: era un **error de
-especificación**. El muestreo y la etiqueta de entrenamiento definían la
-pregunta *«¿es hoy un día peligroso en esta celda?»*, distinta de la que se
-evalúa en operación, *«¿cuál de las 498.530 celdas arde hoy?»*. A partir de
-ese diagnóstico se rediseñó el conjunto de entrenamiento y se construyó un
-segundo sistema. Reproducidas día a día las temporadas de **2025 y 2026** con
-la previsión disponible cada víspera (250 días, protocolo prerregistrado), el
-modelo único con etiqueta EFFIS y ratio 1:10 pasa de **0,743 a 0,807** en 2025
-(Δ +0,064, IC95 [+0,027, +0,101]) y de **0,658 a 0,762** en 2026 (Δ +0,104,
-IC95 [+0,065, +0,144]), ganando dos de cada tres días; y predecir a un día
-vista cuesta lo mismo que conocer el tiempo real (Δ −0,003, IC cruza el cero).
+![Mapa de hoy](publicado/semaforo_hoy.png)
 
-## Cómo se lee este repositorio
+Se genera cada mañana en GitHub Actions (`.github/workflows/mapa_diario.yml`).
+A la izquierda, el modelo elegido (r10) en una escala fija aprendida de diez
+años de historia, con el semáforo nacional que decide si hoy se pinta el nivel
+EXTREMO. A la derecha, el modelo de la primera iteración sobre la misma malla,
+que es con el que se compara. El mapa de mañana está en
+`publicado/semaforo_manana.png` y los diez últimos días en `publicado/`.
 
-El árbol es el orden de lectura de la memoria, no el orden en que ocurrieron
-las cosas.
+## El resultado en un párrafo
+
+El primer modelo alcanzó un AUC de 0,89 en su conjunto de test. Servido a diario
+y medido contra la superficie quemada real, dio entre 0,57 y 0,64. La
+diferencia no era sobreajuste ni un cambio de fuente meteorológica: el muestreo
+y la etiqueta de entrenamiento definían la pregunta «¿es hoy un día peligroso
+en esta celda?», y en operación se le hacía otra, «¿cuál de las 498.530 celdas
+arde hoy?». Con el conjunto de entrenamiento rediseñado para esa segunda
+pregunta se entrenó un segundo modelo. Reproducidas día a día las temporadas de
+2025 y 2026 con la previsión disponible cada víspera (250 días, protocolo
+escrito antes de ejecutar), el modelo único con etiqueta EFFIS y diez negativos
+por positivo (r10) pasa de 0,743 a 0,807 en 2025 (Δ +0,064, IC95 [+0,027,
++0,101]) y de 0,658 a 0,762 en 2026 (Δ +0,104, IC95 [+0,065, +0,144]). Gana dos
+de cada tres días, y predecir a un día vista cuesta lo mismo que conocer el
+tiempo real (Δ −0,003, IC que cruza el cero).
+
+## Cómo se lee el repositorio
+
+Las carpetas siguen el orden de la memoria, no el orden en que se hicieron las
+cosas. Cada una tiene un `README.md` con lo que hace cada script y para qué se
+usó.
 
 | Carpeta | Qué contiene |
 |---|---|
-| `00_marco/` | El hilo conductor, el glosario y el diagrama de las dos iteraciones |
-| `01_datos/` | Ingesta y tratamiento de las nueve fuentes. Marco común a las dos iteraciones |
-| `02_eda/` | Análisis exploratorio sobre el split de entrenamiento |
+| `00_marco/` | El hilo de la memoria, el glosario y el diagrama de las dos iteraciones |
+| `01_datos/` | Descarga y tratamiento de las nueve fuentes, común a las dos iteraciones |
+| `02_eda/` | Análisis exploratorio del cubo y del conjunto de entrenamiento |
 | `03_iteracion1/` | Etiqueta EGIF, muestreo caso-control, entrenamiento y puesta en producción |
-| `04_bisagra/` | **El capítulo clave**: por qué 0,89 no medía lo que hacía falta |
-| `05_iteracion2/` | Rediseño con etiqueta EFFIS, DÓNDE × CUÁNDO, y las ablaciones |
-| `06_comparacion/` | Los dos sistemas sobre los mismos días y las mismas fuentes, y **el replay de 2025-2026** que da el veredicto |
-| `07_produccion/` | La cadena diaria y los tres jueces en vivo (validación operativa en curso) |
-| `docs/` | [Bitácora cronológica](docs/BITACORA.md), [trazabilidad](docs/TRAZABILIDAD.md), [limitaciones](docs/LIMITACIONES.md), [veredicto del replay](docs/REPLAY_VEREDICTO.md), [estructura](docs/ESTRUCTURA.md), [lo que falta](docs/PENDIENTE.md) y [la memoria](docs/MEMORIA/README.md) |
-| `muestras/` | Recorte de julio de 2026 para ejecutar el pipeline sin descargar 44 GB |
+| `04_bisagra/` | Por qué el 0,89 no medía lo que hacía falta |
+| `05_iteracion2/` | Rediseño con etiqueta EFFIS, ablaciones y calibración del semáforo |
+| `06_comparacion/` | Los dos sistemas sobre los mismos días, y el replay de 2025 y 2026 |
+| `07_produccion/` | La cadena diaria: código, workflow y el producto final |
+| `docs/` | [Trazabilidad número → script](docs/TRAZABILIDAD.md), [resultado del replay](docs/REPLAY_VEREDICTO.md), [procedencia de cada fichero](docs/PROCEDENCIA.md), [cómo está montado el repo](docs/ESTRUCTURA.md), [alcance y limitaciones](docs/LIMITACIONES.md), [bitácora](docs/BITACORA.md) y [la memoria](docs/MEMORIA/README.md) |
+| `muestras/` | Recorte de julio de 2026 para ejecutar la rama de servicio sin descargar 44 GB |
 
-## Por dónde empezar a leer
-
-- [`00_marco/README.md`](00_marco/README.md) — el diagrama del hilo y las tres
-  preguntas que separan las dos iteraciones.
-- [`docs/BITACORA.md`](docs/BITACORA.md) — **la historia completa**, del primer
-  modelo en producción al veredicto: qué se midió, qué se descartó y qué
-  conclusión hubo que retirar.
-- [`docs/TRAZABILIDAD.md`](docs/TRAZABILIDAD.md) — **cada número de la memoria
-  con el script que lo produjo** y lo que hace falta para reejecutarlo.
-- [`docs/REPLAY_VEREDICTO.md`](docs/REPLAY_VEREDICTO.md) — **el resultado
-  final**: seis modelos, dos temporadas, dos condiciones, con su prerregistro
-  en `TRAZABILIDAD.md`.
-- [`docs/LIMITACIONES.md`](docs/LIMITACIONES.md) — lo que no cierra y lo que se
-  dejó roto a propósito.
-- [`docs/ESTRUCTURA.md`](docs/ESTRUCTURA.md) — cómo está montado el repo y por
-  qué el código no se ha reescrito.
-- [`docs/PENDIENTE.md`](docs/PENDIENTE.md) — lo que aún le falta, en orden de
-  importancia, y los puntos a decidir en equipo.
+Por dónde empezar: `00_marco/README.md` para el hilo, `04_bisagra/README.md`
+para el diagnóstico, `docs/REPLAY_VEREDICTO.md` para el resultado final y
+`docs/TRAZABILIDAD.md` para saber qué script produjo cada número.
 
 ## Reproducibilidad
 
-Los datos crudos (cubo IberFire 29 GB, reanálisis, históricos AEMET) no están
-en el repositorio: se descargan con los scripts de `01_datos/`. Para trabajar
-sin esperar a las descargas, `muestras/` lleva un recorte de julio de 2026 con
-el que el pipeline se ejecuta de punta a punta en un portátil.
+Los datos crudos (el cubo IberFire de 29 GB, el reanálisis, los históricos de
+AEMET) no están en el repositorio; se descargan con los scripts de `01_datos/`.
+Para trabajar sin esperar a las descargas, `muestras/` lleva un recorte de julio
+de 2026 con el que la rama de servicio corre en un portátil:
 
-## Aviso sobre producción
+```bash
+source entorno.sh                 # PYTHONPATH y rutas de datos
+python 07_produccion/riesgo_hoy.py
+python 07_produccion/dos_riesgo_hoy.py
+python 07_produccion/mapa_r10_semaforo.py
+```
 
-La cadena diaria que puntúa los modelos en vivo **corre en otro repositorio**
-(`tfm-fuego-malla`, GitHub Actions) y está sellada hasta el cierre de la
-temporada, en septiembre de 2026. Aquí está su código y una copia
-documental de su workflow con el `cron` desactivado, para que se pueda leer
-sin riesgo de alterar la comparación en curso.
+Los entrenamientos y las ablaciones necesitan el cubo y los datasets del disco
+externo (`TFM_DATOS`, `TFM_USB`). `environment.yml` fija el entorno conda
+(`tfm_fuego`, xgboost 3.2.0). Todos los modelos citados se reentrenaron en una
+copia aislada y coinciden con los artefactos originales métrica a métrica y por
+md5 del `.ubj` (`docs/TRAZABILIDAD.md`, apartado «Reproducción verificada»).
 
 ## Autoría
 
-Trabajo Fin de Máster, 2026. Módulo de aprendizaje automático de un sistema
-conjunto de apoyo a la gestión de incendios (predicción de riesgo, detección
-por visión y consulta de partes). Datos: IberFire (CC-BY 4.0), EGIF vía Civio
-(CC BY-SA 3.0), EFFIS y ERA5-Land (Copernicus), FIRMS (NASA), AEMET OpenData.
+Trabajo Fin de Máster, 2026. Módulo de aprendizaje automático de un sistema de
+apoyo a la gestión de incendios que tiene otros dos módulos: detección por
+visión y consulta de partes. Datos: IberFire (CC-BY 4.0), EGIF vía Civio (CC
+BY-SA 3.0), EFFIS y ERA5-Land (Copernicus), FIRMS (NASA), AEMET OpenData.

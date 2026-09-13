@@ -1,0 +1,22 @@
+# Entorno mínimo de la cadena diaria en GitHub Actions (no el de entrenamiento).
+# Versiones fijadas: las mismas con las que se generaron los mapas de la temporada 2026.
+numpy==2.4.6
+pandas==3.0.5
+xarray==2026.7.0
+netCDF4==1.7.4
+scipy==1.17.1
+scikit-learn==1.9.0
+xgboost==3.2.0
+pyproj==3.7.2
+geopandas==1.1.4
+rasterio==1.4.4
+shapely==2.1.2
+pyarrow==25.0.1
+matplotlib==3.11.1
+holidays==0.103
+requests==2.34.2
+cdsapi==0.7.7
+python-dotenv==1.2.3
+pymupdf==1.28.2
+pydantic==2.13.5
+rapidfuzz==3.14.6

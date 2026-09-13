@@ -1,0 +1,87 @@
+name: Mapa diario (r10 + semáforo)
+
+# Cada mañana: reanálisis ERA5-Land hasta D-7, previsión IFS hasta D+1, mapa
+# del modelo de producción (referencia) y de los candidatos, y el producto
+# final: el r10 en escala absoluta con el semáforo nacional. El estado entre
+# corridas (reanálisis acumulado, mapas) vive en el Release `estado`
+# (07_produccion/gh_estado.py). Secretos: CDSAPI_KEY y FIRMS_MAP_KEY.
+
+on:
+  schedule:
+    - cron: "17 4 * * *"      # 04:17 UTC = 06:17 Madrid; ERA5-Land de D-7 ya está publicado
+  workflow_dispatch:
+
+concurrency:
+  group: mapa-diario
+  cancel-in-progress: false
+
+jobs:
+  mapa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    permissions:
+      contents: write
+    env:
+      TFM_DATOS: /nope                # sin el cubo de 29 GB: todo sale de estado/ y muestras/
+      TFM_ESTADO: ${{ github.workspace }}/estado
+      TFM_SIN_EXTERNO: "1"
+      FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements_gh.txt
+
+      - name: Dependencias
+        run: pip install -r requirements_gh.txt
+
+      - name: PYTHONPATH (imports planos, ver docs/ESTRUCTURA.md)
+        run: |
+          source entorno.sh
+          echo "PYTHONPATH=$PYTHONPATH" >> "$GITHUB_ENV"
+
+      - name: Credenciales de CDS
+        run: |
+          printf 'url: https://cds.climate.copernicus.eu/api\nkey: %s\n' \
+            "${{ secrets.CDSAPI_KEY }}" > ~/.cdsapirc
+
+      - name: Estado de la corrida anterior (Release)
+        run: python 07_produccion/gh_estado.py pull
+
+      - name: Reanálisis ERA5-Land (mes en curso, incremental)
+        run: timeout 3h python -u 07_produccion/gh_reanalisis.py
+
+      - name: Previsión IFS (Open-Meteo, 5.605 nodos)
+        run: timeout 2h python -u 01_datos/ifs/malla_02b_ifs.py
+
+      - name: Mapa de referencia (modelo de producción sobre la malla)
+        run: timeout 1h python -u 07_produccion/riesgo_hoy.py
+
+      - name: Mapas de los candidatos (r10 incluido)
+        run: timeout 1h python -u 07_produccion/dos_riesgo_hoy.py
+
+      - name: Producto final: r10 en escala absoluta + semáforo
+        run: python -u 07_produccion/mapa_r10_semaforo.py
+
+      - name: Guardar estado (Release)
+        if: always()
+        run: python 07_produccion/gh_estado.py push
+
+      - name: Publicar en el repositorio
+        if: always()
+        run: |
+          mkdir -p publicado
+          cp -f salida/semaforo_*.png salida/semaforo_*.json publicado/ 2>/dev/null || true
+          # los diez últimos días con fecha, más semaforo_hoy / semaforo_manana con nombre fijo
+          ls -t publicado/semaforo_2*.png 2>/dev/null | tail -n +11 | xargs -r rm -f
+          ls -t publicado/semaforo_2*.json 2>/dev/null | tail -n +11 | xargs -r rm -f
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add publicado/
+          git diff --staged --quiet || git commit -m "mapa diario $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase && git push && break || sleep 20; done

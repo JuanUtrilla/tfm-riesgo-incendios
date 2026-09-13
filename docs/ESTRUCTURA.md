@@ -86,9 +86,14 @@ entrenamientos, las ablaciones). Necesita los 29 GB de IberFire. La muestra
 lleva `cubo_estaticas.nc`, que son solo las capas 2D que no cambian con el
 tiempo.
 
-## 6. La cadena diaria no vive aquí
+## 6. La cadena diaria
 
-Sigue en `tfm-fuego-malla` (GitHub Actions), sellada hasta el cierre de la
-temporada, en septiembre de 2026. En `07_produccion/` está su código y una
-copia documental del workflow con el `cron` desactivado. Mover la cadena a este
-repo a mitad de temporada arriesgaría días de veredicto por nada.
+Corre en GitHub Actions desde este repositorio
+(`.github/workflows/mapa_diario.yml`), una vez al día, y publica en
+`publicado/` el mapa del r10 con el semáforo y el mapa de referencia. El
+estado entre corridas (reanálisis acumulado, mapas de los últimos días) vive
+en el Release `estado` del repositorio, que `07_produccion/gh_estado.py` baja
+al empezar y sube al terminar. Hacen falta dos secretos: `CDSAPI_KEY` y
+`FIRMS_MAP_KEY`. Durante la temporada de 2026 la misma cadena corrió en el
+repositorio `tfm-fuego-malla`, con más pasos; su código está íntegro en
+`07_produccion/`.

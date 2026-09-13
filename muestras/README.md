@@ -8,9 +8,9 @@ originales. `config.entrada()` cae aquí cuando no encuentra el dato ni en
 |---|---|---|
 | `cubo_estaticas.nc` | capas 2D del cubo IberFire que no cambian con el tiempo: elevación, pendiente, rugosidad, distancias, población, CLC 2018, máscara de España | 16 MB |
 | `era5land_diario.nc` | reanálisis ERA5-Land agregado a diario en los 5.605 nodos, 20/06 → 31/07/2026 | 9,9 MB |
-| `effis_ba_season_ES.geojson` | perímetros EFFIS con `FIREDATE` en julio de 2026 — 259 incendios | 5,5 MB |
+| `effis_ba_season_ES.geojson` | perímetros EFFIS con `FIREDATE` en julio de 2026 (259 incendios) | 5,5 MB |
 | `malla_mensual_m7.npz` | caché mensual de julio: vegetación y LST por celda (climatología 2020-24) | 5,2 MB |
-| `clim_fwi_nodos.npz` | climatología de FWI por nodo, **solo julio** (del original de 50 MB con los doce meses) | 4,2 MB |
+| `clim_fwi_nodos.npz` | climatología de FWI por nodo, solo julio (del original de 50 MB con los doce meses) | 4,2 MB |
 | `municipios.json` | maestro de municipios, para situar los incidentes de MITECO | 2,8 MB |
 | `dos_13_mapa_donde_effis_c.npz` | mapa del DÓNDE precalculado por celda | 1,2 MB |
 | `modelos/` | `xgb_v2_prototipo` (producción), `donde_dia_effis` (único), `donde_effis_c` y `cuando` (pareja) | 4,2 MB |
@@ -22,15 +22,15 @@ Es el mes con el que se hizo la primera comparación seria entre producción y l
 malla (17 días con área quemada de EFFIS), así que los números que salgan del
 recorte se pueden contrastar con los de la memoria.
 
-## Sus límites, dichos claramente
+## Sus límites
 
-- **Las ventanas móviles empiezan incompletas.** `precip_30d` o
+- Las ventanas móviles empiezan incompletas. `precip_30d` o
   `dias_sin_lluvia` necesitan 30 días de historia: con el reanálisis arrancando
   el 20/06, los primeros días de julio salen sesgados. Para reproducir números
   publicados, usa la segunda quincena.
-- **No entrena nada.** Los `dos_00`…`dos_13` leen el cubo día a día (29 GB).
+- No entrena nada. Los `dos_00`…`dos_13` leen el cubo día a día (29 GB).
   Aquí solo están sus capas estáticas.
-- **La rama de previsión no está.** El IFS se descarga en vivo de Open-Meteo
+- La rama de previsión no está. El IFS se descarga en vivo de Open-Meteo
   (sin clave); para un día de julio ya pasado, lo que aplica es el reanálisis.
 
 ## Procedencia y licencias
