@@ -444,3 +444,30 @@ decía cuál de sus cinco documentos era cuál (README nuevo). Y se escribió el
 primer borrador divulgativo de la sección de la memoria conjunta
 (`docs/MEMORIA/seccion_ML_divulgativa.md`, 5 páginas): titular = replay, r10
 como modelo propuesto, producto de dos capas, límites declarados.
+
+## 13/09/2026 — Revisión de la memoria contra los artefactos, la cadena diaria en este repositorio y los READMEs
+
+Se contrastaron las 42 cifras y afirmaciones de la sección de la memoria con
+los JSON, CSV, parquets y modelos que las produjeron, no con la
+documentación. Todas se reproducen; se corrigieron nueve imprecisiones de
+redacción (entre ellas: el 98,8 % es de la muestra maestra y no del dataset
+final, donde es 90,7 %; el +0,042 es AUC-PR de añadir el percentil local al
+FWI absoluto; el 0,85 por bloques era AUC-PR de v1; las variables de satélite
+del día D pesan un 4,4 % en el r10; el semáforo usa el percentil 98 del día,
+no el máximo; producción tuvo seis días sin ranking en agosto). Se comprobó
+que Baleares está dentro del dominio (8.760 celdas) y se corrigió
+`LIMITACIONES.md` §7.
+
+La cadena diaria pasó a este repositorio: `.github/workflows/mapa_diario.yml`
+(un run al día, 04:17 UTC), Release `estado` propio, secretos `CDSAPI_KEY` y
+`FIRMS_MAP_KEY`, y el producto final nuevo `07_produccion/mapa_r10_semaforo.py`
+(escala absoluta de `dos_27` y semáforo de `dos_26`, r10|TODO; la regla
+reproduce exactamente el 44,0 % / 6,2 % de la calibración). Primer run
+completo con éxito (34774925437, 1 h 13 min): 13/09 sin aviso, p98 del r10
+0,221, probabilidad calibrada 0,06. La cadena de `tfm-fuego-malla` sigue
+corriendo un día más para comparar.
+
+Los READMEs de todos los capítulos se reescribieron con las skills
+`escribir-humano` y `escribir-tfm`: inventario de qué hace y para qué se usó
+cada script, una figura por apartado y sin referencias a los jueces en vivo,
+que ya no forman parte de la cadena ni de la evaluación de la memoria.
