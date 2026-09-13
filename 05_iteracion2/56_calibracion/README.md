@@ -17,6 +17,10 @@ casi todo el año. Este capítulo convierte el orden en tres cosas publicables:
 estimar nada. Aquí se calibra con 3.653 días del cubo, 2015-2024, con la
 variación real de la tasa base y los días de cero fuego incluidos.
 
+![Percentil del día frente a escala absoluta, con el semáforo](../../docs/MEMORIA/figs/f10_percentil_vs_absoluto.png)
+
+*El r10 el 13 de agosto y el 29 de octubre de 2025: a la izquierda por percentil del día, a la derecha con la escala fija y el semáforo.*
+
 ## Qué hay aquí
 
 | Script | Qué hace |

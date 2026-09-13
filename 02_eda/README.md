@@ -37,6 +37,10 @@ capítulo 4.
 Solo el 2,97 % de las celdas tuvo alguna ignición EGIF entre 2015 y 2020, y el
 2,68 % alguna celda EFFIS entre 2021 y 2024.
 
+![Prevalencia real del fuego y persistencia de la etiqueta](../docs/MEMORIA/figs/f7_prevalencia.png)
+
+*Celdas-día quemadas por cada 100.000 y persistencia de `is_fire`, año a año.*
+
 ### La etiqueta persiste
 
 La probabilidad de que una celda con fuego hoy siga con fuego mañana es 0,51;
@@ -101,6 +105,14 @@ de 3,1 ya es el percentil 91,7 de su historia, y en Canarias un 41,4 se queda en
 el 72,8. Como ablación (`03_iteracion1/35_ablaciones/ablacion_features.py`),
 añadir el percentil local al FWI absoluto aporta +0,042 de AUC-PR (de 0,668 a
 0,710).
+
+![El FWI absoluto frente al percentil local](../docs/MEMORIA/figs/f8_normalizacion.png)
+
+*El FWI absoluto de los días de incendio va de 3 en Asturias a 41 en Andalucía; en percentil local todos se concentran arriba.*
+
+![Qué separa un positivo de un negativo en el conjunto de la iteración 1](../docs/MEMORIA/figs/f3_separacion.png)
+
+*Medianas de positivos y negativos: la meteorología separa, las variables estáticas no.*
 
 ### Figuras
 

@@ -37,6 +37,14 @@ temporadas 2025 y 2026 quedan como prueba externa (`06_comparacion/`).
 | `57_ablaciones/dos_30_r10_todo.py` | El r10 reentrenado con 2015-2024, con el protocolo escrito antes de ejecutar | Más años no cambian el orden (`docs/R10_TODOS_LOS_ANIOS.md`) |
 | `57_ablaciones/dos_34_auditoria_geometria.py` | El filtro de vecinos es una caja en entrenamiento y un círculo en servicio | Diferencia de escala (1,39×), no de orden (`docs/LIMITACIONES.md` §8) |
 
+![Variables en las que se apoya el r10, por valores SHAP](../docs/MEMORIA/figs/f11_shap_r10.png)
+
+*Las 15 variables de mayor peso del r10 sobre 6.000 celdas-día de los veranos de 2023 y 2024.*
+
+![De dónde saca cada modelo su ventaja](../docs/MEMORIA/figs/f6_donde_mira.png)
+
+*Importancia por ganancia del modelo de producción y del único, y la comprobación de desfase entre entrenamiento y servicio.*
+
 ## Los tres modelos que salen de aquí
 
 - El único (`donde_dia_effis`): las 46 variables, negativos del mismo día,

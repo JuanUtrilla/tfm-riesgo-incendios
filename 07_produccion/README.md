@@ -12,6 +12,10 @@ Durante la temporada de 2026 la misma cadena corrió en un repositorio aparte
 (`tfm-fuego-malla`) y publicaba, además, los mapas de los otros candidatos.
 Aquí queda su código completo, incluidos los scripts que ya no se ejecutan.
 
+![El mapa publicado hoy](../publicado/semaforo_hoy.png)
+
+*El producto de la cadena: r10 en escala absoluta con el semáforo, y el modelo de referencia al lado.*
+
 ## Cómo se genera un día
 
 ```

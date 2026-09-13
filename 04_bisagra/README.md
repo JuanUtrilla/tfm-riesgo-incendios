@@ -11,6 +11,10 @@ eso la tercera es creíble.
 44  Es la especificación   la etiqueta y el muestreo definían otra pregunta
 ```
 
+![Los tres diseños de muestreo sobre la misma rejilla celda por día](../docs/MEMORIA/figs/f2_disenios.png)
+
+*(a) Negativos en la misma celda otros días. (b) Negativos en otras celdas del mismo día. (c) Lo que se pide en operación.*
+
 ## 41 · La validación en operación
 
 Cinco puntuaciones comparadas contra tres verdades independientes: focos
@@ -103,6 +107,10 @@ Dos medidas, y con ellas el trabajo cambió de dirección:
 - El AUC caso-control de los dos diseños es el mismo (0,92), y el AUC dentro
   del día los separa (0,744 frente a 0,828). La métrica de desarrollo no veía la
   diferencia.
+
+![La misma pareja de modelos bajo dos métricas](../docs/MEMORIA/figs/f4_metrica_ciega.png)
+
+*AUC caso-control (igual para los dos diseños) frente a AUC dentro del día (que los separa).*
 
 | Script | Qué hace | Para qué se usa |
 |---|---|---|

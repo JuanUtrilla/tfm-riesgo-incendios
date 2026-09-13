@@ -32,6 +32,10 @@
                     PRODUCCIÓN  (07)  el mapa de cada mañana, r10 + semáforo
 ```
 
+![Las dos iteraciones y el diagnóstico entre ambas](../docs/MEMORIA/figs/f1_iteraciones.png)
+
+*El mismo hilo, dibujado: la primera iteración, el diagnóstico y la segunda.*
+
 ## Dos decisiones de redacción
 
 La memoria sigue el orden lógico, no el cronológico: lo que importa es en qué

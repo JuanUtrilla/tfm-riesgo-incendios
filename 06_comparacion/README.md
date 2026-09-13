@@ -26,6 +26,10 @@ víspera. Ese segundo bloque es el resultado que da la memoria.
 | `comparar_rankings_justo.py` | Previsión contra previsión, 19 días, sin reanálisis para nadie | El cara a cara sin ventaja |
 | `dos_19_veredicto.py` | La figura de la temporada: AUC por día y diferencia acumulada con IC95 | Seguimiento |
 
+![La temporada 2026 día a día](../docs/MEMORIA/figs/f5_temporada2026.png)
+
+*AUC dentro del día de cada modelo y ventaja acumulada del r10 sobre producción, con su intervalo.*
+
 Temporada 2026, AUC medio por día contra la superficie quemada de EFFIS:
 
 | Sistema | Todos los días | Días grandes (11) | Sin FIRMS |
@@ -72,6 +76,14 @@ de ejecutar las temporadas.
 
 Las métricas de precisión, radio y cobertura se añadieron después de escribir
 el protocolo, y así consta en sus documentos.
+
+![Resumen del replay: las cuatro corridas](../docs/MEMORIA/figs/replay_resumen.png)
+
+*AUC medio de cada modelo en 2025 y 2026, con IFS y con reanálisis, y el intervalo de la diferencia contra producción.*
+
+![El 7 de agosto de 2026 según producción y según el r10](../docs/MEMORIA/figs/f9_mapa_agosto2026.png)
+
+*El segundo mayor día de la temporada (44.672 ha): producción, r10 y la resta entre ambos, con los perímetros EFFIS del día.*
 
 Resultado, AUC medio por día con la previsión de la víspera:
 
