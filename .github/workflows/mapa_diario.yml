@@ -65,7 +65,7 @@ jobs:
       - name: Mapas de los candidatos (r10 incluido)
         run: timeout 1h python -u 07_produccion/dos_riesgo_hoy.py
 
-      - name: Producto final: r10 en escala absoluta + semáforo
+      - name: "Producto final: r10 en escala absoluta + semáforo"
         run: python -u 07_produccion/mapa_r10_semaforo.py
 
       - name: Guardar estado (Release)
