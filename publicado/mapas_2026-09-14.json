@@ -1,0 +1,18 @@
+{
+ "fecha": "2026-09-14",
+ "pct_extremo": 0.997,
+ "posicion_referencia": 39.2,
+ "dias_referencia": 250,
+ "mediana_referencia": 1.497,
+ "niveles_pct": {
+  "BAJO": 46.280063386355884,
+  "MODERADO": 46.99917758209135,
+  "ALTO": 5.723426875012537,
+  "EXTREMO": 0.9973321565402282
+ },
+ "celdas_extremo": 4972,
+ "p98_r10": 0.30688,
+ "rama": "reanálisis + IFS mapeado",
+ "fwi_medio": 41.59628596705942,
+ "fwi_medio_pctl_clim": 65.83291282677786
+}
