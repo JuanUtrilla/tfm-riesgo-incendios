@@ -6,16 +6,19 @@ producción, el diagnóstico de por qué su acierto de laboratorio no se
 trasladaba a la operación, el rediseño, la evaluación sobre dos temporadas
 completas y la cadena que publica cada mañana el mapa del día.
 
-## El mapa de hoy
+## Los mapas de hoy y mañana
 
-![Mapa de hoy](publicado/semaforo_hoy.png)
+![Mapas de hoy](publicado/mapas_hoy.png)
 
-Se genera cada mañana en GitHub Actions (`.github/workflows/mapa_diario.yml`).
-A la izquierda, el modelo elegido (r10) en una escala fija aprendida de diez
-años de historia, con el semáforo nacional que decide si hoy se pinta el nivel
-EXTREMO. A la derecha, el modelo de la primera iteración sobre la misma malla,
-que es con el que se compara. El mapa de mañana está en
-`publicado/semaforo_manana.png` y los diez últimos días en `publicado/`.
+![Mapas de mañana](publicado/mapas_manana.png)
+
+Se generan cada madrugada en GitHub Actions (`.github/workflows/mapa_diario.yml`,
+hacia las 03:03 en verano y las 02:02 en invierno, hora de Madrid). Hay una
+imagen para hoy y otra para mañana. En cada una, a la izquierda, el modelo
+elegido (r10) en escala absoluta, que indica cuánto riesgo hay, con la cifra del
+día: el porcentaje de España en nivel EXTREMO y su posición entre los días de
+referencia. A la derecha, el mismo modelo por percentil del día, que indica
+dónde mirar. Los diez últimos días quedan en `publicado/`.
 
 ## El resultado en un párrafo
 
@@ -46,7 +49,7 @@ usó.
 | `02_eda/` | Análisis exploratorio del cubo y del conjunto de entrenamiento |
 | `03_iteracion1/` | Etiqueta EGIF, muestreo caso-control, entrenamiento y puesta en producción |
 | `04_bisagra/` | Por qué el 0,89 no medía lo que hacía falta |
-| `05_iteracion2/` | Rediseño con etiqueta EFFIS, ablaciones y calibración del semáforo |
+| `05_iteracion2/` | Rediseño con etiqueta EFFIS, ablaciones y calibración en el cubo |
 | `06_comparacion/` | Los dos sistemas sobre los mismos días, y el replay de 2025 y 2026 |
 | `07_produccion/` | La cadena diaria: código, workflow y el producto final |
 | `docs/` | [Trazabilidad número → script](docs/TRAZABILIDAD.md), [resultado del replay](docs/REPLAY_VEREDICTO.md), [procedencia de cada fichero](docs/PROCEDENCIA.md), [cómo está montado el repo](docs/ESTRUCTURA.md), [alcance y limitaciones](docs/LIMITACIONES.md), [bitácora](docs/BITACORA.md) y [la memoria](docs/MEMORIA/README.md) |

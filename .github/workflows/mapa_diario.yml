@@ -1,14 +1,19 @@
-name: Mapa diario (r10 + semáforo)
+name: Mapa diario (r10, hoy y mañana)
 
 # Cada mañana: reanálisis ERA5-Land hasta D-7, previsión IFS hasta D+1, mapa
 # del modelo de producción (referencia) y de los candidatos, y el producto
-# final: el r10 en escala absoluta con el semáforo nacional. El estado entre
+# final: dos imágenes (hoy y mañana), cada una con el r10 en escala absoluta
+# y cifra del día, y el r10 por percentil del día. El estado entre
 # corridas (reanálisis acumulado, mapas) vive en el Release `estado`
 # (07_produccion/gh_estado.py). Secretos: CDSAPI_KEY y FIRMS_MAP_KEY.
 
 on:
   schedule:
-    - cron: "17 4 * * *"      # 04:17 UTC = 06:17 Madrid; ERA5-Land de D-7 ya está publicado
+    # En UTC: 03:03 Madrid en horario de verano y 02:02 en invierno. En las semanas
+    # del cambio de hora (finales de marzo y de octubre) sale una hora antes o
+    # después. A esa hora la fecha UTC coincide con la de Madrid.
+    - cron: "3 1 * 4-10 *"       # abril-octubre: 01:03 UTC = 03:03 Madrid
+    - cron: "2 1 * 1-3,11,12 *"  # noviembre-marzo: 01:02 UTC = 02:02 Madrid
   workflow_dispatch:
 
 concurrency:
@@ -65,7 +70,7 @@ jobs:
       - name: Mapas de los candidatos (r10 incluido)
         run: timeout 1h python -u 07_produccion/dos_riesgo_hoy.py
 
-      - name: "Producto final: r10 en escala absoluta + semáforo"
+      - name: "Producto final: mapas de hoy y mañana (escala absoluta y percentil)"
         run: python -u 07_produccion/mapa_r10_semaforo.py
 
       - name: Guardar estado (Release)
@@ -76,10 +81,10 @@ jobs:
         if: always()
         run: |
           mkdir -p publicado
-          cp -f salida/semaforo_*.png salida/semaforo_*.json publicado/ 2>/dev/null || true
-          # los diez últimos días con fecha, más semaforo_hoy / semaforo_manana con nombre fijo
-          ls -t publicado/semaforo_2*.png 2>/dev/null | tail -n +11 | xargs -r rm -f
-          ls -t publicado/semaforo_2*.json 2>/dev/null | tail -n +11 | xargs -r rm -f
+          cp -f salida/mapas_*.png salida/mapas_*.json publicado/ 2>/dev/null || true
+          # los diez últimos días con fecha, más mapas_hoy / mapas_manana con nombre fijo
+          ls -t publicado/mapas_2*.png 2>/dev/null | tail -n +11 | xargs -r rm -f
+          ls -t publicado/mapas_2*.json 2>/dev/null | tail -n +11 | xargs -r rm -f
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add publicado/
