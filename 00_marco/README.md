@@ -45,8 +45,7 @@ llevaron a ninguna parte están en `docs/BITACORA.md`, no en la memoria.
 El primer modelo se cuenta como grupo de control, no como error. Sin él no se
 podría demostrar que el rediseño hacía falta ni cuantificar lo que aportó.
 
-El desarrollo de las dos decisiones, con el texto de la sección de diagnóstico,
-está en [`docs/MEMORIA/hilo_conductor.md`](../docs/MEMORIA/hilo_conductor.md).
+La memoria, con sus anexos, está en [`docs/MEMORIA/`](../docs/MEMORIA/README.md).
 El glosario está en [`GLOSARIO.md`](GLOSARIO.md).
 
 ## Las tres preguntas que separan las dos iteraciones

@@ -1,19 +1,21 @@
-# Los documentos de la memoria, y cuál es cuál
+# La memoria
 
-Hay varios borradores porque el formato de la memoria cambió por el camino. El
-que se entrega es el primero; el resto es cantera para los anexos.
+La sección de aprendizaje automático de la memoria conjunta del TFM: cuatro
+páginas de memoria y dos de anexos, que remiten a este repositorio para el
+detalle.
 
-| Documento | Qué es | Estado |
-|---|---|---|
-| **`seccion_ML_divulgativa.md`** | La sección de ML de la memoria **conjunta** (RAG + visión + ML, 20 páginas): 5 páginas, divulgativa, sin fundamentos. Titular = replay 2025-2026 | Borrador del 07/09/2026, **el vigente**; PDF al lado (~6,5 págs. con 4 figuras y 2 tablas) |
-| `seccion_modelo.tex` / `.pdf` | Versión técnica de la sección (9 páginas, LaTeX autocontenido, figuras f1-f8). Superada por el formato divulgativo | Cantera para los anexos B y D |
-| `TRAZABILIDAD.md` | Cada cifra de `seccion_modelo.tex` con su artefacto. Complementa `../TRAZABILIDAD.md`, que es la del repositorio entero | Vigente para lo que se recicle del .tex |
-| `BORRADOR_memoria_ML.md` / `.tex` / `.pdf` | Borrador largo por capítulos (10-11 páginas) con el presupuesto de páginas antiguo | Superado |
-| `capitulo_ML_donde_cuando.md` | Primer capítulo autocontenido (21/08), anterior a la fuga de FIRMS: **sus cifras están desactualizadas** | Histórico |
-| `hilo_conductor.md` | Guía de redacción: hilo lógico y no cronológico, la iteración 1 como grupo de control, el texto de la bisagra | Vigente como guía |
-| `PLAN_SECCION.md` | Inventario de evidencia del 31/08 recorriendo los cuatro repos | Histórico |
-| `figs/` | Las figuras y los scripts que las generan (`figs/scripts/`) | f1-f8 del .tex; la sección divulgativa usa **f2** (diseños de muestreo), **f9** (7-ago-2026, producción vs r10), **f10** (percentil vs. escala absoluta) y **f11** (SHAP del r10, lee el USB). `scripts/hacer_pdf.py` genera el PDF |
+| Fichero | Qué es |
+|---|---|
+| [`memoria_ML.pdf`](memoria_ML.pdf) | La sección compilada |
+| `memoria_ML.tex` | Su fuente LaTeX. Se compila con `pdflatex memoria_ML.tex` dos veces desde esta carpeta |
+| `figs/` | Las figuras de la memoria y de los README, con los scripts que las generan en `figs/scripts/` y en `07_produccion/escala_y_cifra/` |
 
-Regla de oro, heredada de todas las versiones: **ninguna cifra se escribe de
-memoria**. Cada número sale de un CSV/JSON que produjo un script del repo, y
-`../TRAZABILIDAD.md` dice cuál.
+Figuras de la memoria: `pagina_2_imagen_1_Im0.jpg` (diseños de muestreo, de
+`f2_disenios.py`), `pagina_3_imagen_1_Im1.jpg` (SHAP del r10, de
+`f11_shap_r10.py`), `fig3_dos_mapas.png` (los dos mapas, de
+`07_produccion/escala_y_cifra/fig3_dos_mapas.py`), `anexo_a_prevalencia.png` y
+`anexo_b_replay.png` (anexos A y B).
+
+Ninguna cifra de la memoria se escribió a mano: cada número sale de un CSV o
+JSON que produjo un script del repositorio, y
+[`../TRAZABILIDAD.md`](../TRAZABILIDAD.md) dice cuál.

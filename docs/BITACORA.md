@@ -41,8 +41,7 @@ Hasta entonces la verdad-terreno eran detecciones FIRMS y perímetros EFFIS. Se
 añadieron los **partes diarios oficiales de MITECO**, archivados a diario por
 un repositorio hermano. Su virtud no es la precisión, es la **latencia**: se
 publican al día siguiente, frente a los ~45 días que tarda EFFIS en cartografiar
-un incendio. Eso convierte a MITECO en el juez *rápido* de todo lo que vino
-después.
+un incendio. Eso convierte a MITECO en la referencia *rápida* de todo lo que vino después.
 
 ### 1.2 El resultado incómodo
 
@@ -218,10 +217,10 @@ del 31/08— que favorecía a producción.)
 
 Ese mismo día se montó la infraestructura para juzgarlo en operación sin
 depender de que el portátil esté encendido: la cadena diaria en **GitHub
-Actions**, los candidatos sirviendo en paralelo a producción, y los **tres
-jueces** — EFFIS (45 días de desfase), MITECO (parte del día siguiente) y el
-juez por estación contra el ranking sellado del hermano, por deploy key de
-lectura.
+Actions**, los candidatos sirviendo en paralelo a producción, y el
+**seguimiento diario** de los mapas contra EFFIS (45 días de desfase), MITECO
+(parte del día siguiente) y el ranking por estación del hermano, por deploy key
+de lectura.
 
 ---
 
@@ -252,10 +251,9 @@ del 23/08 decía 81,7 → 87,6-87,9, inflada por la fuga de FIRMS de la entrada
 
 ## 7. Dónde está hoy: 24-25/08/2026
 
-La cadena diaria corre sola y en verde (21 pasos, dos pasadas al día). Estado de
-los tres jueces:
+La cadena diaria corre sola y en verde (21 pasos, dos pasadas al día). Estado del seguimiento diario:
 
-| Juez | Acumulado | Resultado |
+| Referencia | Acumulado | Resultado |
 |---|---|---|
 | **MITECO** | 3 días / 6 incidentes | único **0,807** > pareja 0,771 > malla 0,598 |
 | **EFFIS** | 1 día (4 celdas, 122 ha) | pareja 90,6 · único 73,5 · malla 39,2 (percentil) |
@@ -390,9 +388,7 @@ sobre entradas archivadas no vale lo mismo que uno sellado antes del día: con
 la temporada guardada se pueden probar veinte variantes hasta que una gane, y
 el intervalo de confianza de la ganadora deja de significar lo que dice. El
 archivo es un banco de pruebas y una herramienta de auditoría —sin las cachés
-de junio y julio la fuga de FIRMS no se habría podido demostrar—; el veredicto
-lo siguen firmando los tres jueces en vivo sobre candidatos comprometidos de
-antemano, que es por lo que `donde_dia_effis_r10` se puso a servir el 31/08 en
+de junio y julio la fuga de FIRMS no se habría podido demostrar—; el veredicto lo daba entonces el seguimiento diario sobre candidatos comprometidos de antemano, que es por lo que `donde_dia_effis_r10` se puso a servir el 31/08 en
 lugar de limitarse a medirlo en retro.
 
 ## 05/09/2026 — Calibración incorporada
@@ -418,8 +414,7 @@ isotónica; `N_BOOT`/`SEED` estaban declarados y sin usar, así que no había IC
 
 Se montó el disco Expansion buscando el mapa operativo del 21-ago: no existe
 (`LIMITACIONES.md` §11). Y se tomó la decisión que cambia el eje del cierre:
-**el veredicto de la memoria es el replay de 2025 y 2026**, no los jueces en
-vivo, que llevan ~15 días y cuyos intervalos siguen cruzando el cero. Es
+**el veredicto de la memoria es el replay de 2025 y 2026**, no el seguimiento diario, que lleva ~15 días y cuyos intervalos siguen cruzando el cero. Es
 defendible por tres cosas: 250 días contra 15, dos temporadas contra una, y el
 prerregistro escrito antes de correrlo. Su límite —a posteriori, no sellado—
 va escrito en la memoria. Se descarta la Fase 4 del «si» (modelo día-nacional
@@ -428,7 +423,7 @@ ningún repositorio.
 
 ## 07/09/2026 — Poner el repositorio en orden para la memoria
 
-Los tres jueces siguen verdes (única corrida fallida de septiembre, el 04/09,
+El seguimiento diario sigue en verde (única corrida fallida de septiembre, el 04/09,
 se repescó el mismo día). MITECO gana un día (13) y el único sigue clavado en
 0,69; EFFIS baja dos centésimas en todos; producción sigue delante por
 estación sin significación.
@@ -442,7 +437,7 @@ no estaban en `LIMITACIONES.md` (§11 nuevo); `PENDIENTE.md` era un diario de
 529 líneas (ahora estado actual + histórico compacto); `docs/MEMORIA/` no
 decía cuál de sus cinco documentos era cuál (README nuevo). Y se escribió el
 primer borrador divulgativo de la sección de la memoria conjunta
-(`docs/MEMORIA/seccion_ML_divulgativa.md`, 5 páginas): titular = replay, r10
+(un borrador de 5 páginas, sustituido después por `docs/MEMORIA/memoria_ML.pdf`): titular = replay, r10
 como modelo propuesto, producto de dos capas, límites declarados.
 
 ## 13/09/2026 — Revisión de la memoria contra los artefactos, la cadena diaria en este repositorio y los READMEs
@@ -469,5 +464,4 @@ corriendo un día más para comparar.
 
 Los READMEs de todos los capítulos se reescribieron con las skills
 `escribir-humano` y `escribir-tfm`: inventario de qué hace y para qué se usó
-cada script, una figura por apartado y sin referencias a los jueces en vivo,
-que ya no forman parte de la cadena ni de la evaluación de la memoria.
+cada script, una figura por apartado y sin referencias al seguimiento diario, que ya no forma parte de la cadena ni de la evaluación de la memoria.
