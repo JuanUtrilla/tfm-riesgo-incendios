@@ -1,0 +1,24 @@
+{
+ "fecha": "2026-09-15",
+ "semaforo": "SIN AVISO",
+ "p98_r10": 0.29321,
+ "prob_dia_grande": 0.106,
+ "umbral": 0.1546,
+ "niveles_pct": {
+  "BAJO": 12.548091388682728,
+  "MODERADO": 77.45210920105109,
+  "ALTO": 9.999799410266183,
+  "EXTREMO": 0.0
+ },
+ "niveles_pct_sin_semaforo": {
+  "BAJO": 12.548091388682728,
+  "MODERADO": 77.45210920105109,
+  "ALTO": 8.98260887007803,
+  "EXTREMO": 1.0171905401881531
+ },
+ "celdas_extremo": 0,
+ "rama": "reanálisis + IFS mapeado",
+ "fwi_medio": 50.4953518946339,
+ "fwi_medio_pctl_clim": 81.20229463787746,
+ "hay_referencia": true
+}

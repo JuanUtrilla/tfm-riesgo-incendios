@@ -1,24 +1,24 @@
 {
  "fecha": "2026-09-14",
  "semaforo": "SIN AVISO",
- "p98_r10": 0.2959,
- "prob_dia_grande": 0.1077,
+ "p98_r10": 0.31592,
+ "prob_dia_grande": 0.1205,
  "umbral": 0.1546,
  "niveles_pct": {
-  "BAJO": 16.307544179888872,
-  "MODERADO": 74.36804204360821,
-  "ALTO": 9.324413776502919,
+  "BAJO": 17.006398812508774,
+  "MODERADO": 73.43650331976009,
+  "ALTO": 9.557097867731128,
   "EXTREMO": 0.0
  },
  "niveles_pct_sin_semaforo": {
-  "BAJO": 16.307544179888872,
-  "MODERADO": 74.36804204360821,
-  "ALTO": 8.410125769763104,
-  "EXTREMO": 0.914288006739815
+  "BAJO": 17.006398812508774,
+  "MODERADO": 73.43650331976009,
+  "ALTO": 8.458869075080736,
+  "EXTREMO": 1.098228792650392
  },
  "celdas_extremo": 0,
  "rama": "reanálisis + IFS mapeado",
- "fwi_medio": 41.92326886617329,
- "fwi_medio_pctl_clim": 66.35141954160359,
+ "fwi_medio": 42.075014666394395,
+ "fwi_medio_pctl_clim": 66.60159881018777,
  "hay_referencia": true
 }
