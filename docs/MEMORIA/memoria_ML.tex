@@ -18,7 +18,7 @@
 \usepackage{float}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning}
-\usepackage[hidelinks]{hyperref}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor={blue!55!black}]{hyperref}
 
 \graphicspath{{figs/}}
 \captionsetup{font=small,labelfont=bf,skip=4pt,width=.92\textwidth}
@@ -460,6 +460,12 @@ toda la península. Expresado como percentil respecto a la historia de cada
 celda, el mismo dato se concentra entre 72 y 92 en las ocho comunidades con más
 incendios. Añadir el percentil al FWI absoluto aumentó el AUC-PR en 0.042.
 
+Detalle en el repositorio: la descarga y el tratamiento de cada fuente en
+\repo{blob/main/01_datos/README.md}{01\_datos/README.md}, las 46 variables y su
+orden en \repo{blob/main/01_datos/comun/features.py}{01\_datos/comun/features.py}
+y el análisis exploratorio completo en
+\repo{blob/main/02_eda/ANALISIS_CUBO.md}{02\_eda/ANALISIS\_CUBO.md}.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=.6\textwidth]{anexo_a_normalizacion.png}
@@ -515,6 +521,25 @@ ordenación y las operativas.
     \bottomrule
   \end{tabular}
 \end{table}
+
+La figura~\ref{fig:an-boxplot} muestra la distribución del AUC día a día
+detrás de esas medias. En 2025 la mediana del r10 es 0.844 y la de producción
+0.797, pero la diferencia está sobre todo en la mitad baja: el primer cuartil
+de producción es 0.621 frente a 0.736 del r10, y producción queda por debajo
+del azar 16 días frente a 7. En 2026 se repite con más margen: medianas de
+0.799 y 0.688, primer cuartil de 0.690 y 0.517, y 19 días bajo el azar frente
+a 3. El r10 no acierta más en los días fáciles; falla menos en los difíciles.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.82\textwidth]{anexo_b_boxplot.png}
+  \caption{AUC dentro del día de los seis modelos en los días con fuego de
+  cada temporada, con la previsión de la víspera. Caja: cuartiles y mediana;
+  bigotes: 1.5 veces el rango intercuartílico; puntos: días fuera de ese
+  rango. La cifra sobre cada caja es la media, la de la
+  tabla~\ref{tab:benchmark}. La línea de puntos es el azar.}
+  \label{fig:an-boxplot}
+\end{figure}
 
 En ordenación, los dos modelos únicos encabezan las dos temporadas y empatan
 entre sí. La pareja supera a producción, pero queda por debajo del modelo
@@ -602,6 +627,14 @@ conserva un conjunto de prueba reservado sin coste.
 \end{table}
 
 
+Detalle en el repositorio: el protocolo y las tablas completas de la
+reproducción en \repo{blob/main/docs/REPLAY_VEREDICTO.md}{docs/REPLAY\_VEREDICTO.md},
+la captura por territorio en
+\repo{blob/main/docs/REPLAY_CAPTURA.md}{docs/REPLAY\_CAPTURA.md}, las
+alternativas en \repo{blob/main/05_iteracion2/README.md}{05\_iteracion2/README.md}
+y el reentrenamiento con todos los años en
+\repo{blob/main/docs/R10_TODOS_LOS_ANIOS.md}{docs/R10\_TODOS\_LOS\_ANIOS.md}.
+
 % ---------------------------------------------------------------------------- C
 \subsection{Escala absoluta y cifra del día}
 \label{an:escala}
@@ -683,6 +716,11 @@ años no supera el 1.6~\% de probabilidad de arder ese día, y esa probabilidad
 depende de la intensidad de la temporada (anexo~E). Por eso el mapa publica
 niveles.
 
+Detalle en el repositorio: los cortes, la referencia y el semáforo evaluado en
+\repo{blob/main/07_produccion/escala_y_cifra/README.md}{07\_produccion/escala\_y\_cifra/README.md}
+y la calibración en el cubo en
+\repo{blob/main/05_iteracion2/56_calibracion/README.md}{05\_iteracion2/56\_calibracion/README.md}.
+
 % ---------------------------------------------------------------------------- D
 \subsection{Repositorio, reproducibilidad y cadena diaria}
 \label{an:repositorio}
@@ -712,6 +750,33 @@ que hace cada script y para qué se usó. Son 181 scripts de Python.
     07\_produccion/ & Cadena diaria, escala del servicio y cifra del día \\
     docs/ & \repo{blob/main/docs/TRAZABILIDAD.md}{TRAZABILIDAD.md} (cifra a cifra, script y fichero de origen), \repo{blob/main/docs/PROCEDENCIA.md}{PROCEDENCIA.md}, \repo{blob/main/docs/LIMITACIONES.md}{LIMITACIONES.md} y bitácora \\
     muestras/ & Recorte de julio de 2026 (48~MB) para ejecutar la rama de servicio sin descargar el cubo \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+La tabla~\ref{tab:an-ampliar} da, para cada parte de la memoria, el fichero
+del repositorio que la amplía. Las rutas son relativas a
+\texttt{https://github.com/JuanUtrilla/tfm-riesgo-incendios/blob/main/}.
+
+\begin{table}[H]
+  \centering
+  \caption{Dónde ampliar cada parte de la memoria.}
+  \label{tab:an-ampliar}
+  \footnotesize
+  \begin{tabular}{@{}>{\raggedright}p{5.2cm}>{\raggedright\arraybackslash}p{11cm}@{}}
+    \toprule
+    Parte & Fichero \\
+    \midrule
+    Objetivo, hilo y glosario & \repo{blob/main/00_marco/README.md}{00\_marco/README.md} · \repo{blob/main/00_marco/GLOSARIO.md}{00\_marco/GLOSARIO.md} \\
+    Datos y análisis exploratorio & \repo{blob/main/01_datos/README.md}{01\_datos/README.md} · \repo{blob/main/02_eda/README.md}{02\_eda/README.md} \\
+    Primer modelo y evaluación en operación & \repo{blob/main/03_iteracion1/README.md}{03\_iteracion1/README.md} · \repo{blob/main/03_iteracion1/MODELO_B_BITACORA.md}{03\_iteracion1/MODELO\_B\_BITACORA.md} \\
+    Diagnóstico: por qué el 0.89 no medía lo que hacía falta & \repo{blob/main/04_bisagra/README.md}{04\_bisagra/README.md} \\
+    Segundo modelo, alternativas y calibración & \repo{blob/main/05_iteracion2/README.md}{05\_iteracion2/README.md} · \repo{blob/main/05_iteracion2/56_calibracion/README.md}{05\_iteracion2/56\_calibracion/README.md} \\
+    Reproducción de 2025 y 2026 & \repo{blob/main/06_comparacion/README.md}{06\_comparacion/README.md} · \repo{blob/main/docs/REPLAY_VEREDICTO.md}{docs/REPLAY\_VEREDICTO.md} \\
+    Mapa diario, escala, cifra y verificación & \repo{blob/main/07_produccion/README.md}{07\_produccion/README.md} · \repo{blob/main/07_produccion/escala_y_cifra/README.md}{07\_produccion/escala\_y\_cifra/README.md} \\
+    Cifra a cifra: script y fichero de origen & \repo{blob/main/docs/TRAZABILIDAD.md}{docs/TRAZABILIDAD.md} \\
+    Procedencia y huella MD5 de cada fichero & \repo{blob/main/docs/PROCEDENCIA.md}{docs/PROCEDENCIA.md} \\
+    Limitaciones y bitácora & \repo{blob/main/docs/LIMITACIONES.md}{docs/LIMITACIONES.md} · \repo{blob/main/docs/BITACORA.md}{docs/BITACORA.md} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -841,6 +906,9 @@ los seis modelos se reportan siempre, y la evaluación de 2026 con reanálisis,
 hecha antes y por otra vía, apunta en la misma dirección ($+0.112$, IC95
 [$+0.074$, $+0.151$]).
 
-
+Detalle en el repositorio: las limitaciones con su medida en
+\repo{blob/main/docs/LIMITACIONES.md}{docs/LIMITACIONES.md} y el defecto del
+viento y el filtro de vecinos en
+\repo{blob/main/04_bisagra/README.md}{04\_bisagra/README.md}.
 
 \end{document}

@@ -14,7 +14,7 @@ limitaciones), que remiten a este repositorio para el detalle.
 Figuras de la memoria: `pagina_2_imagen_1_Im0.jpg` (diseños de muestreo, de
 `f2_disenios.py`), `pagina_3_imagen_1_Im1.jpg` (SHAP del r10, de
 `f11_shap_r10.py`), `fig3_dos_mapas.png` (los dos mapas, de
-`07_produccion/escala_y_cifra/fig3_dos_mapas.py`), `anexo_a_prevalencia.png` y `anexo_a_normalizacion.png` (anexo A).
+`07_produccion/escala_y_cifra/fig3_dos_mapas.py`), `anexo_a_prevalencia.png` y `anexo_a_normalizacion.png` (anexo A), `anexo_b_boxplot.png` (anexo B, de `anexo_b_boxplot.py`).
 
 Ninguna cifra de la memoria se escribió a mano: cada número sale de un CSV o
 JSON que produjo un script del repositorio, y
