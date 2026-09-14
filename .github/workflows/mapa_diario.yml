@@ -71,7 +71,7 @@ jobs:
         run: timeout 1h python -u 07_produccion/dos_riesgo_hoy.py
 
       - name: "Producto final: mapas de hoy y mañana (escala absoluta y percentil)"
-        run: python -u 07_produccion/mapa_r10_semaforo.py
+        run: python -u 07_produccion/mapas_hoy_manana.py
 
       - name: Guardar estado (Release)
         if: always()

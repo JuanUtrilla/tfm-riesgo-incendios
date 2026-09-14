@@ -22,19 +22,19 @@ dónde mirar. Los diez últimos días quedan en `publicado/`.
 
 ## El resultado en un párrafo
 
-El primer modelo alcanzó un AUC de 0,89 en su conjunto de test. Servido a diario
-y medido contra la superficie quemada real, dio entre 0,57 y 0,64. La
+El primer modelo alcanzó un AUC de 0.89 en su conjunto de test. Servido a diario
+y medido contra la superficie quemada real, dio entre 0.57 y 0.64. La
 diferencia no era sobreajuste ni un cambio de fuente meteorológica: el muestreo
 y la etiqueta de entrenamiento definían la pregunta «¿es hoy un día peligroso
-en esta celda?», y en operación se le hacía otra, «¿cuál de las 498.530 celdas
+en esta celda?», y en operación se le hacía otra, «¿cuál de las 498,530 celdas
 arde hoy?». Con el conjunto de entrenamiento rediseñado para esa segunda
 pregunta se entrenó un segundo modelo. Reproducidas día a día las temporadas de
 2025 y 2026 con la previsión disponible cada víspera (250 días, protocolo
 escrito antes de ejecutar), el modelo único con etiqueta EFFIS y diez negativos
-por positivo (r10) pasa de 0,743 a 0,807 en 2025 (Δ +0,064, IC95 [+0,027,
-+0,101]) y de 0,658 a 0,762 en 2026 (Δ +0,104, IC95 [+0,065, +0,144]). Gana dos
+por positivo (r10) pasa de 0.743 a 0.807 en 2025 (Δ +0.064, IC95 [+0.027,
++0.101]) y de 0.658 a 0.762 en 2026 (Δ +0.104, IC95 [+0.065, +0.144]). Gana dos
 de cada tres días, y predecir a un día vista cuesta lo mismo que conocer el
-tiempo real (Δ −0,003, IC que cruza el cero).
+tiempo real (Δ −0.003, IC que cruza el cero).
 
 ## Cómo se lee el repositorio
 
@@ -48,7 +48,7 @@ usó.
 | `01_datos/` | Descarga y tratamiento de las nueve fuentes, común a las dos iteraciones |
 | `02_eda/` | Análisis exploratorio del cubo y del conjunto de entrenamiento |
 | `03_iteracion1/` | Etiqueta EGIF, muestreo caso-control, entrenamiento y puesta en producción |
-| `04_bisagra/` | Por qué el 0,89 no medía lo que hacía falta |
+| `04_bisagra/` | Por qué el 0.89 no medía lo que hacía falta |
 | `05_iteracion2/` | Rediseño con etiqueta EFFIS, ablaciones y calibración en el cubo |
 | `06_comparacion/` | Los dos sistemas sobre los mismos días, y el replay de 2025 y 2026 |
 | `07_produccion/` | La cadena diaria: código, workflow y el producto final |
@@ -70,7 +70,7 @@ de 2026 con el que la rama de servicio corre en un portátil:
 source entorno.sh                 # PYTHONPATH y rutas de datos
 python 07_produccion/riesgo_hoy.py
 python 07_produccion/dos_riesgo_hoy.py
-python 07_produccion/mapa_r10_semaforo.py
+python 07_produccion/mapas_hoy_manana.py
 ```
 
 Los entrenamientos y las ablaciones necesitan el cubo y los datasets del disco

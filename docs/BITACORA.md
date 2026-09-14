@@ -23,10 +23,10 @@ commit**, daba esto:
 
 | Serie | AUC-ROC |
 |---|---|
-| D0 sellada | 0,622 |
-| D1 sellada | 0,629 |
-| ranking (día cerrado) | 0,685 |
-| retro (hindcast) | 0,594 |
+| D0 sellada | 0.622 |
+| D1 sellada | 0.629 |
+| ranking (día cerrado) | 0.685 |
+| retro (hindcast) | 0.594 |
 
 Y una conclusión que parecía buena: **el modelo bate al FWI**. Guárdala, porque
 tres semanas después hubo que retirarla.
@@ -47,13 +47,13 @@ un incendio. Eso convierte a MITECO en la referencia *rápida* de todo lo que vi
 
 Se rehízo la evaluación operativa con baselines e intervalos de confianza. Con
 etiqueta FIRMS filtrada (FRP≥20 MW, confianza no baja) el modelo daba un
-respetable **0,715**… pero:
+respetable **0.715**… pero:
 
 | Baseline | AUC D0 |
 |---|---|
-| FWI percentil | 0,573 |
-| FWI bruto | 0,580 |
-| **Persistencia** (`n_detec_50km_7d`) | **0,723** |
+| FWI percentil | 0.573 |
+| FWI bruto | 0.580 |
+| **Persistencia** (`n_detec_50km_7d`) | **0.723** |
 
 El modelo **empataba con la persistencia**, un baseline trivial que además es
 una de sus propias features. Solo ganaba en D1. Primera señal seria de que el
@@ -80,24 +80,24 @@ Todo esto se hizo, y nada de ello cerró el hueco:
 
 ### 3.1 La validación, rehecha con 20 días
 
-Se redescargaron los perímetros EFFIS de la temporada (1.871 incendios,
-301.996 ha) y la muestra sellada pasó de 3 días a **20**. Con bootstrap de
+Se redescargaron los perímetros EFFIS de la temporada (1,871 incendios,
+301,996 ha) y la muestra sellada pasó de 3 días a **20**. Con bootstrap de
 **días completos** —no de estaciones, que dentro de un día están correlacionadas
 e inflan la precisión artificialmente—:
 
 | Serie | Días | n | Modelo | FWI percentil | Diferencia (IC95) |
 |---|---|---|---|---|---|
-| D0 sellada | 20 | 13.661 | 0,642 | **0,702** | −0,060 [−0,149, +0,020] |
-| D1 sellada | 20 | 13.647 | 0,618 | **0,681** | −0,062 [−0,162, +0,020] |
-| ranking (día cerrado) | 25 | 17.173 | **0,707** | 0,668 | +0,039 [−0,047, +0,116] |
-| retro (hindcast) | 21 | 13.906 | 0,596 | **0,627** | −0,031 [−0,096, +0,037] |
+| D0 sellada | 20 | 13,661 | 0.642 | **0.702** | −0.060 [−0.149, +0.020] |
+| D1 sellada | 20 | 13,647 | 0.618 | **0.681** | −0.062 [−0.162, +0.020] |
+| ranking (día cerrado) | 25 | 17,173 | **0.707** | 0.668 | +0.039 [−0.047, +0.116] |
+| retro (hindcast) | 21 | 13,906 | 0.596 | **0.627** | −0.031 [−0.096, +0.037] |
 
 **Ninguna diferencia es significativa**: el IC95 cruza el cero en las cuatro
-series. Con 20 días no hay potencia para separar 0,64 de 0,70, y afirmar lo
+series. Con 20 días no hay potencia para separar 0.64 de 0.70, y afirmar lo
 contrario en cualquiera de las dos direcciones sería inventar.
 
 Y la retirada explícita de la conclusión del 28/07: al añadir días, el baseline
-**pasó de 0,540 a 0,702** mientras el modelo apenas se movió (0,62 → 0,64). La
+**pasó de 0.540 a 0.702** mientras el modelo apenas se movió (0.62 → 0.64). La
 estimación del modelo era razonable; la del baseline, no. **«El modelo bate al
 FWI» era un artefacto de muestra pequeña.**
 
@@ -110,11 +110,11 @@ existen las dos versiones:
 
 | Proxy operativo | Δ AUC en test 2020 |
 |---|---|
-| Satélite (NDVI/LAI/SWI/LST) → climatología mensual | −0,004 |
-| Rayos → 0 | −0,000 (coherente: +0,002) |
-| **Los dos a la vez, como hoy en producción** | **−0,0045** |
+| Satélite (NDVI/LAI/SWI/LST) → climatología mensual | −0.004 |
+| Rayos → 0 | −0.000 (coherente: +0.002) |
+| **Los dos a la vez, como hoy en producción** | **−0.0045** |
 
-Cuesta 0,0045. **No explica nada.** De regalo, un hallazgo que sí sirve:
+Cuesta 0.0045. **No explica nada.** De regalo, un hallazgo que sí sirve:
 eliminar las cinco features satelitales cuesta lo mismo que congelarlas, o sea
 que **no aportan nada ni siendo reales**.
 
@@ -127,12 +127,12 @@ comparar las mismas features desde dos fuentes:
 
 | Feature | r | sesgo (ERA5 − AEMET) | MAE |
 |---|---|---|---|
-| `t2m_max` | 0,899 | −1,13 °C | 1,75 |
-| `rh_min` | 0,903 | +1,41 % | 5,52 |
-| `precip_30d` | 0,554 | **+8,00 mm** | 10,24 |
-| `dias_sin_lluvia` | 0,555 | **−7,91 días** | 17,71 |
-| `fwi` | 0,822 | **−10,04** | 13,20 |
-| `fwi_pctl_local` | 0,523 | **−16,50 pctl** | 23,84 |
+| `t2m_max` | 0.899 | −1.13 °C | 1.75 |
+| `rh_min` | 0.903 | +1.41 % | 5.52 |
+| `precip_30d` | 0.554 | **+8.00 mm** | 10.24 |
+| `dias_sin_lluvia` | 0.555 | **−7.91 días** | 17.71 |
+| `fwi` | 0.822 | **−10.04** | 13.20 |
+| `fwi_pctl_local` | 0.523 | **−16.50 pctl** | 23.84 |
 
 Temperatura y humedad coinciden bien. Lo que no coincide es la **precipitación**:
 ERA5-Land llueve 8 mm más en 30 días (sesgo húmedo conocido del reanálisis,
@@ -149,7 +149,7 @@ Numerador y referencia de fuentes distintas, y la feature satura:
 
 | | Entrenamiento (jul-ago) | Producción |
 |---|---|---|
-| Filas en percentil ≥99,9 | 1,0 % | **12,6 %** |
+| Filas en percentil ≥99.9 | 1.0 % | **12.6 %** |
 | Mediana nacional del percentil | 54 | **87** |
 
 ### 3.5 Lo que quedó abierto, y se dice
@@ -157,13 +157,13 @@ Numerador y referencia de fuentes distintas, y la feature satura:
 La tercera pata del Experimento B —comparar el AUC entre brazos— **no cerró**.
 Al reconstruir el brazo *AEMET observada* con código propio para tener los tres
 brazos bajo un único pipeline, el control falló: sobre los mismos 18 días y las
-mismas estaciones, la reconstrucción da **0,589** donde producción publicó
-**0,702**. El efecto que se quería medir era −0,012: **nueve veces menor que el
+mismas estaciones, la reconstrucción da **0.589** donde producción publicó
+**0.702**. El efecto que se quería medir era −0.012: **nueve veces menor que el
 error del instrumento**.
 
 Lo que sí se acotó: no es ruido (perturbar con ruido de la misma magnitud cuesta
-solo −0,006, luego la desviación es sistemática); no son los huecos de datos
-(restringir a ventanas completas deja la discrepancia idéntica, −0,113); y está
+solo −0.006, luego la desviación es sistemática); no son los huecos de datos
+(restringir a ventanas completas deja la discrepancia idéntica, −0.113); y está
 **concentrada en la cola alta del FWI**, que con 1 % de prevalencia es justo
 donde se decide el AUC.
 
@@ -181,7 +181,7 @@ entrenó**. De ahí sale todo el pipeline de malla:
 - **Nodos y descarga** ERA5-Land, sin interpolación IDW.
 - **Previsión IFS** (ECMWF vía Open-Meteo) para D0 y D1, donde el reanálisis
   todavía no existe: medida su saturación, corregido el mapeo IFS→ERA5-Land
-  sobre 1.100 nodos, y reajustada la rama de previsión.
+  sobre 1,100 nodos, y reajustada la rama de previsión.
 - **Climatología de FWI a 7 años**, que baja la saturación a la mitad en los
   días extremos.
 - **Comparaciones serias**: 17 días de julio de 2026 con área quemada EFFIS,
@@ -201,18 +201,18 @@ train/serve, no son las features: es **la especificación**.
 Una pasada por el cubo para medir la etiqueta real, y tres diseños de muestreo
 comparados, dejan ver lo que la métrica de desarrollo escondía:
 
-- el **98,8 %** de las celdas del conjunto v1 tenía exactamente un 25 % de
+- el **98.8 %** de las celdas del conjunto v1 tenía exactamente un 25 % de
   positivos, de modo que el modelo no podía aprender qué celda es más peligrosa
   que otra: **solo qué día lo es**;
-- el **AUC caso-control de los dos diseños es idéntico (0,92)** y el **AUC
-  dentro del día los separa (0,744 frente a 0,828)**. La métrica con la que se
+- el **AUC caso-control de los dos diseños es idéntico (0.92)** y el **AUC
+  dentro del día los separa (0.744 frente a 0.828)**. La métrica con la que se
   desarrolló era literalmente ciega a la diferencia.
 
 El rediseño que sale de ahí: negativos del **mismo día**, y etiqueta **EFFIS**
 —la misma con la que se valida— en vez de igniciones EGIF. Resultado sobre la
-temporada 2026: **0,752 dentro del día frente a 0,647** de producción. (Estas
-cifras son las corregidas el 31/08/2026; hasta esa fecha se publicaron 0,773 y
-0,737, infladas por una fuga de futuro en la ventana de FIRMS —ver la entrada
+temporada 2026: **0.752 dentro del día frente a 0.647** de producción. (Estas
+cifras son las corregidas el 31/08/2026; hasta esa fecha se publicaron 0.773 y
+0.737, infladas por una fuga de futuro en la ventana de FIRMS —ver la entrada
 del 31/08— que favorecía a producción.)
 
 Ese mismo día se montó la infraestructura para juzgarlo en operación sin
@@ -232,19 +232,19 @@ justificado. Tres de los cuatro son resultados negativos:
 | Ablación | Pregunta | Resultado |
 |---|---|---|
 | **Solo verano** | ¿Entrenar solo con verano mejora el producto de verano? | **No.** Empeora el DÓNDE |
-| **Capa «ya quemado»** | ¿Ayuda saber que una celda ardió hace poco? | **No.** −0,02 con la verdad completa; solo vale como overlay |
-| **Vegetación consumida** | La cicatriz existe (LAI −40 %), ¿se puede usar? | La etiqueta EFFIS **penaliza** bajar el riesgo; la máscara empeora −0,02 |
+| **Capa «ya quemado»** | ¿Ayuda saber que una celda ardió hace poco? | **No.** −0.02 con la verdad completa; solo vale como overlay |
+| **Vegetación consumida** | La cicatriz existe (LAI −40 %), ¿se puede usar? | La etiqueta EFFIS **penaliza** bajar el riesgo; la máscara empeora −0.02 |
 | **Ratio de negativos** | El 1:3 venía heredado sin justificación | Óptimo en **1:10-1:30**; a partir de 1:60 empeora |
 
 El ratio merece una nota, porque es donde se aprendió a leer los números con
-cuidado: la ganancia en **AUC medio** (+0,006 a +0,017) es del orden del **ruido
-del sorteo de negativos** (0,004, medido re-sorteando la misma receta:
-0,752 frente a 0,748 en 2026, `dos_09_ventana7.log`; 0,809 frente a 0,804 en
+cuidado: la ganancia en **AUC medio** (+0.006 a +0.017) es del orden del **ruido
+del sorteo de negativos** (0.004, medido re-sorteando la misma receta:
+0.752 frente a 0.748 en 2026, `dos_09_ventana7.log`; 0.809 frente a 0.804 en
 test 2024, `dos_18_ratio.json`). Lo que
 sí mejora de forma consistente es el **fuego grande**: el percentil ponderado
-por hectáreas pasa de **79,8 (1:3) a 81,9 (1:10)** y 80,6 (1:30)
+por hectáreas pasa de **79.8 (1:3) a 81.9 (1:10)** y 80.6 (1:30)
 (`dos_09_ventana7.log`, cifras limpias del 31/08/2026; la corrida original
-del 23/08 decía 81,7 → 87,6-87,9, inflada por la fuga de FIRMS de la entrada
+del 23/08 decía 81.7 → 87.6-87.9, inflada por la fuga de FIRMS de la entrada
 §8). Esa es la métrica que importa operativamente, y la que se reporta.
 
 ---
@@ -255,16 +255,16 @@ La cadena diaria corre sola y en verde (21 pasos, dos pasadas al día). Estado d
 
 | Referencia | Acumulado | Resultado |
 |---|---|---|
-| **MITECO** | 3 días / 6 incidentes | único **0,807** > pareja 0,771 > malla 0,598 |
-| **EFFIS** | 1 día (4 celdas, 122 ha) | pareja 90,6 · único 73,5 · malla 39,2 (percentil) |
-| **Por estación** | 1 día, 688 estaciones | pareja 0,607 · único 0,600 · malla 0,572 · producción 0,507 |
+| **MITECO** | 3 días / 6 incidentes | único **0.807** > pareja 0.771 > malla 0.598 |
+| **EFFIS** | 1 día (4 celdas, 122 ha) | pareja 90.6 · único 73.5 · malla 39.2 (percentil) |
+| **Por estación** | 1 día, 688 estaciones | pareja 0.607 · único 0.600 · malla 0.572 · producción 0.507 |
 
 Y el veredicto de temporada, que es el número que se defiende:
 
-> **Único con etiqueta EFFIS y ratio 1:10 — AUC 0,759 frente a 0,647 de
-> producción. Δ +0,112, IC95 [+0,074, +0,151].** Gana el 76 % de los días y su
+> **Único con etiqueta EFFIS y ratio 1:10 — AUC 0.759 frente a 0.647 de
+> producción. Δ +0.112, IC95 [+0.074, +0.151].** Gana el 76 % de los días y su
 > intervalo de confianza **no toca el cero**; tras corregir la fuga tampoco lo
-> tocan el único 1:3 (+0,105) ni la pareja (+0,058).
+> tocan el único 1:3 (+0.105) ni la pareja (+0.058).
 
 El veredicto acumulado sigue siendo prudente a propósito: *«mejor de media, pero
 con 17 días no se distingue del ruido»*. El cierre está previsto para mediados
@@ -274,14 +274,14 @@ de septiembre, cuando venzan los 45 días de desfase de EFFIS.
 
 ## Lo que esta bitácora deja para la memoria
 
-1. **El primer modelo no es un error, es el grupo de control.** Sin sus 0,89 de
-   test y sus 0,64 de operación no hay forma de demostrar que el rediseño hacía
+1. **El primer modelo no es un error, es el grupo de control.** Sin sus 0.89 de
+   test y sus 0.64 de operación no hay forma de demostrar que el rediseño hacía
    falta, ni de cuantificar lo que aportó.
-2. **La métrica de desarrollo puede ser ciega.** 0,92 de AUC caso-control en dos
-   diseños que difieren en 0,084 de AUC dentro del día es el hallazgo central
+2. **La métrica de desarrollo puede ser ciega.** 0.92 de AUC caso-control en dos
+   diseños que difieren en 0.084 de AUC dentro del día es el hallazgo central
    del trabajo.
 3. **Los descartes valen tanto como el hallazgo.** Que no sea el satélite
-   congelado (−0,0045), que no sean los rayos (−0,000) y que no sea el
+   congelado (−0.0045), que no sean los rayos (−0.000) y que no sea el
    train/serve es lo que hace creíble el diagnóstico de especificación.
 4. **Lo que no cerró se dice.** El control fallido del Experimento B y el bug
    sellado en producción van a [`LIMITACIONES.md`](LIMITACIONES.md), no debajo
@@ -302,7 +302,7 @@ producción no perdía nada (63 % → 62 % de incendios de ≥500 ha en el top-2
 del día) mientras que su variante sin FIRMS sí (31 % → 18 %). Un predictor
 honesto pierde fuerza con la distancia; uno que está viendo el suceso, no. La
 confirmación: los 33 incendios de ≥500 ha tenían un foco FIRMS a menos de 5 km
-en su ventana «pasada» (control aleatorio: 1,2 %). Tras el arreglo, 9,1 %.
+en su ventana «pasada» (control aleatorio: 1.2 %). Tras el arreglo, 9.1 %.
 
 **Alcance.** Producción en vivo **nunca** estuvo afectada: `riesgo_hoy.py` y el
 `firms_api.py` del repo hermano llaman sin fecha de inicio, que son los cinco
@@ -313,14 +313,14 @@ retrospectiva, porque la caché de junio y julio se descargó en agosto, cuando
 el futuro ya existía. Se relanzaron `dos_09`, `dos_11`, `dos_14`, `dos_19`,
 `comparar_rankings` y `comparar_rankings_justo`.
 
-**Qué cambia.** Producción baja de 0,737 a **0,647** de AUC medio en 2026 y el
-único de 0,773 a **0,752**, de modo que la ventaja pasa de +0,037 con el
-intervalo rozando el cero a **+0,105 [+0,065, +0,145]**; el ratio 1:10 llega a
-**+0,112 [+0,074, +0,151]**, ganando el 76 % de los días. Dos afirmaciones se
-caen enteras: que producción acertaba los megaincendios (0,883 era la fuga; el
-valor real es 0,692, y sin FIRMS saca 0,689: la feature no le aportaba nada
-ahí) y que la malla batía al ranking sellado en el cara a cara justo (0,602 era
-la fuga; limpia da 0,547 y **pierde**). Comprobación de que el recálculo es
+**Qué cambia.** Producción baja de 0.737 a **0.647** de AUC medio en 2026 y el
+único de 0.773 a **0.752**, de modo que la ventaja pasa de +0.037 con el
+intervalo rozando el cero a **+0.105 [+0.065, +0.145]**; el ratio 1:10 llega a
+**+0.112 [+0.074, +0.151]**, ganando el 76 % de los días. Dos afirmaciones se
+caen enteras: que producción acertaba los megaincendios (0.883 era la fuga; el
+valor real es 0.692, y sin FIRMS saca 0.689: la feature no le aportaba nada
+ahí) y que la malla batía al ranking sellado en el cara a cara justo (0.602 era
+la fuga; limpia da 0.547 y **pierde**). Comprobación de que el recálculo es
 correcto: todas las filas *sin FIRMS* y el percentil del FWI no se mueven ni un
 dígito.
 
@@ -334,7 +334,7 @@ separando causa de fuga por dos criterios —la escala espacial (¿se mueve solo
 donde arde, o también en el anillo de 50-150 km?) y si la fuente puede ver el
 fuego (el reanálisis no; el satélite sí)—. Su resultado: ningún modelo tiene
 fuga seria, y los tres únicos rasgos concurrentes (`lst`, `ndvi`, `swi010`, del
-día D) pesan entre el 2,1 % y el 7,5 % del *gain* según el modelo, **la misma
+día D) pesan entre el 2.1 % y el 7.5 % del *gain* según el modelo, **la misma
 proporción en todos**, así que no sesgan ninguna comparación pero obligan a
 presentar los números del mismo día como cota superior.
 
@@ -371,8 +371,8 @@ mismo dato pasa por otro XGBoost y no se puede atribuir el cambio.
 **El hueco del 15 de agosto al 1 de septiembre.** Es recuperable, al contrario
 de lo que parecía: `historical-forecast-api.open-meteo.com` sirve las pasadas
 archivadas tal y como se emitieron, y es de donde salió `ifs_historico.parquet`
-del retro justo. Se descargó el rango 08-ago → 02-sep en los 5.605 nodos —26
-días, 145.730 filas, 477 KB, sin un solo 429— y vive fuera de los repositorios,
+del retro justo. Se descargó el rango 08-ago → 02-sep en los 5,605 nodos —26
+días, 145,730 filas, 477 KB, sin un solo 429— y vive fuera de los repositorios,
 en `archivo_ifs/`.
 
 **Qué vale y qué no.** La API histórica devuelve una serie continua por nodo, no
@@ -399,15 +399,15 @@ este repo se modificó mientras se producían los resultados.
 
 Lo que salió: los dos regímenes de incendio de España; el aviso de día calibrado
 (funciona en invierno, en verano no se distingue de la climatología); la escala
-absoluta que da significado al color (EXTREMO = 0,13 %, techo 1,6 %); la
-probabilidad por celda mes a mes (0,28 % en diciembre a 10,36 % en julio); y un
+absoluta que da significado al color (EXTREMO = 0.13 %, techo 1.6 %); la
+probabilidad por celda mes a mes (0.28 % en diciembre a 10.36 % en julio); y un
 resultado negativo prerregistrado: entrenar el r10 con todos los años **no
-mejora** (+0,0033, IC [−0,0042, +0,0104]).
+mejora** (+0.0033, IC [−0.0042, +0.0104]).
 
 Cuatro fallos encontrados y corregidos, todos en scripts que nunca habían
 corrido: la climatología del BSS se memorizaba a sí misma e incluía el test; el
 umbral por máximo SEDI se iba al extremo de la rejilla (3 avisos en 854 días);
-la calibración beta por celda no era monótona (techo 0,000 %) y se sustituyó por
+la calibración beta por celda no era monótona (techo 0.000 %) y se sustituyó por
 isotónica; `N_BOOT`/`SEED` estaban declarados y sin usar, así que no había IC.
 
 ## 06/09/2026 — La validación es el replay
@@ -425,7 +425,7 @@ ningún repositorio.
 
 El seguimiento diario sigue en verde (única corrida fallida de septiembre, el 04/09,
 se repescó el mismo día). MITECO gana un día (13) y el único sigue clavado en
-0,69; EFFIS baja dos centésimas en todos; producción sigue delante por
+0.69; EFFIS baja dos centésimas en todos; producción sigue delante por
 estación sin significación.
 
 Auditoría del repo y arreglos: `01_datos/egif/` estaba vacío (ahora README con
@@ -445,21 +445,21 @@ como modelo propuesto, producto de dos capas, límites declarados.
 Se contrastaron las 42 cifras y afirmaciones de la sección de la memoria con
 los JSON, CSV, parquets y modelos que las produjeron, no con la
 documentación. Todas se reproducen; se corrigieron nueve imprecisiones de
-redacción (entre ellas: el 98,8 % es de la muestra maestra y no del dataset
-final, donde es 90,7 %; el +0,042 es AUC-PR de añadir el percentil local al
-FWI absoluto; el 0,85 por bloques era AUC-PR de v1; las variables de satélite
-del día D pesan un 4,4 % en el r10; el semáforo usa el percentil 98 del día,
+redacción (entre ellas: el 98.8 % es de la muestra maestra y no del dataset
+final, donde es 90.7 %; el +0.042 es AUC-PR de añadir el percentil local al
+FWI absoluto; el 0.85 por bloques era AUC-PR de v1; las variables de satélite
+del día D pesan un 4.4 % en el r10; el semáforo usa el percentil 98 del día,
 no el máximo; producción tuvo seis días sin ranking en agosto). Se comprobó
-que Baleares está dentro del dominio (8.760 celdas) y se corrigió
+que Baleares está dentro del dominio (8,760 celdas) y se corrigió
 `LIMITACIONES.md` §7.
 
 La cadena diaria pasó a este repositorio: `.github/workflows/mapa_diario.yml`
 (un run al día, 04:17 UTC), Release `estado` propio, secretos `CDSAPI_KEY` y
 `FIRMS_MAP_KEY`, y el producto final nuevo `07_produccion/mapa_r10_semaforo.py`
 (escala absoluta de `dos_27` y semáforo de `dos_26`, r10|TODO; la regla
-reproduce exactamente el 44,0 % / 6,2 % de la calibración). Primer run
+reproduce exactamente el 44.0 % / 6.2 % de la calibración). Primer run
 completo con éxito (34774925437, 1 h 13 min): 13/09 sin aviso, p98 del r10
-0,221, probabilidad calibrada 0,06. La cadena de `tfm-fuego-malla` sigue
+0.221, probabilidad calibrada 0.06. La cadena de `tfm-fuego-malla` sigue
 corriendo un día más para comparar.
 
 Los READMEs de todos los capítulos se reescribieron con las skills
@@ -471,15 +471,15 @@ cada script, una figura por apartado y sin referencias al seguimiento diario, qu
 ## 14/09/2026 — Mapas de hoy y mañana, escala del servicio y memoria cerrada
 
 **Semáforo descartado.** Revisado fuera de calibración (cubo 2022-2024) y en el
-replay: aplicado todo el año dejaba sin EXTREMO el 34,6 % de los días grandes de
-verano y el 54,4 % de los de 2026, sin mejorar al calendario. Solo tenía
+replay: aplicado todo el año dejaba sin EXTREMO el 34.6 % de los días grandes de
+verano y el 54.4 % de los de 2026, sin mejorar al calendario. Solo tenía
 capacidad propia de diciembre a abril. Detalle en
 `07_produccion/escala_y_cifra/README.md` y `docs/LIMITACIONES.md` §13.
 
 **La escala del cubo no valía para el mapa servido.** Con los cortes de
 `dos_27`, los mapas de la cadena marcaban entre 2 y 10 veces más EXTREMO que el
 cubo en el mismo mes, también con reanálisis. Los cortes se recalibraron con
-los 250 días servidos del replay (0,0060 · 0,1125 · 0,4058): en EXTREMO arde una
+los 250 días servidos del replay (0.0060 · 0.1125 · 0.4058): en EXTREMO arde una
 celda-día de cada 760.
 
 **Producto nuevo** (`2b48d97`). Cada madrugada, una imagen para hoy y otra para
@@ -496,3 +496,13 @@ a las 03:03 en verano y 02:02 en invierno, hora de Madrid. El cron de
 
 **El repositorio pasa a público.** Antes se revisó el historial: ni claves de
 AEMET, CDS o FIRMS ni ficheros de credenciales.
+
+**Limpieza tras hacerlo público (noche).** El script del producto pasa a
+llamarse `07_produccion/mapas_hoy_manana.py` (era `mapa_r10_semaforo.py`, y
+ya no aplica ningún semáforo); el workflow y los README lo citan con el nombre
+nuevo. Se retiraron de `publicado/` las imágenes del semáforo y de los textos
+las frases que aún lo daban por vigente. Todos los `.md` pasan a la misma
+convención numérica que la memoria: decimales con punto y millares con coma
+(`0.807`, `498,530`); `MODELO_B_BITACORA.md` se deja como está porque es una
+copia sellada por md5. Las figuras PNG conservan la coma. La primera corrida con
+los dos mapas (`49d02e3`) publicó `mapas_hoy.png` y `mapas_manana.png`.

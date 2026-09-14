@@ -12,13 +12,13 @@
   etiqueta EGIF (ignición)                          etiqueta EFFIS (superficie
   negativos: la misma celda otros días              quemada, la misma con la que
   pregunta: ¿es hoy peligroso en esta celda?        se evalúa)
-  AUC test 0,89                                     negativos: otras celdas del
+  AUC test 0.89                                     negativos: otras celdas del
         │                                           mismo día
         │  se pone en producción                    pregunta: ¿cuál de las
-        │  687 estaciones, mapa diario              498.530 celdas arde hoy?
+        │  687 estaciones, mapa diario              498,530 celdas arde hoy?
         ▼                                                    │
   DIAGNÓSTICO  (04)                                          │
-  en operación: AUC 0,57-0,64                                │
+  en operación: AUC 0.57-0.64                                │
    41  medido contra tres verdades independientes            │
    42  ¿es la meteorología?  no                              │
    43  ¿es el train/serve?   no                              │
@@ -29,7 +29,7 @@
                     replay de 2025 y 2026 = el resultado de la memoria
                                  │
                                  ▼
-                    PRODUCCIÓN  (07)  el mapa de cada mañana, r10 + semáforo
+                    PRODUCCIÓN  (07)  el mapa de cada mañana: r10 en escala absoluta y por percentil, con la cifra del día
 ```
 
 ![Las dos iteraciones y el diagnóstico entre ambas](../docs/MEMORIA/figs/f1_iteraciones.png)

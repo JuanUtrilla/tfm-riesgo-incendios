@@ -9,7 +9,7 @@ cadena diaria publica solo la escala absoluta, con cortes recalibrados sobre
 los mapas servidos, y la cifra del día; el semáforo se evaluó y se descartó
 (`07_produccion/escala_y_cifra/README.md`).
 
-1. Si se pinta hoy: un aviso de día calibrado, el semáforo.
+1. Si se pinta hoy: un aviso de día calibrado, el semáforo (evaluado y descartado).
 2. Qué significa el rojo: una escala fija en la puntuación, en vez del percentil del día.
 3. Cuánta probabilidad tiene una celda: un número, no solo un color.
 
@@ -17,7 +17,7 @@ los mapas servidos, y la cifra del día; el semáforo se evaluó y se descartó
 
 `replay_si.py` (capítulo 6) fijó un primer umbral del aviso con un solo verano
 (jun-ago de 2025: 92 días, 86 con fuego), demasiado pocos días sin fuego para
-estimar nada. Aquí se calibra con 3.653 días del cubo, 2015-2024, con la
+estimar nada. Aquí se calibra con 3,653 días del cubo, 2015-2024, con la
 variación real de la tasa base y los días de cero fuego incluidos.
 
 ![Percentil del día frente a escala absoluta, con el semáforo](../../docs/MEMORIA/figs/f10_percentil_vs_absoluto.png)
@@ -58,16 +58,16 @@ si se corta, se relanza y sigue por donde iba. Los demás leen su salida.
 ## Los resultados
 
 España tiene dos regímenes de incendio. Entre noviembre y marzo hay fuego el
-33,9 % de los días, y marzo se parece a septiembre. El 85,6 % del fuego de
-diciembre a abril cae en el noroeste, que es el 14,4 % del territorio: quemas
+33.9 % de los días, y marzo se parece a septiembre. El 85.6 % del fuego de
+diciembre a abril cae en el noroeste, que es el 14.4 % del territorio: quemas
 pastorales, es decir, ignición y no sequía.
 
 El aviso de día funciona en invierno y no en verano.
 
 | régimen | BSS (test 2024, r10) | SEDI |
 |---|---|---|
-| invierno-primavera | +0,297 [+0,198, +0,381] | 0,794 |
-| verano | −0,107 [−0,230, +0,022] | 0,368 |
+| invierno-primavera | +0.297 [+0.198, +0.381] | 0.794 |
+| verano | −0.107 [−0.230, +0.022] | 0.368 |
 
 En verano el intervalo cruza el cero: el aviso no se distingue de la
 climatología del día del año.
@@ -76,13 +76,13 @@ Qué significa cada color (frecuencia observada de quema, r10):
 
 | nivel | % del territorio | quemadas | tasa | lift |
 |---|---|---|---|---|
-| BAJO | 30,1 % | 5 en diez años | 0,0000 % | 0,0× |
-| MODERADO | 59,9 % | 1.062 | 0,0005 % | 0,1× |
-| ALTO | 8,0 % | 2.682 | 0,0092 % | 2,6× |
-| EXTREMO | 2,0 % | 9.148 | 0,1259 % | 35,6× |
+| BAJO | 30.1 % | 5 en diez años | 0.0000 % | 0.0× |
+| MODERADO | 59.9 % | 1,062 | 0.0005 % | 0.1× |
+| ALTO | 8.0 % | 2,682 | 0.0092 % | 2.6× |
+| EXTREMO | 2.0 % | 9,148 | 0.1259 % | 35.6× |
 
 EXTREMO no significa «va a arder»: arde 1 de cada 800. Y la celda más roja
-que llega a existir en diez años no pasa del 1,6 %.
+que llega a existir en diez años no pasa del 1.6 %.
 
 La escala absoluta sola no basta. Con corte absoluto, el r10 no tiene ni un
 día sin rojo en diez años: el «dónde» está dominado por variables estáticas
@@ -90,28 +90,31 @@ día sin rojo en diez años: el «dónde» está dominado por variables estátic
 agosto. Hace falta la puerta del «si» para apagar el mapa: si la puntuación del 2 %
 más alto del día (su p98), pasada por la calibración del aviso, no llega al
 umbral, no se pinta EXTREMO. Con ella, en invierno el 44 % de los días se
-quedan sin rojo perdiendo el 6,2 % de los días grandes (5 o más celdas
-nuevas quemadas). Es la regla que aplica `07_produccion/mapa_r10_semaforo.py`.
+quedan sin rojo perdiendo el 6.2 % de los días grandes (5 o más celdas
+nuevas quemadas). Esa regla se revisó después con los años fuera de
+calibración y con el replay: en verano ocultaba el EXTREMO en uno de cada tres
+días con incendio grande, y se descartó (`07_produccion/escala_y_cifra/README.md`).
+La cadena publica la escala absoluta sin puerta y la cifra del día.
 
 La punta, mes a mes (probabilidad de la celda peor clasificada):
 
 | diciembre | febrero | octubre | julio |
 |---|---|---|---|
-| 0,28 % | 3,74 % | 3,16 % | 10,36 % |
+| 0.28 % | 3.74 % | 3.16 % | 10.36 % |
 
 Un factor 37 entre diciembre y julio, con el mismo mapa y el mismo orden. Lo
 que se puede decir de la celda peor clasificada de un día de diciembre es que
-su probabilidad de arder es del 0,3 %.
+su probabilidad de arder es del 0.3 %.
 
 ## Límites de la calibración, medidos
 
 - La calibración beta no vale por celda: sin restricción da coeficiente
   negativo en −log(1−s), no es monótona y hunde la cola alta (la celda máxima
-  salía con 0,000 %). Se usa la isotónica, que es monótona por construcción.
+  salía con 0.000 %). Se usa la isotónica, que es monótona por construcción.
 - La probabilidad por celda no se puede calibrar en valor absoluto. Se probó la
-  ventana móvil (`dos_31`) y empeora: en jun-sep el error va de 0,453 con
-  toda la historia a 0,947 con tres años. La razón es que la punta de julio va
-  del 0,00 % (2023) al 12,76 % (2022), mediana 0,53 %: esa variación no está
+  ventana móvil (`dos_31`) y empeora: en jun-sep el error va de 0.453 con
+  toda la historia a 0.947 con tres años. La razón es que la punta de julio va
+  del 0.00 % (2023) al 12.76 % (2022), mediana 0.53 %: esa variación no está
   en la puntuación de la celda, está en la intensidad del año. La descomposición
   correcta son dos factores, `P(día grande) × P(celda | día grande)`, que es el
   producto de dos capas. La calibración sirve para el orden y la magnitud típica,

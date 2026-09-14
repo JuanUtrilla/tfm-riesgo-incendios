@@ -22,7 +22,7 @@ detalladas en [`01_datos/README.md`](../01_datos/README.md).
 
 ## Modelado
 
-- **Celda** — unidad espacial del cubo. La Península peninsular son **498.530**
+- **Celda** — unidad espacial del cubo. La Península peninsular son **498,530**
   celdas.
 - **Caso-control temporal** — muestreo de la iteración 1: para cada celda con
   ignición se toman como negativos **otros días de esa misma celda**. Enseña a
@@ -32,15 +32,15 @@ detalladas en [`01_datos/README.md`](../01_datos/README.md).
 - **Pseudoausencias** — celdas-día sin fuego que se usan como negativos. Su
   número relativo a los positivos es el **ratio** (1:3, 1:10, 1:30…), medido
   en `05_iteracion2/57_ablaciones/`. El DÓNDE por celda no las usa: es censo de
-  las 498.530 celdas.
+  las 498,530 celdas.
 - **DÓNDE** — modelo que ordena celdas dentro de un día.
 - **CUÁNDO** — modelo que ordena días. El producto de los dos es la «pareja».
 - **AUC caso-control** — AUC sobre el conjunto de test tal como se muestreó.
   Fue la métrica de desarrollo de la iteración 1, y es **ciega** a la diferencia
-  entre los dos diseños de muestreo (0,92 en ambos).
+  entre los dos diseños de muestreo (0.92 en ambos).
 - **AUC dentro del día** — AUC calculado **día a día**, ordenando las celdas de
   ese día. Es la métrica que corresponde a la pregunta operativa, y sí separa
-  los dos diseños (0,744 frente a 0,828).
+  los dos diseños (0.744 frente a 0.828).
 - **Percentil ponderado por hectáreas** — en qué percentil del mapa cayó lo que
   ardió, pesando cada celda por su superficie quemada. Mide si el modelo acierta
   con los fuegos **grandes**, que es lo que importa operativamente.

@@ -1,13 +1,13 @@
-# 4 · El diagnóstico: por qué el 0,89 no medía lo que hacía falta
+# 4 · El diagnóstico: por qué el 0.89 no medía lo que hacía falta
 
-El modelo daba 0,89 en test y entre 0,57 y 0,64 en operación. Probamos tres
+El modelo daba 0.89 en test y entre 0.57 y 0.64 en operación. Probamos tres
 explicaciones en este orden y descartamos las dos primeras con números. Por
 eso la tercera es creíble.
 
 ```
 41  ¿Está mal medido?      no: tres verdades independientes dicen lo mismo
 42  ¿Es la meteorología?   no: hay diferencias de fuente, pero no bastan
-43  ¿Es el train/serve?    no: lo que cambia entre entrenar y servir cuesta 0,0045
+43  ¿Es el train/serve?    no: lo que cambia entre entrenar y servir cuesta 0.0045
 44  Es la especificación   la etiqueta y el muestreo definían otra pregunta
 ```
 
@@ -22,8 +22,8 @@ FIRMS, perímetros EFFIS y los partes del MITECO.
 
 | Serie (20 días) | Modelo | FWI percentil local | Diferencia (IC95) |
 |---|---|---|---|
-| Previsión del día | 0,642 | 0,702 | −0,060 [−0,149, +0,020] |
-| Ranking a día cerrado | 0,707 | 0,668 | +0,039 [−0,047, +0,116] |
+| Previsión del día | 0.642 | 0.702 | −0.060 [−0.149, +0.020] |
+| Ranking a día cerrado | 0.707 | 0.668 | +0.039 [−0.047, +0.116] |
 
 Ninguna diferencia es significativa. El modelo en operación no se distinguía
 de un índice sin modelo, el percentil local del FWI.
@@ -48,14 +48,14 @@ iteración 2.
 
 Lo que quedó firme:
 
-- La precipitación no coincide: +8,00 mm en 30 días, y de ahí sale un FWI 10
+- La precipitación no coincide: +8.00 mm en 30 días, y de ahí sale un FWI 10
   puntos más bajo.
 - La climatología del percentil no debe cruzar fuentes. Con numerador de AEMET
-  y referencia del cubo, la variable satura: el 12,6 % de las filas en
-  percentil 99,9 o más en producción, frente al 1,0 % en entrenamiento. La
+  y referencia del cubo, la variable satura: el 12.6 % de las filas en
+  percentil 99.9 o más en producción, frente al 1.0 % en entrenamiento. La
   malla calcula numerador y denominador con la misma fuente.
 - El cubo es ERA5-Land reprocesado: temperatura, humedad y viento coinciden con
-  correlación 0,987-0,998 y sesgo cero. Solo difiere la precipitación.
+  correlación 0.987-0.998 y sesgo cero. Solo difiere la precipitación.
 
 La comparación directa de AUC entre fuentes meteorológicas no se reporta
 porque su control no cerró (`docs/LIMITACIONES.md` §2). Lo de arriba basta
@@ -84,9 +84,9 @@ que usa producción para las variables que no tiene en tiempo real:
 
 | Aproximación operativa | Δ AUC en test 2020 |
 |---|---|
-| Vegetación y LST de satélite sustituidas por su climatología mensual | −0,004 |
-| Rayos a cero | −0,000 |
-| Las dos, como en producción | −0,0045 |
+| Vegetación y LST de satélite sustituidas por su climatología mensual | −0.004 |
+| Rayos a cero | −0.000 |
+| Las dos, como en producción | −0.0045 |
 
 No explica la diferencia. De paso: las cinco variables de satélite aportan lo
 mismo reales que congeladas.
@@ -94,18 +94,18 @@ mismo reales que congeladas.
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
 | `auditoria_train_serve.py` | Para cada variable, qué le llega al modelo en producción frente a lo que vio al entrenar, y cuánto cuesta cada desviación | La auditoría |
-| `ablacion_proxies_operativos.py` | Reentrena y evalúa con las variables de satélite congeladas y los rayos a cero, con bootstrap por bloques | El −0,0045 |
+| `ablacion_proxies_operativos.py` | Reentrena y evalúa con las variables de satélite congeladas y los rayos a cero, con bootstrap por bloques | El −0.0045 |
 | `dos_06_deriva.py` | Deriva de distribución (PSI) entre el cubo y ERA5-Land en los nodos | Comprobar la malla antes de servirla |
 
 ## 44 · Es la especificación
 
 Dos medidas, y con ellas el trabajo cambió de dirección:
 
-- En la muestra caso-control, el 98,8 % de las celdas tenía exactamente un
+- En la muestra caso-control, el 98.8 % de las celdas tenía exactamente un
   25 % de positivos. El modelo no podía aprender qué celda es más peligrosa que
   otra, solo qué día lo es.
-- El AUC caso-control de los dos diseños es el mismo (0,92), y el AUC dentro
-  del día los separa (0,744 frente a 0,828). La métrica de desarrollo no veía la
+- El AUC caso-control de los dos diseños es el mismo (0.92), y el AUC dentro
+  del día los separa (0.744 frente a 0.828). La métrica de desarrollo no veía la
   diferencia.
 
 ![La misma pareja de modelos bajo dos métricas](../docs/MEMORIA/figs/f4_metrica_ciega.png)
@@ -119,4 +119,4 @@ Dos medidas, y con ellas el trabajo cambió de dirección:
 
 No era un problema de ajuste. La pregunta con la que se entrenó, «¿es hoy
 peligroso en esta celda?», no es la que se hace en operación, «¿cuál de las
-498.530 celdas arde hoy?».
+498,530 celdas arde hoy?».

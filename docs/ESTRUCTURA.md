@@ -17,7 +17,7 @@ reescribirlos para que el repo luciera mejor y se descartó: una reescritura
 obliga o a reejecutar el pipeline entero para volver a generar los resultados
 —semanas de cómputo sobre 29 GB de datos, a semanas de entregar— o a publicar
 código que no produjo los números que documenta. Sin tests que fijen las
-cifras, un refactor que convierta un 0,773 en un 0,771 no se detectaría.
+cifras, un refactor que convierta un 0.773 en un 0.771 no se detectaría.
 
 Lo único adaptado son las **rutas**, y solo en los cuatro módulos de
 `01_datos/comun/`:
@@ -77,7 +77,7 @@ principio), los cuatro modelos entrenados, los perímetros EFFIS de julio (259
 incendios) y las capas de dibujo.
 
 **Lo que sí se puede ejecutar con esto**: la rama de servicio —construir las
-features en los 5.605 nodos, puntuar los modelos sobre las 498.530 celdas y
+features en los 5,605 nodos, puntuar los modelos sobre las 498,530 celdas y
 dibujar los mapas— que es justamente lo que corre en GitHub Actions, que
 tampoco tiene el cubo.
 
@@ -90,7 +90,8 @@ tiempo.
 
 Corre en GitHub Actions desde este repositorio
 (`.github/workflows/mapa_diario.yml`), una vez al día, y publica en
-`publicado/` el mapa del r10 con el semáforo y el mapa de referencia. El
+`publicado/` dos imágenes, hoy y mañana, con el r10 en escala absoluta, la
+cifra del día y el r10 por percentil, además del mapa de referencia. El
 estado entre corridas (reanálisis acumulado, mapas de los últimos días) vive
 en el Release `estado` del repositorio, que `07_produccion/gh_estado.py` baja
 al empezar y sube al terminar. Hacen falta dos secretos: `CDSAPI_KEY` y

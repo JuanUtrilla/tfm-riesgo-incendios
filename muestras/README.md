@@ -7,14 +7,14 @@ originales. `config.entrada()` cae aquí cuando no encuentra el dato ni en
 | Fichero | Qué es | Tamaño |
 |---|---|---|
 | `cubo_estaticas.nc` | capas 2D del cubo IberFire que no cambian con el tiempo: elevación, pendiente, rugosidad, distancias, población, CLC 2018, máscara de España | 16 MB |
-| `era5land_diario.nc` | reanálisis ERA5-Land agregado a diario en los 5.605 nodos, 20/06 → 31/07/2026 | 9,9 MB |
-| `effis_ba_season_ES.geojson` | perímetros EFFIS con `FIREDATE` en julio de 2026 (259 incendios) | 5,5 MB |
-| `malla_mensual_m7.npz` | caché mensual de julio: vegetación y LST por celda (climatología 2020-24) | 5,2 MB |
-| `clim_fwi_nodos.npz` | climatología de FWI por nodo, solo julio (del original de 50 MB con los doce meses) | 4,2 MB |
-| `municipios.json` | maestro de municipios, para situar los incidentes de MITECO | 2,8 MB |
-| `dos_13_mapa_donde_effis_c.npz` | mapa del DÓNDE precalculado por celda | 1,2 MB |
-| `modelos/` | `xgb_v2_prototipo` (producción), `donde_dia_effis` (único), `donde_effis_c` y `cuando` (pareja) | 4,2 MB |
-| `estaciones_prototipo.parquet`, `nodos.npz`, `limites.npz`, `mapeo_ifs_a_era5land.npz` | estaciones, malla de nodos, capa base administrativa y mapeo IFS→ERA5-Land | < 0,5 MB |
+| `era5land_diario.nc` | reanálisis ERA5-Land agregado a diario en los 5,605 nodos, 20/06 → 31/07/2026 | 9.9 MB |
+| `effis_ba_season_ES.geojson` | perímetros EFFIS con `FIREDATE` en julio de 2026 (259 incendios) | 5.5 MB |
+| `malla_mensual_m7.npz` | caché mensual de julio: vegetación y LST por celda (climatología 2020-24) | 5.2 MB |
+| `clim_fwi_nodos.npz` | climatología de FWI por nodo, solo julio (del original de 50 MB con los doce meses) | 4.2 MB |
+| `municipios.json` | maestro de municipios, para situar los incidentes de MITECO | 2.8 MB |
+| `dos_13_mapa_donde_effis_c.npz` | mapa del DÓNDE precalculado por celda | 1.2 MB |
+| `modelos/` | `xgb_v2_prototipo` (producción), `donde_dia_effis` (único), `donde_effis_c` y `cuando` (pareja) | 4.2 MB |
+| `estaciones_prototipo.parquet`, `nodos.npz`, `limites.npz`, `mapeo_ifs_a_era5land.npz` | estaciones, malla de nodos, capa base administrativa y mapeo IFS→ERA5-Land | < 0.5 MB |
 
 ## Por qué julio de 2026
 

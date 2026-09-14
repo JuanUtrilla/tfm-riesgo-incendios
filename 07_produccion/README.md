@@ -21,10 +21,10 @@ Aquí queda su código completo, incluidos los scripts que ya no se ejecutan.
 ```
 gh_estado.py pull          baja el estado de la corrida anterior (Release)
 gh_reanalisis.py           ERA5-Land del mes en curso, incremental, hasta D-7 (CDS)
-malla_02b_ifs.py           previsión IFS en los 5.605 nodos, de D-6 a D+1 (Open-Meteo)
+malla_02b_ifs.py           previsión IFS en los 5,605 nodos, de D-6 a D+1 (Open-Meteo)
 riesgo_hoy.py              mapa de referencia: el modelo de producción sobre la malla
 dos_riesgo_hoy.py          mapas de los candidatos; de aquí sale la puntuación del r10
-mapa_r10_semaforo.py       el producto: r10 en escala absoluta + cifra del día + percentil, PNG y JSON
+mapas_hoy_manana.py       el producto: r10 en escala absoluta + cifra del día + percentil, PNG y JSON
 gh_estado.py push          guarda el estado; publicado/ se sube a git
 ```
 
@@ -64,10 +64,10 @@ en uno de cada tres días con incendio grande.
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
 | `gh_reanalisis.py` | Descarga ERA5-Land del mes en curso de forma incremental y lo agrega a diario | Meteorología observada hasta D−7 |
-| `riesgo_hoy.py` | Construye las 46 variables en los nodos (reanálisis, IFS, climatologías, FIRMS), puntúa el modelo de producción sobre las 498.530 celdas y dibuja el mapa | El mapa de referencia |
+| `riesgo_hoy.py` | Construye las 46 variables en los nodos (reanálisis, IFS, climatologías, FIRMS), puntúa el modelo de producción sobre las 498,530 celdas y dibuja el mapa | El mapa de referencia |
 | `dos_riesgo_hoy.py` | Lo mismo con los modelos de etiqueta EFFIS: único, r10, pareja y dónde. Con `--pasada <fecha>` repite un día pasado | La puntuación del r10 de cada día |
-| `mapa_r10_semaforo.py` | Lee la puntuación del r10, aplica la escala absoluta y el percentil del día, calcula la cifra del día y escribe el PNG y el JSON que se publican | El producto final |
-| `escala_servicio.json` | Cortes de la escala absoluta y serie de referencia de la cifra del día | Lo lee `mapa_r10_semaforo.py` |
+| `mapas_hoy_manana.py` | Lee la puntuación del r10, aplica la escala absoluta y el percentil del día, calcula la cifra del día y escribe el PNG y el JSON que se publican | El producto final |
+| `escala_servicio.json` | Cortes de la escala absoluta y serie de referencia de la cifra del día | Lo lee `mapas_hoy_manana.py` |
 | `gh_estado.py` | Baja y sube el estado de la cadena a un Release de GitHub | Persistencia entre corridas |
 | `gh_exportar_estado.py` | Exporta desde el portátil lo que la cadena necesita del cubo y del disco externo (capas estáticas, climatologías, modelos) | Se ejecutó una vez, y cada vez que cambió un modelo |
 | `gh_mensual_rapido.py` | Cachés mensuales de vegetación, LST e historial EGIF para los meses fuera de verano | Ampliar la cadena a todo el año |
@@ -86,9 +86,9 @@ también GitHub Actions (allí tampoco está el cubo de 29 GB):
 source entorno.sh
 python 07_produccion/riesgo_hoy.py
 python 07_produccion/dos_riesgo_hoy.py
-python 07_produccion/mapa_r10_semaforo.py
+python 07_produccion/mapas_hoy_manana.py
 ```
 
 Para un día pasado del que se tenga la pasada IFS guardada,
 `dos_riesgo_hoy.py --pasada 2026-08-20` y después
-`mapa_r10_semaforo.py --fecha 2026-08-20`.
+`mapas_hoy_manana.py --fecha 2026-08-20`.

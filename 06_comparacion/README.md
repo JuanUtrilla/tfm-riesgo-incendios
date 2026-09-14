@@ -2,7 +2,7 @@
 
 Para saber si el rediseño aportó algo hay que comparar los dos sistemas en
 igualdad de condiciones: los mismos días, la misma meteorología y la misma
-verdad. Comparar el 0,89 de test con el 0,64 de operación no vale, porque no
+verdad. Comparar el 0.89 de test con el 0.64 de operación no vale, porque no
 son la misma medida.
 
 Hay dos bloques. El primero compara los sistemas sobre la temporada 2026 con
@@ -34,19 +34,19 @@ Temporada 2026, AUC medio por día contra la superficie quemada de EFFIS:
 
 | Sistema | Todos los días | Días grandes (11) | Sin FIRMS |
 |---|---|---|---|
-| producción (`xgb_v2`) | 0,647 | 0,692 | 0,611 |
-| único (`donde_dia_effis`) | 0,752 | 0,746 | 0,744 |
-| único 1:10 (r10) | 0,759 | 0,763 | — |
-| pareja | 0,705 | 0,763 | — |
+| producción (`xgb_v2`) | 0.647 | 0.692 | 0.611 |
+| único (`donde_dia_effis`) | 0.752 | 0.746 | 0.744 |
+| único 1:10 (r10) | 0.759 | 0.763 | — |
+| pareja | 0.705 | 0.763 | — |
 
-El r10 da 0,759 frente a 0,647 de producción: Δ +0,112, IC95 [+0,074, +0,151],
+El r10 da 0.759 frente a 0.647 de producción: Δ +0.112, IC95 [+0.074, +0.151],
 y gana el 76 % de los días. Los tres candidatos son significativos.
 
-Dos observaciones más. FIRMS aporta poco: producción baja de 0,647 a 0,611
+Dos observaciones más. FIRMS aporta poco: producción baja de 0.647 a 0.611
 sin esa variable, y en los once días de megaincendio producción con y sin
 FIRMS son indistinguibles. Y en el cara a cara justo, previsión contra
-previsión durante 19 días, el ranking de producción da 0,568, la malla con el
-modelo de producción 0,547 y el único 0,605, ganando 14 de 19 días. Es la
+previsión durante 19 días, el ranking de producción da 0.568, la malla con el
+modelo de producción 0.547 y el único 0.605, ganando 14 de 19 días. Es la
 primera vez que el único gana a producción por estación, que es la geometría
 en la que producción está en casa.
 
@@ -84,16 +84,16 @@ el protocolo, y así consta en sus documentos.
 
 ![El 7 de agosto de 2026 según producción y según el r10](../docs/MEMORIA/figs/f9_mapa_agosto2026.png)
 
-*El segundo mayor día de la temporada (44.672 ha): producción, r10 y la resta entre ambos, con los perímetros EFFIS del día.*
+*El segundo mayor día de la temporada (44,672 ha): producción, r10 y la resta entre ambos, con los perímetros EFFIS del día.*
 
 Resultado, AUC medio por día con la previsión de la víspera:
 
 | Temporada | Días con fuego | producción | único | r10 | pareja | Δ r10 (IC95) | gana |
 |---|---|---|---|---|---|---|---|
-| 2025 | 138 | 0,743 | 0,806 | 0,807 | 0,794 | +0,064 [+0,027, +0,101] | 60 % |
-| 2026 | 86 | 0,658 | 0,757 | 0,762 | 0,716 | +0,104 [+0,065, +0,144] | 67 % |
+| 2025 | 138 | 0.743 | 0.806 | 0.807 | 0.794 | +0.064 [+0.027, +0.101] | 60 % |
+| 2026 | 86 | 0.658 | 0.757 | 0.762 | 0.716 | +0.104 [+0.065, +0.144] | 67 % |
 
-El coste de la previsión (AUC con IFS menos AUC con reanálisis) es de −0,003
+El coste de la previsión (AUC con IFS menos AUC con reanálisis) es de −0.003
 para todos, con IC que cruza el cero: el modelo no depende de acertar el tiempo
 al detalle. En 2025, dilatando el 2 % superior del r10 a 6 km se cubre el 44 %
 de los incendios vigilando el 10 % del territorio. Las tablas completas, con

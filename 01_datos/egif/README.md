@@ -1,6 +1,6 @@
 # EGIF, el registro oficial de igniciones
 
-No hay script de descarga. El fichero `egif_civio.csv` (292.181 incendios,
+No hay script de descarga. El fichero `egif_civio.csv` (292,181 incendios,
 1968-2023, 30 MB) se bajó a mano del portal de datos de Civio, del conjunto
 «Todos los incendios forestales» (CC BY-SA 3.0, elaborado a partir de la
 Estadística General de Incendios Forestales del MAPA), el 30/06/2026. Se
@@ -25,7 +25,7 @@ consecuencia y no predictor.
 - La descarga de junio estaba incompleta desde 2021 (888, 226 y 23 incendios
   en 2021, 2022 y 2023) por retraso de consolidación. Por eso la iteración 1
   (v1-v3) entrena con 2015-2020. La republicación de julio consolida 2021 y
-  casi todo 2022 (2.897 y 2.520), y v4 se prueba sobre 2022.
+  casi todo 2022 (2,897 y 2,520), y v4 se prueba sobre 2022.
 - A 2022 le faltan Navarra y Cantabria; `muestrear_dataset_v4.py` excluye las
   celdas a menos de 15 km de esas dos comunidades ese año.
 - Es un punto de ignición, no un perímetro. Esa diferencia con EFFIS es el

@@ -6,7 +6,7 @@ se ha adaptado son las rutas, y solo en los cuatro módulos compartidos de
 `01_datos/comun/` (ver [`ESTRUCTURA.md`](ESTRUCTURA.md)).
 
 La razón es de evidencia, no de pereza: si se reescribiera `dos_18_ratio.py`,
-el 87,6 de percentil ponderado que aparece en la memoria ya no lo habría
+el 87.6 de percentil ponderado que aparece en la memoria ya no lo habría
 producido el código que se enseña. Se conserva el original y se documenta de
 dónde viene.
 
@@ -312,7 +312,7 @@ cuyo reentrenamiento (§16) fue interactivo y no dejó script.
 
 ## Actualización del 01/09/2026 — entran `dos_20`…`dos_24`
 
-Faltaban los cinco. La memoria ya citaba dos de sus salidas —el 4,6 % de
+Faltaban los cinco. La memoria ya citaba dos de sus salidas —el 4.6 % de
 importancia concurrente de `dos_24_auditoria_fugas.json` y la curva de desfase
 de `dos_23_vispera.json`— sin que el código que las produce viajara con el
 repositorio, que es exactamente lo que este documento existe para impedir.
@@ -345,7 +345,7 @@ rehecho, con los hashes de esa fecha en vez de los del 25/08:
     cuenta los días HACIA ADELANTE, así que devolvía `[D-1, D+3]` y el mapa del
     día D llevaba dentro los focos del propio incendio. La versión copiada el
     25/08 (`3b866e80`) TENÍA ESE BUG: los números que produjo están inflados a
-    favor de producción (AUC 0,737 en vez de 0,647) y no deben citarse.
+    favor de producción (AUC 0.737 en vez de 0.647) y no deben citarse.
     Producción en vivo nunca estuvo afectada, y el entrenamiento tampoco.
   · `puntuar_effis.py`, `dos_15_veredicto_miteco.py`, `dos_16_juez_estaciones.py`,
     `dos_riesgo_hoy.py` — añaden `donde_dia_effis_r10` como cuarto candidato.
@@ -467,7 +467,7 @@ No tienen fila con md5 porque no son copia de ningún otro repositorio:
 | `03_iteracion1/33_train/reconstruir_v2.py`, `verificar_v2.py` | Reconstrucción y verificación del modelo servido, escritos aquí el 01-02/09/2026 |
 | `01_datos/miteco/__init__.py` | Vacío; hace importable la carpeta |
 | `docs/MEMORIA/figs/scripts/*.py` | Los scripts que generan las figuras de la memoria |
-| `07_produccion/mapa_r10_semaforo.py` | El producto final de la cadena: escala absoluta y semáforo sobre las puntuaciones del día. Escrito aquí el 13/09/2026 |
+| `07_produccion/mapas_hoy_manana.py` | El producto final de la cadena: escala absoluta, cifra del día y percentil sobre las puntuaciones del día, hoy y mañana. Escrito aquí el 13/09/2026 como `mapa_r10_semaforo.py`; el semáforo se quitó y el script se renombró el 14/09/2026 |
 | `.github/workflows/mapa_diario.yml`, `requirements_gh.txt` | El workflow de la cadena diaria en este repositorio, derivado del de `tfm-fuego-malla` |
 
 ## Incorporación del 14/09/2026 — escala del servicio, cifra del día y captura

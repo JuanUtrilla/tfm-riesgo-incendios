@@ -9,7 +9,7 @@ qué verdad se evalúa.
 | Carpeta | Fuente | Para qué se usa |
 |---|---|---|
 | `cubo/` | IberFire, datacubo diario de 1 km (29 GB, 261 variables, 2008-2024) | Las 46 variables de entrenamiento de las dos iteraciones |
-| `era5land/` | ERA5-Land (Copernicus/ECMWF), ~9 km | La meteorología: la del cubo al entrenar y la de los 5.605 nodos al servir |
+| `era5land/` | ERA5-Land (Copernicus/ECMWF), ~9 km | La meteorología: la del cubo al entrenar y la de los 5,605 nodos al servir |
 | `ifs/` | IFS de ECMWF vía Open-Meteo | La previsión de hoy y mañana, donde el reanálisis aún no existe |
 | `aemet/` | AEMET: observación horaria y climatología diaria por estación | La meteorología de la producción de la iteración 1 |
 | `effis/` | EFFIS (Copernicus EMS) | Perímetros de superficie quemada: etiqueta de la iteración 2 y verdad para evaluar |
@@ -43,7 +43,7 @@ qué verdad se evalúa.
 
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
-| `malla_01_nodos.py` | Define los 5.605 nodos de ERA5-Land sobre España y el mapeo de cada celda a su nodo | Base de la rama de malla |
+| `malla_01_nodos.py` | Define los 5,605 nodos de ERA5-Land sobre España y el mapeo de cada celda a su nodo | Base de la rama de malla |
 | `malla_02_descarga.py` | Descarga ERA5-Land horario del CDS y lo agrega a diario (tmax, HR mínima, viento máximo, precipitación) | Meteorología de servicio y de evaluación |
 | `malla_04_climatologia.py` | Climatología del FWI por nodo y mes (2008-2014) | El denominador del percentil local en servicio |
 | `malla_06_descarga_historico.py` | ERA5-Land horario 2015-2020 para entrenar con la misma fuente que sirve | Se descartó: el cubo ya es ERA5-Land reprocesado (ver `02_eda`) |
@@ -55,7 +55,7 @@ qué verdad se evalúa.
 
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
-| `malla_02b_ifs.py` | Previsión IFS en los mismos 5.605 nodos, de D−6 a D+1, ajustada a la escala de ERA5-Land | La rama de previsión de la cadena diaria |
+| `malla_02b_ifs.py` | Previsión IFS en los mismos 5,605 nodos, de D−6 a D+1, ajustada a la escala de ERA5-Land | La rama de previsión de la cadena diaria |
 | `rellenar_ifs.py` | Recupera del archivo de Open-Meteo las pasadas IFS de días pasados, tal como se emitieron | Entradas del replay de 2026 |
 | `bajar_ifs_2025.py` | Lo mismo para la temporada 2025 | Entradas del replay de 2025 |
 
@@ -104,7 +104,7 @@ El FWI del cubo corresponde a las 13 UTC. Se comprobó antes de construir nada
 calcula el FWI a esa hora. Servirlo a otra hora introduce un factor de
 alrededor de 2 respecto al entrenamiento.
 
-ERA5-Land da más lluvia que las estaciones: +8,00 mm en 30 días frente a AEMET
+ERA5-Land da más lluvia que las estaciones: +8.00 mm en 30 días frente a AEMET
 (`04_bisagra/42_no_es_la_meteo/experimento_b_era5.py`). De ahí salen menos días
 sin lluvia, un combustible más húmedo y un FWI 10 puntos más bajo. Es la razón
 de que entrenar y servir con la misma fuente importe tanto.

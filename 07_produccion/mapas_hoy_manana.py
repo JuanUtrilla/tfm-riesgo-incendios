@@ -26,8 +26,8 @@ EXTREMO en uno de cada tres días con incendio grande sin mejorar al calendario
 (calibracion_si/semaforo_2026-09-14/README.md).
 
 Uso:
-    python 07_produccion/mapa_r10_semaforo.py                 # hoy y mañana
-    python 07_produccion/mapa_r10_semaforo.py --fecha 2026-09-11
+    python 07_produccion/mapas_hoy_manana.py                 # hoy y mañana
+    python 07_produccion/mapas_hoy_manana.py --fecha 2026-09-11
 """
 import argparse
 import json

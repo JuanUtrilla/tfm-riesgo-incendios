@@ -11,7 +11,7 @@ que se hace en operación.
 
 ## El diseño
 
-- Positivo: una ignición registrada en EGIF, en su celda y su fecha (19.561
+- Positivo: una ignición registrada en EGIF, en su celda y su fecha (19,561
   entre 2015 y 2020).
 - Negativo: la misma celda en otros días en que no ardió, tres por positivo.
 - Variables: 46 en el modelo servido (la lista completa tiene 50; ver más
@@ -41,8 +41,8 @@ que se hace en operación.
 |---|---|---|
 | `entrenar_modelo.py` | Entrena v1 (train 2015-2018, val 2019, test 2020) con una escalera de baselines, validación espacial por bloques de 100 km y un control con las etiquetas barajadas | El modelo base y `metricas_v1.json` |
 | `entrenar_modelo_v3.py` | Reajuste con 2015-2020 completo | Explorado; no se desplegó |
-| `entrenar_modelo_v4.py` | Entrena con el EGIF consolidado y prueba sobre 2022, el peor año de la década | El 0,89 de la memoria |
-| `tuning_optuna.py` | Ajuste bayesiano acotado (40 pruebas) sobre la validación | Medir cuánto aporta el ajuste: +0,007 |
+| `entrenar_modelo_v4.py` | Entrena con el EGIF consolidado y prueba sobre 2022, el peor año de la década | El 0.89 de la memoria |
+| `tuning_optuna.py` | Ajuste bayesiano acotado (40 pruebas) sobre la validación | Medir cuánto aporta el ajuste: +0.007 |
 | `modelo_nativo_estacion.py` | Entrena directamente en la geometría de estaciones donde se sirve | Alternativa de servicio, explorada |
 | `reconstruir_v2.py` | Reconstruye el modelo servido (`xgb_v2_prototipo`) con la receta de v1 sin cuatro variables; los 240 árboles salen idénticos | Reproducibilidad del modelo en producción |
 | `verificar_v2.py` | Comprueba con las muestras que las 46 variables del modelo servido son las 50 menos esas cuatro, en el mismo orden | Corre recién clonado el repo |
@@ -67,21 +67,21 @@ que se hace en operación.
 
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
-| `ablacion_features.py` | Modelo meteorológico con FWI absoluto, con percentil local y con los dos | Medir lo que aporta el percentil local: +0,042 de AUC-PR al añadirlo |
+| `ablacion_features.py` | Modelo meteorológico con FWI absoluto, con percentil local y con los dos | Medir lo que aporta el percentil local: +0.042 de AUC-PR al añadirlo |
 | `ablacion_v3_firms.py` | Sustituir el historial EGIF (que caduca) por su equivalente FIRMS | Decidir la variable autorregresiva de servicio |
 
 ## Los números de test
 
 | Métrica | Valor |
 |---|---|
-| AUC-ROC de v4, test 2022 | 0,8906 [0,8644, 0,9136] |
-| AUC-ROC de v1, test 2020 | 0,931 |
-| AUC-PR de v1, test 2020 | 0,843 (azar 0,263) |
-| AUC-PR de v1 en validación espacial por bloques de 100 km | 0,848 ± 0,028 |
-| AUC-PR de v1 con las etiquetas barajadas | 0,231, igual que la prevalencia |
-| Ajuste de hiperparámetros (Optuna, 40 pruebas) | +0,007 de AUC-PR |
+| AUC-ROC de v4, test 2022 | 0.8906 [0.8644, 0.9136] |
+| AUC-ROC de v1, test 2020 | 0.931 |
+| AUC-PR de v1, test 2020 | 0.843 (azar 0.263) |
+| AUC-PR de v1 en validación espacial por bloques de 100 km | 0.848 ± 0.028 |
+| AUC-PR de v1 con las etiquetas barajadas | 0.231, igual que la prevalencia |
+| Ajuste de hiperparámetros (Optuna, 40 pruebas) | +0.007 de AUC-PR |
 
-El 0,89 es el número que la memoria da al principio, para explicar después
+El 0.89 es el número que la memoria da al principio, para explicar después
 por qué no medía lo que hacía falta.
 
 ## La puesta en producción
@@ -101,5 +101,5 @@ para no romper la serie a mitad de temporada.
 
 ## Y entonces se midió
 
-Servido a diario y evaluado contra la superficie quemada real, el 0,89 pasó a
-0,57-0,64. Eso es el capítulo 4.
+Servido a diario y evaluado contra la superficie quemada real, el 0.89 pasó a
+0.57-0.64. Eso es el capítulo 4.
