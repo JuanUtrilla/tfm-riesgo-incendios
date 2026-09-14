@@ -465,3 +465,34 @@ corriendo un día más para comparar.
 Los READMEs de todos los capítulos se reescribieron con las skills
 `escribir-humano` y `escribir-tfm`: inventario de qué hace y para qué se usó
 cada script, una figura por apartado y sin referencias al seguimiento diario, que ya no forma parte de la cadena ni de la evaluación de la memoria.
+
+---
+
+## 14/09/2026 — Mapas de hoy y mañana, escala del servicio y memoria cerrada
+
+**Semáforo descartado.** Revisado fuera de calibración (cubo 2022-2024) y en el
+replay: aplicado todo el año dejaba sin EXTREMO el 34,6 % de los días grandes de
+verano y el 54,4 % de los de 2026, sin mejorar al calendario. Solo tenía
+capacidad propia de diciembre a abril. Detalle en
+`07_produccion/escala_y_cifra/README.md` y `docs/LIMITACIONES.md` §13.
+
+**La escala del cubo no valía para el mapa servido.** Con los cortes de
+`dos_27`, los mapas de la cadena marcaban entre 2 y 10 veces más EXTREMO que el
+cubo en el mismo mes, también con reanálisis. Los cortes se recalibraron con
+los 250 días servidos del replay (0,0060 · 0,1125 · 0,4058): en EXTREMO arde una
+celda-día de cada 760.
+
+**Producto nuevo** (`2b48d97`). Cada madrugada, una imagen para hoy y otra para
+mañana, cada una con el r10 en escala absoluta y por percentil del día, y la
+cifra del día (% de España en EXTREMO frente a los 250 días de referencia). Cron
+a las 03:03 en verano y 02:02 en invierno, hora de Madrid. El cron de
+`tfm-fuego-malla` se paró (`132fa98` en aquel repositorio).
+
+**Memoria.** Seis páginas: cuatro de memoria y dos de anexos que enlazan aquí
+(`docs/MEMORIA/memoria_ML.pdf`). Para que los enlaces lleven a algo entraron
+`07_produccion/escala_y_cifra/`, `06_comparacion/captura_lift.py` y
+`docs/REPLAY_CAPTURA.md`, y se retiraron los borradores superados de
+`docs/MEMORIA/` (`05c14b0`, `b9ab184`, `2764f65`).
+
+**El repositorio pasa a público.** Antes se revisó el historial: ni claves de
+AEMET, CDS o FIRMS ni ficheros de credenciales.
