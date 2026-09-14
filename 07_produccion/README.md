@@ -51,7 +51,7 @@ y su posición entre los 250 días de referencia.
 Los cortes y la referencia están en `escala_servicio.json` y se calibraron con
 los mapas servidos del replay de 2025 y 2026. Los del cubo
 (`05_iteracion2/56_calibracion/dos_27_escala_absoluta.py`) no sirven para el mapa
-servido: con ellos marcaba entre 2 y 9 veces más EXTREMO que el cubo en el mismo
+servido: con ellos marcaba entre 2 y 10 veces más EXTREMO que el cubo en el mismo
 mes. La referencia no tiene días de diciembre a abril y hay que ampliarla con
 los días publicados.
 

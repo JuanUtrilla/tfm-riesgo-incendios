@@ -469,3 +469,17 @@ No tienen fila con md5 porque no son copia de ningún otro repositorio:
 | `docs/MEMORIA/figs/scripts/*.py` | Los scripts que generan las figuras de la memoria |
 | `07_produccion/mapa_r10_semaforo.py` | El producto final de la cadena: escala absoluta y semáforo sobre las puntuaciones del día. Escrito aquí el 13/09/2026 |
 | `.github/workflows/mapa_diario.yml`, `requirements_gh.txt` | El workflow de la cadena diaria en este repositorio, derivado del de `tfm-fuego-malla` |
+
+## Incorporación del 14/09/2026 — escala del servicio, cifra del día y captura
+
+Origen **S** = `~/Desktop/Master/calibracion_si/semaforo_2026-09-14/`, banco de
+trabajo aislado como el origen C. Copias literales; llevan rutas absolutas del
+equipo donde se ejecutaron, igual que los scripts del replay.
+
+| Fichero | Destino | Origen |
+|---|---|---|
+| `calibrar_servicio.py`, `comparar_senales.py`, `semaforo_variantes.py`, `fig_benchmark_semaforo.py`, `fig3_dos_mapas.py` y sus salidas (`calibracion_servicio.json`, `calibracion_servicio_dias.csv`, `comparar_senales.txt`, `semaforo_variantes.csv`) | `07_produccion/escala_y_cifra/` | S |
+| `captura_lift.py` | `06_comparacion/` | S |
+| `captura_lift.csv`, `captura_absoluta_semaforo.csv` | `docs/resultados/` | S |
+| `f12_dos_mapas.png` a `f16_benchmark_replay.png` | `docs/MEMORIA/figs/` | S |
+| `docs/REPLAY_CAPTURA.md`, `07_produccion/escala_y_cifra/README.md` | — | escritos en este repositorio |

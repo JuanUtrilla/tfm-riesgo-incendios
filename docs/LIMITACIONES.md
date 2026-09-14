@@ -6,29 +6,23 @@ capítulo de limitaciones de la memoria.
 
 ---
 
-## 1. Producción sirve una versión con un defecto conocido, y es deliberado
+## 1. El ranking por estaciones de producción tenía un defecto en el viento
 
-Desde el 18/08/2026 se sabe que `ranking_diario.py` usa `np.minimum` donde
-debería usar `np.fmin` al combinar las dos fuentes de viento. La diferencia
-importa: **`minimum` propaga NaN**, así que a toda estación a la que le falte el
-dato de racha el viento le sale NaN, y el cálculo del FWI trata el viento NaN
-igual que viento 0.
+Desde el 18/08/2026 se sabe que el cálculo del FWI del ranking por estaciones
+que publicaba la producción usaba `np.minimum` donde debía usar `np.fmin` al
+combinar las dos fuentes de viento. `minimum` propaga NaN: a toda estación sin
+dato de racha el viento le salía NaN, y el FWI lo trataba como viento 0.
 
 | | |
 |---|---|
 | Efecto | FWI 35,7 donde debería ser 58,0 (con 15 km/h de viento) |
 | Alcance | **16,3 %** de las estaciones-día; 128 de 858 estaciones a lo largo de la serie |
-| Estado | **Sin corregir en producción, a propósito** |
+| Estado | Sin corregir durante la temporada de 2026, para no alterar la serie publicada |
 
-**Por qué no se arregla:** el valor del veredicto de septiembre depende de que
-producción sirva durante toda la temporada exactamente la misma versión con la
-que empezó. Arreglarlo a mitad de temporada rompería la comparación sellada, que
-es justo lo que da fuerza al resultado. El arreglo está escrito y se aplicará al
-cerrar la temporada.
-
-**Cómo afecta a la lectura de los resultados:** el baseline contra el que compiten
-los candidatos está **penalizado** en un 16 % de sus filas. Toda ventaja medida
-sobre producción debe leerse teniendo esto en cuenta.
+**Qué afecta:** las cifras de acierto en operación del primer modelo (entre
+0,57 y 0,64), penalizadas en esas filas. **Qué no afecta:** el replay de 2025 y
+2026, que ejecuta el modelo de producción sobre la malla de ERA5-Land e IFS,
+con otro cálculo del viento.
 
 ---
 
@@ -58,30 +52,18 @@ instrumento. Lo acotado:
 
 ---
 
-## 3. El veredicto final es a posteriori; el sellado día a día no tiene días suficientes
+## 3. La evaluación final es a posteriori
 
-Hay dos evaluaciones hacia adelante y no valen lo mismo:
+El resultado de la memoria sale del replay de 2025 y 2026: 250 días (224 con
+fuego) con la pasada IFS de cada víspera. Los mapas se generaron el 02/09/2026,
+todos a la vez, cuando los perímetros ya se conocían. Un modelo puntuado a
+posteriori no vale lo mismo que uno publicado antes del día, porque nada impide,
+en principio, elegir los modelos o las métricas a la vista del resultado.
 
-| | Replay 2025-2026 | Jueces en vivo |
-|---|---|---|
-| Días | 250 (138 + 86 con fuego) | 8-13 según juez, a 07/09/2026 |
-| Entradas | La pasada IFS de cada víspera, archivada | Las de cada día |
-| Cuándo se generó el mapa | El 02/09/2026, todos a la vez | Cada madrugada, sellado en un Release |
-| Prerregistro | Sí (`ed7931f`, antes de correr) | No hace falta: no hay grados de libertad |
-| Resultado | Δ +0,064 (2025) y +0,104 (2026), IC sin tocar el cero | Candidatos delante en EFFIS y MITECO; producción delante por estación; ningún IC excluye el cero |
-
-**La decisión (06/09/2026) es que el veredicto de la memoria sale del replay**,
-porque cubre dos temporadas contra ~15 días y su protocolo estaba escrito antes
-de ejecutarlo. Su límite hay que decirlo sin disimulo: los mapas se generaron
-*después* de conocer los perímetros, aunque con las entradas de la víspera. Un
-modelo puntuado a posteriori no vale lo mismo que uno sellado antes del día,
-porque nada impide, en principio, haber elegido el conjunto de modelos o las
-métricas mirando el resultado. Lo que lo mitiga: el prerregistro, que los seis
-modelos se reportan siempre, y que el 2026 retrospectivo con reanálisis
-(Δ +0,112 [+0,074, +0,151]) y el cara a cara de 19 días previsión contra
-previsión (`comparar_rankings_justo.py`, único 0,605 vs 0,568) apuntan en la
-misma dirección. Los jueces en vivo se citan al cierre como validación
-operativa en curso, con sus intervalos.
+Lo mitigan tres cosas: el protocolo se escribió antes de ejecutar (commit
+`ed7931f`, 02/09/2026 a las 18:10), los seis modelos se reportan siempre, y la
+evaluación retrospectiva de 2026 con reanálisis (Δ +0,112 [+0,074, +0,151])
+apunta en la misma dirección.
 
 ---
 
@@ -146,9 +128,10 @@ Cuadra con la geometría: caja 21×21 = 441 km² contra círculo r=10 km = 314 k
 vieron al entrenar.** Afecta a producción, único, r10 y a la rama `cuando` de la
 pareja.
 
-Se documenta y **no se corrige antes del cierre de los jueces**, por la misma
-razón que el bug del viento (§1): tocar `riesgo_hoy.py` a mitad de temporada
-rompe la serie sellada. La calibración de `56_calibracion` replica el camino de
+Se documenta y **no se corrigió durante la temporada**, por la misma razón que
+el defecto del viento (§1): tocar `riesgo_hoy.py` a mitad de temporada habría
+roto la serie publicada. Es una de las causas de que los cortes de la escala
+absoluta calculados en el cubo no sirvan para el mapa servido (§12). La calibración de `56_calibracion` replica el camino de
 SERVICIO a propósito, así que sus números son válidos para lo que se sirve.
 
 **Confirmado por una vía independiente** (`dos_34_auditoria_geometria.py`,
@@ -249,19 +232,36 @@ intervalo toca el cero.
 
 ---
 
-## 11. Seis días de 2026 no cuentan en el juez EFFIS (07/09/2026)
+## 11. Seis días de 2026 sin mapa diario válido (07/09/2026)
 
 - **27-31 de agosto**: el 31/08 un `gh_estado.py push --base` lanzado desde el
   portátil con una `salida/` congelada en el 21-26/08 pisó el estado del Release
-  y se perdieron los `.npz` de mapa diario de cinco días (los veredictos
-  acumulados se recuperaron íntegros de `publicado/`). Reconstruirlos exigiría
+  y se perdieron los `.npz` de mapa diario de cinco días. Reconstruirlos exigiría
   IFS archivado que compite con la cadena viva; se decidió no hacerlo. El
   `--base` ahora aborta si el diario remoto es más nuevo.
 - **21 de agosto**: el `.npz` que quedó en el Release es una regeneración del
-  31/08 (es el único con `prob_r10` y su huella FIRMS es la del 26-30/08). Se
-  buscó el original el 06/09 en el disco Expansion congelado el 21/08 a las
-  09:51 y no existe: el disco solo trae los mapas retro de ventana 5. Como
-  `puntuar_effis.py` recalcula el veredicto con todos los días, ese mapa retro
-  se puntuaría como si fuera operativo. **Se excluye y se documenta.**
+  31/08, no el mapa publicado ese día (su huella FIRMS es la del 26-30/08). El
+  original no existe en ningún disco, así que ese día se excluye de las series
+  diarias.
 
 Ninguno de los dos afecta al replay, que no usa los mapas del Release.
+
+## 12. La escala absoluta del cubo no se traslada al mapa servido (14/09/2026)
+
+Con los cortes calculados en el cubo (`dos_27_escala_absoluta.py`), los mapas
+servidos marcan entre 2 y 10 veces más celdas en EXTREMO que el cubo en el mismo
+mes, con previsión y con reanálisis (`07_produccion/escala_y_cifra/comparar_cubo_servicio.txt`).
+Los cortes que publica la cadena se calibraron con los 250 días servidos del
+replay. Tres límites:
+
+- No hay días de diciembre a abril en esa referencia.
+- El significado cambia entre temporadas: con cortes de 2025, en EXTREMO ardió
+  una celda-día de cada 550 en 2025 y una de cada 2.560 en 2026.
+- Hay que recalcular los cortes y la referencia al acumular días publicados.
+
+## 13. El semáforo nacional se descartó (14/09/2026)
+
+El aviso de día solo superó a la climatología de diciembre a abril. En verano,
+aplicado todo el año, dejaba sin EXTREMO el 34,6 % de los días grandes de
+2022-2024 sin mejorar al calendario. Detalle y variantes en
+`07_produccion/escala_y_cifra/README.md`.

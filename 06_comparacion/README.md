@@ -73,6 +73,7 @@ de ejecutar las temporadas.
 | `replay_dia_todo.py`, `replay_temporada_todo.py` | Variantes para el r10 entrenado con todos los años (`docs/R10_TODOS_LOS_ANIOS.md`) |
 | `verificar_replay.py` | Comprobación de punta a punta: un día del replay contra el mapa que publicó la cadena ese día |
 | `dos_33_anomalia_punta.py` | Sensibilidad de la captura de hectáreas de 2026 a un solo día (el 23 de julio) |
+| `captura_lift.py` | Superficie quemada dentro del 0.5-20 % de celdas de mayor riesgo de cada día, lift de los seis modelos y de la escala absoluta (`docs/REPLAY_CAPTURA.md`) |
 
 Las métricas de precisión, radio y cobertura se añadieron después de escribir
 el protocolo, y así consta en sus documentos.

@@ -10,9 +10,8 @@ detalladas en [`01_datos/README.md`](../01_datos/README.md).
 - **EGIF** — Estadística General de Incendios Forestales. Registro oficial de
   **igniciones** (punto y fecha de inicio). Etiqueta de la iteración 1.
 - **EFFIS** — European Forest Fire Information System. Perímetros de
-  **superficie quemada**. Etiqueta de la iteración 2 y juez de la temporada.
-- **MITECO** — parte diario oficial de incendios. Juez rápido: se publica al
-  día siguiente, frente a los ~45 días de desfase de EFFIS.
+  **superficie quemada**. Etiqueta de la iteración 2 y referencia de las evaluaciones.
+- **MITECO** — parte diario oficial de incendios. Se publica al día siguiente, frente a los ~45 días de desfase de EFFIS; se usó como segunda referencia durante el desarrollo.
 - **ERA5-Land** — reanálisis meteorológico de ECMWF, ~9 km. Alimenta la malla.
 - **IFS** — modelo de previsión de ECMWF (vía Open-Meteo). La rama de
   *previsión* para los días D y D+1, donde el reanálisis todavía no existe.
@@ -51,11 +50,7 @@ detalladas en [`01_datos/README.md`](../01_datos/README.md).
 - **FWI** — Fire Weather Index canadiense (Van Wagner, 1987), con sus
   componentes FFMC, DMC, DC, ISI y BUI. Implementación en
   `01_datos/comun/fwi_canadiense.py`.
-- **Los tres jueces** — las tres formas independientes de puntuar los mapas
-  diarios de la temporada 2026: **EFFIS** (superficie quemada, ventana de 45
-  días), **MITECO** (parte del día siguiente) y **por estación** (contra el
-  ranking sellado de producción, 688 estaciones).
-- **Sellado** — congelado a propósito durante la temporada: producción sirve la
-  versión con la que empezó, aunque después se le haya encontrado un defecto,
-  para que la comparación de septiembre siga siendo válida. Ver
-  `docs/LIMITACIONES.md`.
+
+- **Sellado** — congelado a propósito durante la temporada: producción sirvió la
+  versión con la que empezó, aunque después se le encontrara un defecto, para
+  no alterar la serie publicada. Ver `docs/LIMITACIONES.md`.

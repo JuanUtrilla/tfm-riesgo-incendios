@@ -103,5 +103,5 @@ python 06_comparacion/replay_temporada_todo.py --anio 2026 --condicion ifs
 fallos por temporada son los días previos al 1-jun: el archivo IFS empieza el
 25-may y el reanálisis debe llegar a D−7.
 
-**Nada de esto tocó la cadena viva**: el modelo nuevo no se sirvió, los jueces
-siguen puntuando el `r10` sellado, y `donde_dia_effis_r10.ubj` no se modificó.
+**Nada de esto tocó la cadena viva**: el modelo nuevo no se sirvió y
+`donde_dia_effis_r10.ubj` no se modificó.

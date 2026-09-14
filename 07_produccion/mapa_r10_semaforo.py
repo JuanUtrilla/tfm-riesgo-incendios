@@ -16,7 +16,7 @@ nada.
 La escala y la referencia están en `escala_servicio.json`, junto a este
 script, y se calibraron sobre los mapas SERVIDOS del replay 2025-2026 (250
 días, condición IFS): los cortes de la climatología del cubo (dos_27) marcaban
-en servicio entre 2 y 9 veces más EXTREMO que en el cubo el mismo mes. Con los
+en servicio entre 2 y 10 veces más EXTREMO que en el cubo el mismo mes. Con los
 cortes del servicio, en EXTREMO ardió 1 celda-día de cada 760 (13 veces la
 media de las dos temporadas).
 

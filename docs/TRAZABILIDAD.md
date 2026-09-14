@@ -8,8 +8,7 @@ datos hace falta ejecutarlo.
 > y relanzar la evaluación retrospectiva. El juego oficial es el de **ventana
 > FIRMS de 7 días** (`dos_09_temporada2026.json`, que es lo que lee `dos_19`);
 > la corrida con ventana de 5 (`dos_09_ventana5.json`) es solo la ablación del
-> desajuste train/serve. Solo la sección «Capítulo 7 · Producción y jueces» se
-> actualiza hasta el cierre de septiembre. A partir de aquí, un número que no
+> desajuste train/serve. A partir de aquí, un número que no
 > coincida con esta tabla es un error del documento, no una duda sobre el
 > resultado.
 
@@ -200,42 +199,46 @@ Partición fija en los cuatro scripts: **calibración 2015-2021 · validación
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
 | 0,647 prod · 0,752 único · **0,759** único 1:10 · 0,705 pareja | Temporada 2026 contra EFFIS | `06_comparacion/dos_09_temporada2026.py` | `dos_09_temporada2026.csv/json` | disco |
-| **0,611** | Producción sin FIRMS (0,520 con juez MITECO): la caída real es de 0,036, no de 0,126 | ídem | ídem | disco |
+| **0,611** | Producción sin FIRMS (0,520 contra los partes del MITECO): la caída real es de 0,036, no de 0,126 | ídem | ídem | disco |
 | 0,692 vs 0,763 en los 11 días grandes | Los megaincendios: los acierta el único 1:10, no producción | ídem | ídem | disco |
 | 0,568 · 0,547 · **0,605** (14/19 días) | Cara a cara justo: previsión contra previsión, 19 días | `06_comparacion/comparar_rankings_justo.py` | `rankings_justo.csv/json` | sellado |
 | 17 días de julio 2026 | La primera comparación seria con área quemada | `06_comparacion/comparar_julio2026.py` | `julio2026_effis.json` | cubo |
 | **0,759 · Δ+0,112 [+0,074, +0,151]** | **El veredicto de la memoria** | `06_comparacion/dos_19_veredicto.py` | `dos_19_veredicto.json/png` | disco |
 | — | **Todas las cifras de 2026 y MITECO de esta página se recalcularon el 31/08/2026** tras corregir la fuga de futuro de FIRMS (`docs/BITACORA.md`). Las de test 2020/2024 no dependían de ella y no cambian. | `06_comparacion/comparar_rankings.py` | — | — |
 
-## Capítulo 7 · Producción y jueces
+## Capítulo 7 · Producción: escala absoluta y cifra del día (14/09/2026)
 
-Cifras al cierre, 13/09/2026 (corrida 34770468392 de la cadena).
+Números del mapa que publica la cadena diaria, calibrados sobre los 250 días
+servidos del replay (25-may→01-nov-2025 y 25-may→02-sep-2026, condición IFS).
+Scripts en `07_produccion/escala_y_cifra/`; detalle en su README.
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
-| 0,470 / 0,796 / 0,836 (7 d) / 0,711 (malla, único, r10, pareja), 13 días | Juez EFFIS acumulado, sin el 21-ago | `07_produccion/puntuar_effis.py` | `puntuacion_effis.csv`, `historico_veredictos.csv` | sellado |
-| 0,540 / 0,714 / 0,709 (11 d) / 0,673, 19 días / 47 incidentes | Juez MITECO acumulado | `07_produccion/dos_15_veredicto_miteco.py` | `veredicto_miteco.csv/json` | sellado |
-| 0,565 producción / 0,492 / 0,652 / 0,669 (8 d) / 0,539, 13 días / 149 positivas | Juez por estación | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.csv/json` | sellado |
-| Δ único +0,087 [−0,066, +0,253] por estación | Ningún IC excluye el cero | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.json` | sellado |
-| 21-ago excluido; 27-31/08 sin mapa | Días que no cuentan | — | `LIMITACIONES.md` §11 | — |
+| 0,0060 · 0,1125 · **0,4058** | Cortes MODERADO, ALTO y EXTREMO de la escala absoluta (cubo: 0,0018 · 0,0736 · 0,4066) | `calibrar_servicio.py` | `07_produccion/escala_servicio.json`, `calibracion_servicio.json` | archivo IFS |
+| entre 2 y 10 veces | EXTREMO con los cortes del cubo en los mapas servidos frente al cubo, mediana por mes | `comparar_cubo_servicio.py` | `comparar_cubo_servicio.txt` | archivo IFS |
+| 1 de cada **760** · factor 13,2 · 29,0 % de ha | Significado de EXTREMO en los 250 días | `calibrar_servicio.py` | `calibracion_servicio.json` | archivo IFS |
+| 1 de cada 550 → 1 de cada 2.560 | EXTREMO con cortes de 2025, medido en 2025 y en 2026 | ídem | ídem | archivo IFS |
+| mediana 1,5 % · p90 4,6 % · máx. 7,2 % | Referencia de la cifra del día | ídem | ídem | archivo IFS |
+| **0,69 · 0,66** (calendario 0,74 · 0,44) | AUC de la cifra del día para días grandes, 2025 y 2026 | ídem | ídem | archivo IFS |
+| 0,873 · 0,792 · 0,773 | AUC del % EXTREMO por época en el cubo 2022-2024 (calendario 0,607 · 0,570 · 0,707) | `comparar_senales.py` | `comparar_senales.txt` | cubo |
+| 34,6 % · 21,0 % | Días grandes sin EXTREMO con el semáforo en verano y en todo el año, 2022-2024: se descarta | `semaforo_variantes.py` | `semaforo_variantes.csv` | cubo |
+| 26,3 % (lift 13,2) · 63,0 % | Hectáreas del r10 en el 2 % y el 10 % de celdas de mayor riesgo, 2025 | `06_comparacion/captura_lift.py` | `docs/resultados/captura_lift.csv`, `docs/REPLAY_CAPTURA.md` | archivo IFS |
+| 4,8 % · 0,3 % (92 % · 10 %) | EXTREMO y posición del 13-ago y del 29-oct-2025 en la figura 3 | `fig3_dos_mapas.py` | `docs/MEMORIA/figs/f12_dos_mapas.png` | archivo IFS |
 
----|---|---|---|---|
-| 0,506 / 0,745 / 0,722 / 0,735 (malla, único, r10, pareja), 9 días | Juez EFFIS acumulado | `07_produccion/puntuar_effis.py` | `puntuacion_effis.csv`, `historico_veredictos.csv` | sellado |
-| 0,516 / 0,692 / 0,674 / 0,651, 13 días | Juez MITECO acumulado | `07_produccion/dos_15_veredicto_miteco.py` | `veredicto_miteco.csv/json` | sellado |
-| 0,645 producción / 0,578 / 0,571 / 0,504 / 0,594, 8 días | Juez por estación | `07_produccion/dos_16_juez_estaciones.py` | `veredicto_estaciones.csv/json` | sellado |
-| Δ único −0,074 [−0,213, +0,073] por estación | Ningún IC excluye el cero | `06_comparacion/dos_19_veredicto.py` | `veredicto_acumulado.json` | sellado |
-| 21-ago excluido; 27-31/08 sin mapa | Días que no cuentan | — | `LIMITACIONES.md` §11 | — |
+Las series que la cadena puntuaba cada día durante la temporada de 2026
+(`puntuar_effis.py`, `dos_15_veredicto_miteco.py`, `dos_16_juez_estaciones.py`)
+se usaron para el seguimiento del desarrollo y no dan ninguna cifra de la
+memoria.
 
 ---
 
-## Figuras de la sección divulgativa (07/09/2026)
+## Figuras de la memoria (14/09/2026)
 
 | Figura | Script | Entradas | Se ejecuta con |
 |---|---|---|---|
 | Fig. 1 diseños de muestreo | `docs/MEMORIA/figs/scripts/f2_disenios.py` | — (esquema) | muestra |
-| Fig. 2 SHAP del r10 (top: `n_fuegos_10km_mismomes_hist` 0,70, `ndvi_med_30d` 0,45, `clc_matorral` 0,37) | `f11_shap_r10.py` → `figs/f11_shap.json` | `donde_dia_effis_r10.ubj`, banco `eval_dia` de `dataset_effis.parquet` (6.000 filas, semilla 42) | disco |
-| Fig. 3 mapas del 7-ago-2026 | `f9_mapa_agosto2026.py` | `archivo_ifs/replay/2026/ifs/2026-08-07.npz`, `verdad_2026/` | archivo_ifs |
-| Fig. 4 percentil vs absoluto (13-ago y 29-oct-2025) | `f10_percentil_vs_absoluto.py` | `replay/2025/ifs/`, cortes de `dos_27_bandas.csv`, umbral 0,076 de `dos_26` | archivo_ifs |
+| Fig. 2 SHAP del r10 (top: `n_fuegos_10km_mismomes_hist` 0,70, `ndvi_med_30d` 0,45, `clc_matorral` 0,37) | `docs/MEMORIA/figs/scripts/f11_shap_r10.py` → `figs/f11_shap.json` | `donde_dia_effis_r10.ubj`, banco `eval_dia` de `dataset_effis.parquet` (6.000 filas, semilla 42) | disco |
+| Fig. 3 los dos mapas del 13-ago y 29-oct-2025 | `07_produccion/escala_y_cifra/fig3_dos_mapas.py` → `figs/f12_dos_mapas.png` | `archivo_ifs/replay/2025/ifs/`, `07_produccion/escala_servicio.json` | archivo IFS |
 
 ## Prerregistro: r10 con todos los años (escrito el 05/09/2026 a las 11:30 UTC, ANTES de correr nada)
 

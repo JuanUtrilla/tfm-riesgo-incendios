@@ -4,7 +4,10 @@
 
 El modelo ordena bien las celdas, pero un mapa que pinta de rojo el 2 %
 superior de cada día se lee como «estas celdas van a arder», y eso es falso
-casi todo el año. Este capítulo convierte el orden en tres cosas publicables:
+casi todo el año. Este capítulo convierte el orden en tres cosas publicables. Al cierre, la
+cadena diaria publica solo la escala absoluta, con cortes recalibrados sobre
+los mapas servidos, y la cifra del día; el semáforo se evaluó y se descartó
+(`07_produccion/escala_y_cifra/README.md`).
 
 1. Si se pinta hoy: un aviso de día calibrado, el semáforo.
 2. Qué significa el rojo: una escala fija en la puntuación, en vez del percentil del día.
@@ -19,7 +22,7 @@ variación real de la tasa base y los días de cero fuego incluidos.
 
 ![Percentil del día frente a escala absoluta, con el semáforo](../../docs/MEMORIA/figs/f10_percentil_vs_absoluto.png)
 
-*El r10 el 13 de agosto y el 29 de octubre de 2025: a la izquierda por percentil del día, a la derecha con la escala fija y el semáforo.*
+*El r10 el 13 de agosto y el 29 de octubre de 2025: a la izquierda por percentil del día, a la derecha con la escala fija del cubo y el semáforo, tal como se evaluaron.*
 
 ## Qué hay aquí
 
