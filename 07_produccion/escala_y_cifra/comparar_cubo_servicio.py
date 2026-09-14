@@ -9,7 +9,7 @@ escala absoluta calculados en el cubo (dos_27: EXTREMO >= 0.4066):
              reanálisis, el mismo camino de cálculo que la cadena diaria
 
 Resultado del 14/09/2026: con los mismos cortes, los mapas servidos marcan entre
-2 y 9 veces más EXTREMO que el cubo en el mismo mes. Por eso la cadena usa los
+2 y 10 veces más EXTREMO que el cubo en el mismo mes. Por eso la cadena usa los
 cortes de calibrar_servicio.py.
 
 Entradas: ~/Desktop/Master/archivo_ifs/replay/<año>/<condición>/<fecha>.npz y
