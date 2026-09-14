@@ -506,3 +506,31 @@ convención numérica que la memoria: decimales con punto y millares con coma
 (`0.807`, `498,530`); `MODELO_B_BITACORA.md` se deja como está porque es una
 copia sellada por md5. Las figuras PNG conservan la coma. La primera corrida con
 los dos mapas (`49d02e3`) publicó `mapas_hoy.png` y `mapas_manana.png`.
+
+**Memoria v8: anexos largos (`687fc4f`).** La guía del máster no cuenta los
+anexos en las veinte caras y pide detalle del análisis exploratorio, de la
+ejecución de los modelos, de la productivización y de la reproducibilidad. El
+cuerpo de cuatro páginas queda intacto y los anexos pasan de dos a cinco: A
+datos y variables (fuentes, las 46 variables por familia, prevalencia y
+persistencia de la etiqueta, FWI en percentil local); B benchmark de los seis
+modelos en las dos temporadas, captura del r10 según el territorio vigilado y
+alternativas descartadas; C escala absoluta, cifra del día y semáforo
+descartado; D repositorio, trazabilidad, reproducción verificada y cadena
+diaria; E limitaciones. Las figuras de los anexos están en `docs/MEMORIA/figs/`
+y sus scripts en `figs/scripts/`. Desde este día los commits los hace el autor.
+
+**Verificación a posteriori.** Cada corrida redibuja ahora los mapas de los
+veinte días anteriores con la verdad que ya se conoce: perímetros EFFIS del día
+(y del siguiente, en trazo fino) e incidentes del parte MITECO, en el centroide
+del municipio y juzgados a 10 km (`07_produccion/verificar_mapas.py`, paso
+nuevo del workflow con `continue-on-error`). El original no se toca: por fecha
+hay `mapas_<fecha>.png` y `verificado_<fecha>.png`, veinte días de cada uno en
+`publicado/`. Se probó antes en un banco aislado con los 13 primeros días de
+septiembre (`calibracion_si/verificacion_2026-09-14/`): el 22 % de las celdas
+quemadas del día y el 37 % de los incidentes MITECO cayeron en EXTREMO, que
+ocupaba entre el 0.2 y el 1.6 % de España; en ALTO o EXTREMO, el 66 y el 78 %.
+Esas 13 imágenes entran en `publicado/`. Para que la cadena tenga los partes de
+septiembre hay que subir al Release `estado` un diario con `salida/miteco/`
+(los PDF están en el Release de `tfm-fuego-malla`); `puntuar_effis` y `dos_15`
+importan `historico`, que no está en este repositorio, y el script les da un
+módulo vacío.

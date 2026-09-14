@@ -3,7 +3,9 @@ name: Mapa diario (r10, hoy y mañana)
 # Cada mañana: reanálisis ERA5-Land hasta D-7, previsión IFS hasta D+1, mapa
 # del modelo de producción (referencia) y de los candidatos, y el producto
 # final: dos imágenes (hoy y mañana), cada una con el r10 en escala absoluta
-# y cifra del día, y el r10 por percentil del día. El estado entre
+# y cifra del día, y el r10 por percentil del día. Después, la verificación:
+# los mapas de los últimos días redibujados con los perímetros EFFIS y los
+# incidentes MITECO que ya se conocen (verificado_<fecha>.png). El estado entre
 # corridas (reanálisis acumulado, mapas) vive en el Release `estado`
 # (07_produccion/gh_estado.py). Secretos: CDSAPI_KEY y FIRMS_MAP_KEY.
 
@@ -73,6 +75,10 @@ jobs:
       - name: "Producto final: mapas de hoy y mañana (escala absoluta y percentil)"
         run: python -u 07_produccion/mapas_hoy_manana.py
 
+      - name: "Verificación: la verdad (EFFIS y MITECO) sobre los mapas de los últimos días"
+        continue-on-error: true
+        run: timeout 30m python -u 07_produccion/verificar_mapas.py --refrescar --ultimos 20
+
       - name: Guardar estado (Release)
         if: always()
         run: python 07_produccion/gh_estado.py push
@@ -82,9 +88,11 @@ jobs:
         run: |
           mkdir -p publicado
           cp -f salida/mapas_*.png salida/mapas_*.json publicado/ 2>/dev/null || true
-          # los diez últimos días con fecha, más mapas_hoy / mapas_manana con nombre fijo
-          ls -t publicado/mapas_2*.png 2>/dev/null | tail -n +11 | xargs -r rm -f
-          ls -t publicado/mapas_2*.json 2>/dev/null | tail -n +11 | xargs -r rm -f
+          cp -f salida/verificado_*.png salida/verificacion.csv publicado/ 2>/dev/null || true
+          # los veinte últimos días con fecha (limpio y verificado), más mapas_hoy / mapas_manana
+          ls -t publicado/mapas_2*.png 2>/dev/null | tail -n +21 | xargs -r rm -f
+          ls -t publicado/mapas_2*.json 2>/dev/null | tail -n +21 | xargs -r rm -f
+          ls -t publicado/verificado_2*.png 2>/dev/null | tail -n +21 | xargs -r rm -f
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add publicado/

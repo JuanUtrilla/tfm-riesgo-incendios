@@ -446,11 +446,27 @@ en los veranos evaluados quedan 7,301 de las 28,135 celdas-día marcadas.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.6\textwidth]{anexo_a_prevalencia.png}
+  \includegraphics[width=.52\textwidth]{anexo_a_prevalencia.png}
   \caption{(a)~Celdas-día con fuego por cada 100,000, año completo y verano, en
   escala logarítmica, frente a la proporción de positivos del primer diseño.
   (b)~Probabilidad de que una celda siga marcada como quemada $k$ días después.}
   \label{fig:an-prev}
+\end{figure}
+
+El análisis exploratorio motivó también el FWI en percentil local
+(figura~\ref{fig:an-norm}). En los días de incendio, el FWI mediano va de 3
+en Asturias y Cantabria a 41 en Andalucía, y ningún umbral absoluto sirve para
+toda la península. Expresado como percentil respecto a la historia de cada
+celda, el mismo dato se concentra entre 72 y 92 en las ocho comunidades con más
+incendios. Añadir el percentil al FWI absoluto aumentó el AUC-PR en 0.042.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.6\textwidth]{anexo_a_normalizacion.png}
+  \caption{FWI en los días de incendio del periodo de entrenamiento, por
+  comunidad autónoma. (a)~Valor absoluto. (b)~Percentil respecto a la historia
+  de la propia celda.}
+  \label{fig:an-norm}
 \end{figure}
 
 
@@ -744,6 +760,20 @@ día; las de hoy aparecen en la portada del repositorio y los diez últimos día
 quedan en la carpeta \texttt{publicado/}. Durante el verano de 2026 la misma
 cadena corrió en un repositorio previo y publicó, además, los mapas de los
 otros candidatos.
+
+La verdad llega después del mapa: el parte del MITECO del día D se publica el
+D+1 y los perímetros de EFFIS tardan entre seis y nueve días. Por eso cada
+corrida redibuja también los mapas de los veinte días anteriores con lo que ya
+se conoce, sin tocar el original. De cada fecha quedan dos imágenes: la que se
+predijo y la misma con los perímetros de EFFIS y los incidentes del MITECO
+encima. El parte del MITECO solo da el municipio del incidente, así que se
+sitúa en su centroide, con un error de 5 a 15~km, y se juzga con un radio de
+10~km: el mejor nivel del mapa dentro de ese círculo. Es el mismo parte que
+alimenta el módulo de consulta del sistema, de modo que el documento que el
+asistente lee es el que verifica el mapa. En los trece primeros días de
+septiembre de 2026, con el nivel extremo entre el 0.2 y el 1.6~\% de España,
+cayó en él el 22~\% de las celdas quemadas del día y el 37~\% de los
+incidentes del MITECO; en alto o extremo, el 66 y el 78~\%.
 
 \begin{figure}[H]
   \centering

@@ -468,6 +468,7 @@ No tienen fila con md5 porque no son copia de ningún otro repositorio:
 | `01_datos/miteco/__init__.py` | Vacío; hace importable la carpeta |
 | `docs/MEMORIA/figs/scripts/*.py` | Los scripts que generan las figuras de la memoria |
 | `07_produccion/mapas_hoy_manana.py` | El producto final de la cadena: escala absoluta, cifra del día y percentil sobre las puntuaciones del día, hoy y mañana. Escrito aquí el 13/09/2026 como `mapa_r10_semaforo.py`; el semáforo se quitó y el script se renombró el 14/09/2026 |
+| `07_produccion/verificar_mapas.py` | Los mapas de los últimos días redibujados con los perímetros EFFIS y los incidentes MITECO ya conocidos. Escrito aquí el 14/09/2026 a partir del banco `calibracion_si/verificacion_2026-09-14/`; usa `capa_verdad.py`, `puntuar_effis.refrescar` y `dos_15.descargar/incidentes` sin modificarlos |
 | `.github/workflows/mapa_diario.yml`, `requirements_gh.txt` | El workflow de la cadena diaria en este repositorio, derivado del de `tfm-fuego-malla` |
 
 ## Incorporación del 14/09/2026 — escala del servicio, cifra del día y captura

@@ -24,7 +24,8 @@ gh_reanalisis.py           ERA5-Land del mes en curso, incremental, hasta D-7 (C
 malla_02b_ifs.py           previsión IFS en los 5,605 nodos, de D-6 a D+1 (Open-Meteo)
 riesgo_hoy.py              mapa de referencia: el modelo de producción sobre la malla
 dos_riesgo_hoy.py          mapas de los candidatos; de aquí sale la puntuación del r10
-mapas_hoy_manana.py       el producto: r10 en escala absoluta + cifra del día + percentil, PNG y JSON
+mapas_hoy_manana.py        el producto: r10 en escala absoluta + cifra del día + percentil, PNG y JSON
+verificar_mapas.py         la verdad (EFFIS, MITECO) sobre los mapas de los 20 últimos días
 gh_estado.py push          guarda el estado; publicado/ se sube a git
 ```
 
@@ -48,6 +49,37 @@ formas.
 Junto al mapa absoluto va la cifra del día: el porcentaje de España en EXTREMO
 y su posición entre los 250 días de referencia.
 
+## La verificación: lo que se predijo y lo que pasó
+
+La verdad llega con retraso: el parte del MITECO del día D sale el D+1 hacia
+las 14 h y los perímetros de EFFIS tardan entre seis y nueve días. Por eso cada
+corrida, después de los mapas del día, vuelve a dibujar los de los veinte días
+anteriores con la verdad que ya se conoce (`verificar_mapas.py`). El mapa
+original no se toca: por cada fecha hay `mapas_<fecha>.png` (lo que se
+predijo) y `verificado_<fecha>.png` (lo mismo con lo que ocurrió encima).
+
+![Verificación del 6 de septiembre de 2026](../publicado/verificado_2026-09-06.png)
+
+*El mapa del 6 de septiembre con los perímetros EFFIS de ese día (contorno) y los incidentes del parte MITECO (triángulos). Los incendios grandes del norte caen sobre EXTREMO.*
+
+Lo que se dibuja:
+
+- Perímetros EFFIS con fecha D, en contorno grueso, y con fecha D+1 en trazo
+  fino discontinuo, porque la fecha de EFFIS es la de detección por satélite y
+  un fuego de la tarde aparece a menudo con el día siguiente.
+- Incidentes del parte del MITECO del día D: un triángulo en el centroide del
+  municipio, que es lo único que da el parte, con un error de 5 a 15 km. Por
+  eso se juzgan con un radio de 10 km alrededor: el mejor nivel del mapa dentro
+  de ese círculo. Es el mismo criterio con el que se puntuó durante la
+  temporada (`dos_15_veredicto_miteco.py`) y el mismo parte que alimenta el
+  módulo de consulta del TFM.
+- FIRMS no se dibuja: es variable del modelo, no juez.
+
+`publicado/verificacion.csv` guarda, por día, en qué nivel cayó cada verdad.
+En los 13 primeros días de septiembre de 2026, con EXTREMO entre el 0.2 y el
+1.6 % de España, cayó en EXTREMO el 22 % de las celdas quemadas del día y el
+37 % de los incidentes MITECO (a 10 km); en ALTO o EXTREMO, el 66 % y el 78 %.
+
 Los cortes y la referencia están en `escala_servicio.json` y se calibraron con
 los mapas servidos del replay de 2025 y 2026. Los del cubo
 (`05_iteracion2/56_calibracion/dos_27_escala_absoluta.py`) no sirven para el mapa
@@ -67,6 +99,7 @@ en uno de cada tres días con incendio grande.
 | `riesgo_hoy.py` | Construye las 46 variables en los nodos (reanálisis, IFS, climatologías, FIRMS), puntúa el modelo de producción sobre las 498,530 celdas y dibuja el mapa | El mapa de referencia |
 | `dos_riesgo_hoy.py` | Lo mismo con los modelos de etiqueta EFFIS: único, r10, pareja y dónde. Con `--pasada <fecha>` repite un día pasado | La puntuación del r10 de cada día |
 | `mapas_hoy_manana.py` | Lee la puntuación del r10, aplica la escala absoluta y el percentil del día, calcula la cifra del día y escribe el PNG y el JSON que se publican | El producto final |
+| `verificar_mapas.py` | Descarga los perímetros EFFIS de la temporada y el parte MITECO del día, regenera `miteco_incidentes.csv` y redibuja los mapas de los últimos días con esa verdad encima | `verificado_<fecha>.png` y `verificacion.csv` en `publicado/` |
 | `escala_servicio.json` | Cortes de la escala absoluta y serie de referencia de la cifra del día | Lo lee `mapas_hoy_manana.py` |
 | `gh_estado.py` | Baja y sube el estado de la cadena a un Release de GitHub | Persistencia entre corridas |
 | `gh_exportar_estado.py` | Exporta desde el portátil lo que la cadena necesita del cubo y del disco externo (capas estáticas, climatologías, modelos) | Se ejecutó una vez, y cada vez que cambió un modelo |

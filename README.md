@@ -18,7 +18,11 @@ imagen para hoy y otra para mañana. En cada una, a la izquierda, el modelo
 elegido (r10) en escala absoluta, que indica cuánto riesgo hay, con la cifra del
 día: el porcentaje de España en nivel EXTREMO y su posición entre los días de
 referencia. A la derecha, el mismo modelo por percentil del día, que indica
-dónde mirar. Los diez últimos días quedan en `publicado/`.
+dónde mirar. Los veinte últimos días quedan en `publicado/`, y de cada uno hay
+además una versión verificada (`verificado_<fecha>.png`): el mismo mapa con
+los perímetros de EFFIS y los incidentes del parte del MITECO de ese día
+encima, dibujada días después, cuando esa verdad ya se conoce
+(`07_produccion/README.md`).
 
 ## El resultado en un párrafo
 
