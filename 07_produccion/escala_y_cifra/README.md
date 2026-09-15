@@ -1,9 +1,9 @@
 # Escala absoluta, cifra del día y semáforo descartado
 
-Cómo se decide el color del mapa que publica la cadena diaria y qué significa.
-Cada día se publican dos mapas del r10 (percentil del día y escala absoluta) y
-una cifra: el porcentaje de España en nivel EXTREMO y su posición entre los
-días de referencia.
+Este directorio recoge cómo se decide el color del mapa que publica la cadena
+diaria y qué significa cada nivel. Cada día se publican dos mapas del r10
+(percentil del día y escala absoluta) y una cifra: el porcentaje de España en
+nivel EXTREMO y su posición entre los días de referencia.
 
 ![Los dos mapas del mismo modelo en dos días de 2025](../../docs/MEMORIA/figs/f12_dos_mapas.png)
 
@@ -29,8 +29,9 @@ del replay (`docs/PROCEDENCIA.md`). Se ejecutaron el 14/09/2026 con el entorno
 
 Los cortes se calcularon primero con los diez años del cubo
 (`05_iteracion2/56_calibracion/dos_27_escala_absoluta.py`). En los mapas que
-produce la cadena marcaban muchas más celdas en EXTREMO que el cubo en el
-mismo mes, con previsión y con reanálisis:
+produce la cadena marcaban muchas más celdas en EXTREMO que en el cubo del
+mismo mes, tanto con previsión como con reanálisis. La tabla siguiente da la
+mediana diaria del porcentaje de España en EXTREMO con esos cortes:
 
 | Mes | Cubo 2015-2024 | Servicio 2025, previsión | Servicio 2025, reanálisis | Servicio 2026, previsión |
 |---|---|---|---|---|
@@ -42,11 +43,12 @@ mismo mes, con previsión y con reanálisis:
 
 *Mediana diaria del % de España en EXTREMO con los cortes del cubo.*
 
-La diferencia está en cómo se calculan las variables en servicio (nodos de
+La diferencia se debe a cómo se calculan las variables en servicio (nodos de
 ERA5-Land, filtro de vecinos, climatologías de satélite; `docs/LIMITACIONES.md`
-§8), no en la meteorología. Por eso los cortes publicados salen de los 250 días
-servidos del replay (del 25 de mayo al 1 de noviembre de 2025 y del 25 de mayo
-al 2 de septiembre de 2026):
+§8); la meteorología es la misma. Por eso los cortes publicados se calcularon
+con los 250 días servidos del replay, del 25 de mayo al 1 de noviembre de 2025
+y del 25 de mayo al 2 de septiembre de 2026. La tabla siguiente recoge los
+cortes y lo que significa cada nivel en esos días:
 
 | Nivel | Corte servicio | Corte cubo | Celdas-día | Una quemada de cada | Factor sobre la media | Hectáreas |
 |---|---|---|---|---|---|---|
@@ -55,19 +57,20 @@ al 2 de septiembre de 2026):
 | ALTO | 0.1125 | 0.0736 | 8.0 % | 2,760 | 3.63 | 29.5 % |
 | EXTREMO | 0.4058 | 0.4066 | 2.0 % | 760 | 13.17 | 29.0 % |
 
-El significado cambia entre temporadas. Con cortes calculados solo con 2025 y
-medidos en 2026, en EXTREMO ardió una celda-día de cada 2,560 (factor 3.6); en
-2025 había sido una de cada 550. En 2026 casi todo ardió en nivel ALTO (42.5 %
-de las hectáreas). Hay que recalcular los cortes cuando haya más días servidos,
-sobre todo de diciembre a abril, que ahora no están.
+El significado cambia de una temporada a otra. Con cortes calculados solo con
+2025 y medidos en 2026, en EXTREMO ardió una celda-día de cada 2,560 (factor
+3.6); en 2025 había sido una de cada 550. En 2026 casi todo ardió en nivel
+ALTO (42.5 % de las hectáreas). Hay que recalcular los cortes cuando haya más
+días servidos, sobre todo de diciembre a abril, que ahora no están.
 
 ## La cifra del día
 
-Es el porcentaje de España en EXTREMO ese día, situado entre los 250 días de
-referencia (mediana 1.5 %, percentil 90 4.6 %, máximo 7.2 %).
+La cifra del día es el porcentaje de España en EXTREMO, situado entre los 250
+días de referencia (mediana 1.5 %, percentil 90 4.6 %, máximo 7.2 %).
 
-Capacidad para separar días con incendio grande (al menos cinco celdas nuevas
-quemadas), AUC:
+La tabla siguiente da la capacidad de cuatro señales diarias para separar los
+días con incendio grande (al menos cinco celdas nuevas quemadas), medida como
+AUC (*Area Under the ROC Curve*):
 
 | Datos | Periodo | Calendario | p98 | % EXTREMO | % EXTREMO frente a su mes |
 |---|---|---|---|---|---|
@@ -77,10 +80,10 @@ quemadas), AUC:
 | Servicio | 2025 | 0.738 | — | 0.689 | — |
 | Servicio | 2026 | 0.437 | — | 0.663 | — |
 
-El p98 y el % EXTREMO llevan casi la misma información. Comparar con el mismo
-mes empeora, así que la referencia agrupa todos los días. En plena temporada la
-cifra resume cuánto riesgo marca el mapa, pero no anticipa los días grandes
-mejor que el calendario de forma consistente.
+El p98 y el % EXTREMO llevan casi la misma información. Comparar cada día con
+su mes empeora el resultado, así que la referencia agrupa todos los días. En
+plena temporada la cifra resume cuánto riesgo marca el mapa, pero no anticipa
+los días grandes mejor que el calendario de forma consistente.
 
 ## El semáforo nacional, evaluado y descartado
 
@@ -90,9 +93,10 @@ llegaba a una probabilidad de día grande de 0.155.
 
 ![Curva del semáforo y p98 diario por época](../../docs/MEMORIA/figs/f15_semaforo_curva.png)
 
-Solo tuvo capacidad propia de diciembre a abril (BSS +0.297 en la prueba de
-2024; en verano −0.107, con intervalo que cruza el cero). Variantes fuera de
-calibración:
+El semáforo solo tuvo capacidad propia de diciembre a abril, con BSS (*Brier
+Skill Score*) de +0.297 en la prueba de 2024; en verano dio −0.107, con un
+intervalo que cruza el cero. La tabla siguiente recoge cuatro variantes de la
+puerta, evaluadas fuera de calibración:
 
 | Puerta | Cubo 2022-2024: días sin EXTREMO / días grandes perdidos | Replay 2026: días grandes perdidos / hectáreas |
 |---|---|---|
@@ -105,6 +109,6 @@ calibración:
 
 Se descartó. En verano, apagando el 60 % de los días se perdía el 34.6 % de los
 días grandes con la señal del modelo y el 38.3 % eligiendo los días por
-calendario: el interruptor no compensaba. Un aviso limitado a diciembre-abril
-queda como línea futura, cuando haya mapas servidos de invierno para
-calibrarlo.
+calendario. La puerta no compensaba. Un aviso limitado a
+diciembre-abril queda como línea futura, cuando haya mapas servidos de
+invierno para calibrarlo.

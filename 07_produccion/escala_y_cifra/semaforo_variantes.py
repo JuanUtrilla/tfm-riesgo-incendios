@@ -8,13 +8,16 @@ Solo lectura. Entradas:
   archivo_ifs/replay/replay_<año>_ifs.csv               p98 diario del r10 en el replay
 
 Variantes:
-  V0 actual           beta y umbral globales todo el año (mapa_r10_semaforo.py)
-  V1 sin puerta jun-sep  V0 fuera de verano; en verano siempre se permite EXTREMO
-  V2 puerta solo dic-abr  V0 solo en invierno-primavera; resto siempre EXTREMO
-  V3 umbral por régimen   beta y umbral propios de cada régimen (dos_26)
-  SIN                 sin semáforo (referencia)
+  V0   la que estuvo en servicio hasta el 14/09/2026: beta y umbral globales
+       todo el año (mapa_r10_semaforo.py)
+  V1   sin puerta jun-sep: V0 fuera de verano; en verano siempre se permite EXTREMO
+  V2   puerta solo dic-abr: V0 solo en invierno-primavera; el resto siempre EXTREMO
+  V3   umbral por régimen: beta y umbral propios de cada régimen (dos_26)
+  SIN  sin semáforo (referencia)
 
 Día grande: al menos 5 celdas nuevas quemadas (el objetivo de dos_26).
+Salida: semaforo_variantes.csv junto a este script. Con estos resultados el
+semáforo se retiró de la cadena el 14/09/2026 (ver mapas_hoy_manana.py).
 """
 import json
 import pathlib

@@ -1,66 +1,63 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 5: mapa de riesgo SIN IDW, retrospectivo.
+Pipeline de malla, módulo 5: mapa de riesgo sin IDW, retrospectivo.
 
-NO TOCA PRODUCCIÓN. Escribe eda/malla_mapa_riesgo_<fecha>.png y
+No toca producción. Escribe eda/malla_mapa_riesgo_<fecha>.png y
 dataset/malla_05_riesgo_<fecha>.json.
 
-=============================================================================
-QUÉ CIERRA ESTE MÓDULO
-=============================================================================
+Qué cierra este módulo
+----------------------
 Producción (`mapa_riesgo_hoy.py`) calcula las features meteo por estación
 AEMET y las interpola a la malla de 1 km con IDW k=8. Ese paso nunca se
 validó. Aquí se sustituye por lo que preparan los módulos 1-4: la meteo se
 calcula en los 5.605 nodos de la malla nativa de ERA5-Land y cada celda toma
-el valor de SU nodo. No hay interpolación, no hay huecos y no hay dependencia
-de que una estación concreta reporte.
+el valor de su nodo. No hay interpolación, no hay huecos y no depende de que
+una estación concreta reporte.
 
 Y, sobre todo, `fwi_pctl_local` pasa a tener numerador y denominador de la
-MISMA fuente: FWI de ERA5-Land sobre climatología de ERA5-Land
+misma fuente: FWI de ERA5-Land sobre climatología de ERA5-Land
 (`clim_fwi_nodos.npz`, módulo 4). Ese era el invariante roto que originó todo
 el trabajo: en producción el numerador es AEMET y el denominador el cubo, y
 la división satura al 3,3 %.
 
-El módulo pinta LOS DOS mapas —referencia del cubo y malla ERA5-Land— con
+El módulo pinta los dos mapas (referencia del cubo y malla ERA5-Land) con
 todo lo no-meteo compartido, de modo que la única diferencia entre ellos es
-la fuente de la meteo. Es a la vez la demo visual y la prueba de aceptación.
+la fuente de la meteo. Sirve de demo visual y de prueba de aceptación.
 
-=============================================================================
-POR QUÉ RETROSPECTIVO Y POR QUÉ ESTA FECHA
-=============================================================================
+Por qué retrospectivo y por qué esta fecha
+------------------------------------------
 ERA5-Land es reanálisis: llega con ~6 días de retraso y no da D+1. El mapa de
-HOY/MAÑANA necesita la previsión del módulo 2b, que aún no existe. Retrospectivo
-no necesita 2b y además permite comparar contra el cubo, que es la referencia.
+hoy/mañana necesita la previsión del módulo 2b, que aún no existe. El
+retrospectivo no necesita 2b y permite comparar contra el cubo, que es la
+referencia.
 
 Por defecto 2024-09-17: 97 detecciones FIRMS dentro de España y FRP máximo de
 710 (el mayor de jun-sep 2024), con el cubo cubriendo 2024 y ERA5-Land ya en
 disco para jun-sep. Es verdad-terreno independiente y año fuera del rango de
 entrenamiento (2015-2018).
 
-=============================================================================
-DOS LIMITACIONES, AMBAS MEDIDAS ANTES DE ACEPTARLAS
-=============================================================================
-1. VENTANA CORTA. Solo hay ERA5-Land desde el 1-jun-2024, así que
+Dos limitaciones, ambas medidas antes de aceptarlas
+---------------------------------------------------
+1. Ventana corta. Solo hay ERA5-Land desde el 1-jun-2024, así que
    `dias_sin_lluvia` (ventana de 120 d) se trunca a los días disponibles.
    Medido sobre el cubo para esta fecha: afecta al 0,30 % de las celdas, con
    10 días de diferencia media donde afecta. Despreciable.
 
-2. SPIN-UP DEL FWI. Arrancar la recursión el 1-jun deja el DC bajo. Medido
-   con la MISMA meteo del cubo, arranque 1-ene contra 1-jun al 17-09-2024:
+2. Spin-up del FWI. Arrancar la recursión el 1-jun deja el DC bajo. Medido
+   con la misma meteo del cubo, arranque 1-ene contra 1-jun al 17-09-2024:
    DC 1.023 contra 782, pero el FWI solo cae −0,30 (correlación 0,9999). A
    BUI alto el FWI ya no depende del DC. Aceptable.
 
-`lst` sale del cubo en LOS DOS mapas: es satélite (MODIS), no meteo, y
+`lst` sale del cubo en los dos mapas: es satélite (MODIS), no meteo, y
 ERA5-Land no lo da. Igual que en producción. Lo mismo vegetación, estáticas,
 autorregresivas EGIF, FIRMS y rayos: idénticas en ambos mapas por diseño.
 
-=============================================================================
-NODOS COSTEROS
-=============================================================================
+Nodos costeros
+--------------
 226 nodos (4,0 %) tienen su vecino ERA5-Land más próximo en mar y quedan a
 NaN, como avisaba el módulo 4. Aquí se resuelven con el respaldo que ese
-módulo dejaba pendiente: cada nodo sin dato hereda el nodo TERRESTRE más
-cercano, y lo hereda entero —meteo y climatología del mismo nodo— para no
+módulo dejaba pendiente: cada nodo sin dato hereda el nodo terrestre más
+cercano, y lo hereda entero (meteo y climatología del mismo nodo) para no
 volver a mezclar numerador y denominador de sitios distintos.
 
 Uso:
@@ -105,7 +102,7 @@ def ventanas(fwi, tmx, tmn, hrm, vto, pre):
     """Las 20 features meteo del día final, desde series (dias, puntos).
 
     Réplica exacta de las ventanas de `mapa_riesgo_dia.py`: el día D es el
-    último de cada serie y las medias móviles EXCLUYEN D (`[-8:-1]` = los 7
+    último de cada serie y las medias móviles excluyen D (`[-8:-1]` = los 7
     días previos), igual que en el extractor de entrenamiento.
     """
     F = {}
@@ -150,8 +147,8 @@ def meteo_malla(d, mes, permitir_descarga, mapear=False):
     faltan = [(p.year, p.month) for p in meses
               if not os.path.exists(f"{CRUDO}/era5land_{p.year}{p.month:02d}.nc")]
     if faltan and not permitir_descarga:
-        # No es fatal: la unica feature que mira tan atras es `dias_sin_lluvia`
-        # y el truncado esta medido (0,30 % de celdas). Se avisa y se sigue.
+        # No es fatal: la única feature que mira tan atrás es `dias_sin_lluvia`
+        # y el truncado está medido (0,30 % de celdas). Se avisa y se sigue.
         print("  aviso: sin ERA5-Land para "
               + ", ".join(f"{x}-{y:02d}" for x, y in faltan)
               + " · la ventana se trunca (--permitir-descarga para bajarlos)",
@@ -195,13 +192,13 @@ def meteo_malla(d, mes, permitir_descarga, mapear=False):
     dias = len(fechas)
 
     # --- variante híbrida (--mapear-fwi) -----------------------------------
-    # El modelo se entrenó con el FWI del CUBO y el de ERA5-Land corre más
+    # El modelo se entrenó con el FWI del cubo y el de ERA5-Land corre más
     # alto: alimentarlo crudo es desajuste train/serve. El mapeo de cuantiles
-    # del módulo 3b lo lleva a la escala del cubo. Se aplica SOLO a las
-    # features de NIVEL; el percentil y la anomalía se calculan abajo con el
-    # FWI SIN mapear contra la climatología SIN mapear, que es donde el sesgo
+    # del módulo 3b lo lleva a la escala del cubo. Se aplica solo a las
+    # features de nivel; el percentil y la anomalía se calculan abajo con el
+    # FWI sin mapear contra la climatología sin mapear, que es donde el sesgo
     # se cancela por construcción y donde mapear rompería el invariante.
-    # El mapeo es monótono pero no lineal: hay que mapear la SERIE y luego
+    # El mapeo es monótono pero no lineal: hay que mapear la serie y luego
     # promediar, no al revés.
     if mapear:
         mp = np.load(f"{DATA}/mapeo_fwi.npz")
@@ -234,7 +231,7 @@ def meteo_malla(d, mes, permitir_descarga, mapear=False):
         arbol = cKDTree(np.column_stack([la[bueno], lo[bueno]]))
         _, k = arbol.query(np.column_stack([la[malo], lo[malo]]))
         origen = bueno[k]
-        for v in F:                       # el nodo se hereda ENTERO
+        for v in F:                       # el nodo se hereda entero
             F[v][malo] = F[v][origen]
         print(f"  nodos sin dato con respaldo terrestre: {n_malo} "
               f"({n_malo/len(la)*100:.1f} %)", flush=True)
@@ -242,7 +239,7 @@ def meteo_malla(d, mes, permitir_descarga, mapear=False):
 
 
 def a_celdas(F, idx_nodo):
-    """Cada celda toma el valor de SU nodo. Sin IDW, sin pesos, sin vecinos."""
+    """Cada celda toma el valor de su nodo. Sin IDW, sin pesos, sin vecinos."""
     seg = np.clip(idx_nodo, 0, None)
     fuera = idx_nodo < 0
     out = {}
@@ -293,9 +290,9 @@ def meteo_cubo(ds, t, mes, ny, nx):
 
 # ------------------------------------------------------- resto del mapa
 def compartidas(ds, d, t, anio, mes, dia_anio, ny, nx, xs, ys):
-    """Todo lo NO meteo: vegetación, estáticas, EGIF, FIRMS y rayos.
+    """Todo lo no meteo: vegetación, estáticas, EGIF, FIRMS y rayos.
 
-    Es la variable de CONTROL del experimento: idéntica en los dos
+    Es la variable de control del experimento: idéntica en los dos
     mapas, así la única diferencia entre ellos es la fuente meteo.
     Devuelve (B, firms, fd, tr) porque el FIRMS del propio día y el
     transformador se reutilizan luego para la métrica y la figura."""

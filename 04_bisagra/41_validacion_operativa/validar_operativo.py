@@ -1,59 +1,57 @@
 #!/usr/bin/env python3
 """
-Evaluación operativa del modelo: tres verdades-terreno independientes, cinco
-scores en competencia e intervalos de confianza por remuestreo de días.
+Evaluación operativa del modelo sobre la temporada 2026: tres verdades-terreno
+independientes, cinco scores en competencia e intervalos de confianza por
+remuestreo de días. Es una comprobación complementaria; la validación del
+trabajo es el replay de 2025-2026.
 
-=============================================================================
-QUÉ ARREGLA RESPECTO A LAS VALIDACIONES ANTERIORES
-=============================================================================
+Qué arregla respecto a las comprobaciones anteriores
 
-1. PSEUDO-REPLICACIÓN (el sesgo detectado en la bitácora §25).
-   FIRMS da una fila por PÍXEL: un mega-incendio en zona de riesgo alto aporta
+1. Pseudo-replicación (el sesgo detectado en la bitácora §25).
+   FIRMS da una fila por píxel: un mega-incendio en zona de riesgo alto aporta
    más de mil aciertos y domina el día. Aquí las detecciones se agrupan en
-   EVENTOS (DBSCAN espacio-temporal) y cada evento cuenta una vez, en su día de
-   PRIMERA detección — que es el día de ignición, no el de máxima extensión.
+   eventos (DBSCAN espacio-temporal) y cada evento cuenta una vez, en su día de
+   primera detección, que es el día de ignición y no el de máxima extensión.
 
-2. FALTABAN LOS BASELINES QUE IMPORTAN.
+2. Faltaban los baselines que importan.
    Hasta ahora el modelo competía contra el FWI y contra el azar. En
-   verificación operativa el listón real es la CLIMATOLOGÍA: la tasa histórica
+   verificación operativa el listón real es la climatología: la tasa histórica
    de incendio de esa zona en esa época del año. Es información gratis; un
-   sistema que no la bate no aporta nada. Se añade también PERSISTENCIA
+   sistema que no la bate no aporta nada. Se añade también la persistencia
    (¿hubo fuego cerca en los últimos 7 días?), el otro baseline barato clásico.
 
-3. NO HABÍA INCERTIDUMBRE.
+3. No había incertidumbre.
    Con unas decenas de eventos, un lift de 2,3× tiene un intervalo ancho. Se
-   calcula por BOOTSTRAP DE BLOQUES sobre los días (no sobre estación-día: las
+   calcula por bootstrap de bloques sobre los días (no sobre estación-día: las
    estaciones del mismo día están fuertemente correlacionadas y remuestrearlas
    por separado daría intervalos falsamente estrechos).
 
-4. EL RADIO ERA ARBITRARIO.
+4. El radio era arbitrario.
    Se repite todo a 10 / 25 / 50 km para comprobar que la conclusión no depende
    de una elección de diseño.
 
-=============================================================================
-LAS TRES ETIQUETAS (sus sesgos van en direcciones distintas: si las tres
+Las tres etiquetas (sus sesgos van en direcciones distintas: si las tres
 coinciden, la conclusión es robusta; si discrepan, la discrepancia informa)
-=============================================================================
+
   effis   perímetro de área quemada cartografiado, con fecha estimada de inicio
           y superficie. La mejor: geometría real y umbral de completitud
-          explícito. Latencia de días → se excluyen los últimos.
+          explícito. Tiene latencia de días, así que se excluyen los últimos.
   miteco  partes oficiales de actuaciones: incendios con despliegue de medios
           del Ministerio. Sesgo a grandes; localización a nivel de municipio.
   firms   eventos VIIRS agrupados: cobertura completa y sin criterio humano,
           pero ciego a fuegos pequeños o bajo nubes.
 
-=============================================================================
-LOS CINCO SCORES
-=============================================================================
+Los cinco scores
+
   modelo        probabilidad de XGBoost (la previsión sellada)
-  fwi           FWI absoluto — el estándar internacional
-  fwi_pctl      percentil local del FWI — la contribución del TFM, aislada
+  fwi           FWI absoluto, el estándar internacional
+  fwi_pctl      percentil local del FWI, la aportación del TFM aislada
   climatologia  tasa histórica de incendio EGIF 2015-2020 a <25 km en esa
-                ventana del calendario. SIN meteorología: es "lo que pasa
+                ventana del calendario. Sin meteorología: es "lo que pasa
                 normalmente aquí por estas fechas"
   persistencia  detecciones FIRMS a <50 km en los 7 días previos (ya venía en
-                los CSV sellados). ⚠️ Con la etiqueta `firms` es parcialmente
-                circular (misma fuente): interpretar solo con effis/miteco.
+                los CSV sellados). Ojo: con la etiqueta `firms` es parcialmente
+                circular (misma fuente); interpretar solo con effis/miteco.
 
 Uso:
     python3 validar_operativo.py                       # todo, radio 25 km
@@ -94,7 +92,7 @@ SCORES = {
 }
 # `modelo_clim` no es una fuente: es la media de los percentiles intra-día del
 # modelo y de la climatología. Se incluye porque, si ambos rinden parecido pero
-# aciertan en días distintos, combinarlos debería batir a los dos — y eso sería
+# aciertan en días distintos, combinarlos debería batir a los dos, y eso sería
 # una mejora operativa inmediata sin reentrenar nada.
 
 
@@ -117,7 +115,7 @@ def previsiones(tipo: str = "prevision_D0") -> list:
 # etiquetas
 # --------------------------------------------------------------------------- #
 def perimetros_effis(area_min: float):
-    """Perímetros proyectados a 3035, indexados por día de INICIO."""
+    """Perímetros proyectados a 3035, indexados por día de inicio."""
     from pyproj import Transformer
     from shapely.geometry import shape
     from shapely.ops import transform as sh_transform
@@ -153,7 +151,7 @@ def etiqueta_effis(prev, polis, radio_km):
 
 
 def eventos_firms() -> pd.DataFrame:
-    """Agrupa las detecciones VIIRS en eventos y devuelve UNA fila por evento:
+    """Agrupa las detecciones VIIRS en eventos y devuelve una fila por evento:
     su día de primera detección y el centroide de las detecciones de ese día.
 
     Es la corrección de la pseudo-replicación: el incendio de Zamora que produjo
@@ -218,7 +216,7 @@ def climatologia(est: pd.DataFrame, radio_km: float, ventana_dias: int = 10):
 
     Es el baseline honesto de un sistema operativo: "lo que pasa normalmente
     aquí por estas fechas", sin mirar la meteorología del día. Se construye con
-    EGIF 2015-2020 —años anteriores a la evaluación— así que no puede contener
+    EGIF 2015-2020 (años anteriores a la evaluación), así que no puede contener
     información del periodo evaluado.
     """
     from pyproj import Transformer
@@ -293,17 +291,17 @@ def _metricas_np(y: np.ndarray, p: np.ndarray) -> dict:
 
 
 def bootstrap(t: pd.DataFrame, cols: list, B: int, rng) -> tuple:
-    """Bootstrap de bloques por DÍA, para TODOS los scores a la vez.
+    """Bootstrap de bloques por día, para todos los scores a la vez.
 
     Dos decisiones que cambian las conclusiones:
 
-    1. EL BLOQUE ES EL DÍA. Las ~684 estaciones de una misma jornada comparten
+    1. El bloque es el día. Las ~684 estaciones de una misma jornada comparten
        la situación sinóptica: tratarlas como independientes daría intervalos
        mucho más estrechos de lo real y sugeriría una precisión que estos datos
        no tienen.
 
-    2. TODOS LOS SCORES SE MIDEN SOBRE EL MISMO REMUESTREO (emparejado). Es lo
-       que permite después calcular la distribución de la DIFERENCIA entre dos
+    2. Todos los scores se miden sobre el mismo remuestreo (emparejado). Es lo
+       que permite después calcular la distribución de la diferencia entre dos
        scores. Comparar dos intervalos por separado y concluir "se solapan,
        luego no hay diferencia" es un error clásico: como ambos se miden sobre
        los mismos días, sus errores están muy correlacionados, y al restar se
@@ -334,13 +332,13 @@ def bootstrap(t: pd.DataFrame, cols: list, B: int, rng) -> tuple:
 
 
 def contraste(muestras: dict, a: str, b: str, metrica: str = "auc_roc") -> dict:
-    """Distribución de la diferencia a − b sobre el MISMO remuestreo.
+    """Distribución de la diferencia a − b sobre el mismo remuestreo.
 
     `p_mejor` es la fracción de réplicas en las que `a` supera a `b`: la lectura
     directa de "qué probabilidad hay de que vaya mejor que". Es una probabilidad
-    BOOTSTRAP, no una posterior bayesiana: mide el respaldo que estos datos dan
-    a que `a` sea superior, y hereda las limitaciones de la muestra — aquí,
-    pocos días y de un solo régimen estacional.
+    bootstrap, no una posterior bayesiana: mide el respaldo que estos datos dan
+    a que `a` sea superior, y hereda las limitaciones de la muestra (aquí,
+    pocos días y de un solo régimen estacional).
     """
     da = np.asarray(muestras[a][metrica], dtype=float)
     db = np.asarray(muestras[b][metrica], dtype=float)
@@ -416,7 +414,7 @@ def main() -> None:
                 d["climatologia"] = [tasa_clim(i, doy) for i in d["idema"]]
                 d["persistencia"] = d.get("n_detec_50km_7d", 0)
                 d["fwi_pctl"] = d.get("fwi_pctl_local", np.nan)
-                # percentil INTRA-DÍA: lo que ordena un operador cada mañana
+                # percentil intra-día: lo que ordena un operador cada mañana
                 for c in SCORES:
                     if c == "modelo_clim":
                         continue
@@ -455,9 +453,9 @@ def main() -> None:
                       flush=True)
 
             # ---- contrastes emparejados: la probabilidad de ir mejor --------
-            # Aquí está la respuesta a "¿va bien o va mal?": no en si los
-            # intervalos se pisan, sino en la distribución de la DIFERENCIA
-            # medida sobre los mismos días.
+            # La respuesta a "¿va bien o va mal?" está en la distribución de la
+            # diferencia medida sobre los mismos días, y no en si los intervalos
+            # se pisan.
             if "modelo" in cols:
                 print(f"\n    ¿El MODELO va mejor que…?   "
                       f"(Δ AUC-ROC emparejado · P(modelo mejor))", flush=True)

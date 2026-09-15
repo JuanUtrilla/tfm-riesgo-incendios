@@ -1,23 +1,23 @@
 # 1 · Datos: nueve fuentes, un cubo y una malla
 
-Este capítulo es común a las dos iteraciones. Entre la primera y la segunda no
-cambian los datos; cambia qué se toma como positivo, qué como negativo y con
-qué verdad se evalúa.
+Este capítulo es común a las dos iteraciones, que usan los mismos datos. Lo que
+cambia entre la primera y la segunda es qué se toma como positivo, qué se toma
+como negativo y con qué verdad se evalúa.
 
 ## Las fuentes
 
 | Carpeta | Fuente | Para qué se usa |
 |---|---|---|
 | `cubo/` | IberFire, datacubo diario de 1 km (29 GB, 261 variables, 2008-2024) | Las 46 variables de entrenamiento de las dos iteraciones |
-| `era5land/` | ERA5-Land (Copernicus/ECMWF), ~9 km | La meteorología: la del cubo al entrenar y la de los 5,605 nodos al servir |
-| `ifs/` | IFS de ECMWF vía Open-Meteo | La previsión de hoy y mañana, donde el reanálisis aún no existe |
-| `aemet/` | AEMET: observación horaria y climatología diaria por estación | La meteorología de la producción de la iteración 1 |
-| `effis/` | EFFIS (Copernicus EMS) | Perímetros de superficie quemada: etiqueta de la iteración 2 y verdad para evaluar |
-| `miteco/` | Parte diario del MITECO | Incidentes con medios del Estado, usados como segunda verdad durante el desarrollo |
-| `firms/` | FIRMS (VIIRS, NASA) | Focos activos de la última semana como variables de entorno |
-| `egif/` | EGIF (vía Civio) | Registro oficial de igniciones: etiqueta de la iteración 1 ([README propio](egif/README.md)) |
+| `era5land/` | ERA5-Land (Copernicus/ECMWF, el *European Centre for Medium-Range Weather Forecasts*), ~9 km | La meteorología: la del cubo al entrenar y la de los 5,605 nodos al servir |
+| `ifs/` | IFS (*Integrated Forecasting System*) de ECMWF vía Open-Meteo | La previsión de hoy y mañana, donde el reanálisis aún no existe |
+| `aemet/` | AEMET (Agencia Estatal de Meteorología): observación horaria y climatología diaria por estación | La meteorología de la producción de la iteración 1 |
+| `effis/` | EFFIS (*European Forest Fire Information System*, Copernicus EMS) | Perímetros de superficie quemada: etiqueta de la iteración 2 y verdad para evaluar |
+| `miteco/` | Parte diario del MITECO (Ministerio para la Transición Ecológica y el Reto Demográfico) | Incidentes con medios del Estado, usados como segunda verdad durante el desarrollo |
+| `firms/` | FIRMS (*Fire Information for Resource Management System*, VIIRS, NASA) | Focos activos de la última semana como variables de entorno |
+| `egif/` | EGIF (Estadística General de Incendios Forestales, vía Civio) | Registro oficial de igniciones: etiqueta de la iteración 1 ([README propio](egif/README.md)) |
 | `extra/` | Carreteras, población, usos del suelo, censo ganadero, rayos WGLC | Variables humanas y estructurales |
-| `comun/` | `config`, `features`, `fwi_canadiense` | Rutas, el orden de las 46 variables y el cálculo del FWI |
+| `comun/` | `config`, `features`, `fwi_canadiense` | Rutas, el orden de las 46 variables y el cálculo del FWI (*Fire Weather Index*) |
 
 ## Qué hace cada script
 
@@ -44,7 +44,7 @@ qué verdad se evalúa.
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
 | `malla_01_nodos.py` | Define los 5,605 nodos de ERA5-Land sobre España y el mapeo de cada celda a su nodo | Base de la rama de malla |
-| `malla_02_descarga.py` | Descarga ERA5-Land horario del CDS y lo agrega a diario (tmax, HR mínima, viento máximo, precipitación) | Meteorología de servicio y de evaluación |
+| `malla_02_descarga.py` | Descarga ERA5-Land horario del CDS (*Climate Data Store*) y lo agrega a diario (tmax, HR mínima, viento máximo, precipitación) | Meteorología de servicio y de evaluación |
 | `malla_04_climatologia.py` | Climatología del FWI por nodo y mes (2008-2014) | El denominador del percentil local en servicio |
 | `malla_06_descarga_historico.py` | ERA5-Land horario 2015-2020 para entrenar con la misma fuente que sirve | Se descartó: el cubo ya es ERA5-Land reprocesado (ver `02_eda`) |
 | `descargar_era5_2026.py` | ERA5-Land horario de 2026 para el experimento de fuentes meteorológicas | `04_bisagra/42` |
@@ -67,7 +67,7 @@ qué verdad se evalúa.
 | `observacion_horaria.py` | Consulta la observación horaria de una estación | Utilidad de desarrollo del colector |
 | `aemet_descarga_historico.py`, `_key2.py`, `_key3.py` | Descargan el histórico climatológico diario de todas las estaciones, repartido entre tres claves de la API | Climatología de FWI por estación |
 | `descargar_historico_aemet.py` | Histórico diario 2015-2025 consolidado en un parquet | Base de la climatología de FWI propia |
-| `descargar_datos_2025_2026.py` | Climatologías diarias de 2025-2026 con arranque en noviembre de 2024, para que el FWI tenga rodaje | Validación por estaciones |
+| `descargar_datos_2025_2026.py` | Climatologías diarias de 2025-2026 con arranque en noviembre de 2024, para que el FWI tenga rodaje | Contraste por estaciones durante el desarrollo de la primera iteración |
 
 ### `effis/`, `firms/`, `miteco/`, `extra/`
 
@@ -97,7 +97,7 @@ malla_02b_ifs.py         la rama de previsión, en los mismos nodos
 Las descargas de AEMET, FIRMS, EGIF y las fuentes extra no dependen unas de
 otras.
 
-## Dos cosas de los datos que condicionan el diseño
+## Dos propiedades de los datos que condicionan el diseño
 
 El FWI del cubo corresponde a las 13 UTC. Se comprobó antes de construir nada
 (`04_bisagra/42_no_es_la_meteo/verificar_hora_fwi.py`) y toda la rama de malla
@@ -106,8 +106,8 @@ alrededor de 2 respecto al entrenamiento.
 
 ERA5-Land da más lluvia que las estaciones: +8.00 mm en 30 días frente a AEMET
 (`04_bisagra/42_no_es_la_meteo/experimento_b_era5.py`). De ahí salen menos días
-sin lluvia, un combustible más húmedo y un FWI 10 puntos más bajo. Es la razón
-de que entrenar y servir con la misma fuente importe tanto.
+sin lluvia, un combustible más húmedo y un FWI 10 puntos más bajo. Por esta
+razón se entrena y se sirve con la misma fuente meteorológica.
 
 ## Ejecutar
 

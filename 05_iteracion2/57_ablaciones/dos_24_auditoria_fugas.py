@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 24: auditoría de FUGA para todos los modelos.
+Dos modelos, paso 24: auditoría de fuga para todos los modelos.
 
 Nace de los tres hallazgos del 31/08/2026 (ventana FIRMS invertida, ventana
 7d/5d train-serve, y ndvi/lst del día D con la firma del incendio dentro).
-Los tres se habrían cazado antes con una prueba automática. Esta es.
+Los tres se habrían cazado antes con una prueba automática, y este script
+es esa prueba.
 
-=============================================================================
-CÓMO SE DISTINGUE UNA FUGA DE UNA CAUSA
-=============================================================================
+Cómo se distingue una fuga de una causa
+---------------------------------------
 En un diseño «dentro del día» la meteo del propio día D es legítima: el calor
-y la sequedad CAUSAN el incendio. Lo que no es legítimo es una feature que
-CAMBIA PORQUE el incendio ya está ardiendo. Estadísticamente las dos cosas
+y la sequedad causan el incendio. Lo que no es legítimo es una feature que
+cambia porque el incendio ya está ardiendo. Estadísticamente las dos cosas
 mueven la feature el día D, así que mirar solo el salto no distingue nada.
 
-Lo que sí las separa es la ESCALA ESPACIAL. La meteo es regional: el día que
+Lo que sí las separa es la escala espacial. La meteo es regional: el día que
 sube la temperatura, sube en toda la comarca, en la celda que arde y en sus
 vecinas. El daño del fuego es local: solo la celda que arde. Así que se mide
 
@@ -30,10 +30,10 @@ calor del propio fuego revierte.
 Después el índice se pondera por el `gain` de cada feature en cada modelo, y
 sale el % de cada modelo que se apoya en señal concurrente.
 
-Las features de ventana (`*_7d`, `*_30d`, historia, FIRMS) son limpias POR
-CONSTRUCCIÓN — `slice(t-7, t)` y `< d` — y se marcan como tales sin medirlas.
+Las features de ventana (`*_7d`, `*_30d`, historia, FIRMS) son limpias por
+construcción (`slice(t-7, t)` y `< d`) y se marcan como tales sin medirlas.
 
-NO TOCA PRODUCCIÓN. Escribe salida/dos_24_auditoria_fugas.{json,csv}.
+No toca producción. Escribe salida/dos_24_auditoria_fugas.{json,csv}.
 """
 
 import json
@@ -47,15 +47,13 @@ import config
 import config_expansion as ce
 from dos_05_modelos import FULL
 
-# =========================================================================
-# EL CRITERIO QUE MANDA: ¿PUEDE LA FUENTE VER EL FUEGO?
-# =========================================================================
-# La estadística sola no basta. ERA5-Land es un REANÁLISIS: asimila
+# Criterio principal: ¿puede la fuente ver el fuego?
+# La estadística sola no basta. ERA5-Land es un reanálisis: asimila
 # observaciones atmosféricas, no incendios; su temperatura del día D no puede
 # contener el fuego aunque se desplace localmente (los fuegos empiezan donde
-# hace localmente más calor — eso es causa, no fuga). Los productos
-# SATELITALES de superficie (LST, NDVI, LAI, SWI) sí observan el suelo, y por
-# tanto ven la quema el mismo día. Por eso una feature solo es CONCURRENTE si
+# hace localmente más calor, y eso es causa, no fuga). Los productos
+# satelitales de superficie (LST, NDVI, LAI, SWI) sí observan el suelo, y por
+# tanto ven la quema el mismo día. Por eso una feature solo es concurrente si
 # (a) su fuente observa la superficie y (b) el desplazamiento local es real.
 FUENTE = {"FWI": "reanálisis", "t2m_max": "reanálisis", "t2m_min": "reanálisis",
           "RH_min": "reanálisis", "wind_speed_max": "reanálisis",
@@ -63,7 +61,7 @@ FUENTE = {"FWI": "reanálisis", "t2m_max": "reanálisis", "t2m_min": "reanálisi
           "LST": "satélite", "NDVI": "satélite", "LAI": "satélite",
           "SWI_010": "satélite"}
 
-# feature del modelo -> variable del cubo leída EN EL DÍA D
+# feature del modelo -> variable del cubo leída en el día D
 DIA_D = {"fwi": "FWI", "t2m_max": "t2m_max", "t2m_min": "t2m_min",
          "rh_min": "RH_min", "viento_max": "wind_speed_max",
          "precip_dia": "total_precipitation_mean", "lst": "LST",
@@ -94,11 +92,11 @@ N_MUESTRA = 600
 R_MIN_KM, R_MAX_KM = 50, 150
 # Dos varas, porque miden cosas distintas y hacen falta las dos:
 #   d  = tamaño de efecto por celda (media / desviación). Cuánto puede
-#        explotarlo el modelo en UNA celda concreta.
+#        explotarlo el modelo en una celda concreta.
 #   t  = media / error estándar. Si el desplazamiento es real o es ruido.
-# Una feature es CONCURRENTE si el desplazamiento es real (|t| ≥ 4) Y tiene
+# Una feature es concurrente si el desplazamiento es real (|t| ≥ 4) y tiene
 # tamaño suficiente para que el árbol lo use (|d| ≥ 0,10). Con |t| ≥ 4 pero
-# d minúsculo se marca MARGINAL: real pero probablemente inocuo.
+# d minúsculo se marca marginal: real pero probablemente inocuo.
 UMBRAL_T, UMBRAL_D = 4.0, 0.10
 SEMILLA = 20260831
 

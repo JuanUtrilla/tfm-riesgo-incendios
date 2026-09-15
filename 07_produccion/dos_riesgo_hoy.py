@@ -1,48 +1,49 @@
 #!/usr/bin/env python3
 """
-Mapa de HOY y MAÑANA con los modelos de etiqueta EFFIS sobre la malla
-ERA5-Land. Candidato a producción; corre EN PARALELO con `riesgo_hoy.py`.
+Mapa de hoy y mañana con los modelos de etiqueta EFFIS sobre la malla
+ERA5-Land. Candidato a producción; corre en paralelo con `riesgo_hoy.py`.
 
-NO TOCA PRODUCCIÓN. Escribe salida/dos_riesgo_<fecha>.{npz,png,json}.
+No toca producción. Escribe salida/dos_riesgo_<fecha>.{npz,png,json}.
 
-=============================================================================
-QUÉ SIRVE
-=============================================================================
+Qué sirve
+---------
 Misma cadena que `riesgo_hoy.py` (reanálisis ERA5-Land hasta D−7, IFS D−6→D+1
 con el FWI mapeado a la escala de ERA5-Land, 46 features por celda) y dos
 mapas nuevos en vez del modelo de producción:
 
   unico    `donde_dia_effis`: un XGBoost con las 46 features, muestreo del
-           MISMO DÍA (negativos en otras celdas) y etiqueta EFFIS (`is_fire`
+           mismo día (negativos en otras celdas) y etiqueta EFFIS (`is_fire`
            del cubo = celda quemada ≥5 ha). Train y servicio comparten malla
-           (ERA5-Land → 1 km), features y target. Medido en la temporada 2026:
-           AUC 0,773 contra 0,737 de producción; 0,744 sin FIRMS.
+           (ERA5-Land → 1 km), features y target. Medido durante el
+           seguimiento de la temporada 2026: AUC 0,773 contra 0,737 de
+           producción; 0,744 sin FIRMS.
   pareja   `donde_effis_c` (susceptibilidad por celda, etiqueta EFFIS) ×
            `cuando` (solo dinámicas, etiqueta EGIF: el cuándo con EFFIS salió
            peor, `RESULTADOS_DOS_MODELOS.md`). 0,754 en 2026. Interpretable:
            el mapa estático va aparte.
-  r10      `donde_dia_effis_r10`: EL MISMO modelo que `unico` cambiando solo
-           cuántos negativos del mismo día ve en entrenamiento — 10 por
+  r10      `donde_dia_effis_r10`: el mismo modelo que `unico` cambiando solo
+           cuántos negativos del mismo día ve en entrenamiento, 10 por
            positivo en vez de 3 (`dos_18_ratio.py`, escalera anidada: los
            negativos del 1:3 son un subconjunto de los del 1:10, así que la
            diferencia es cuántos y no cuáles). Añadido el 31/08/2026 como
-           CANDIDATO ADICIONAL: en AUC medio empata con el 1:3 (0,759 vs
-           0,752) pero mete más fuego grande en la punta del día (34 % de los
-           incendios de ≥500 ha en el top-2 % contra 29 %) y sube el percentil
-           ponderado por hectáreas (81,9 vs 79,8). No sustituye al 1:3: este
-           sigue sirviéndose y su serie de jueces no se rompe.
+           candidato adicional: en AUC medio empata con el 1:3 (0,759 frente
+           a 0,752) pero mete más fuego grande en la punta del día (34 % de
+           los incendios de ≥500 ha en el top-2 % contra 29 %) y sube el
+           percentil ponderado por hectáreas (81,9 frente a 79,8). No
+           sustituye al 1:3: este sigue sirviéndose y su serie diaria no se
+           rompe.
 
-Los dos se publican como PERCENTIL DEL DÍA sobre las 498.530 celdas y con
+Los dos se publican como percentil del día sobre las 498.530 celdas y con
 niveles por percentil (p30/p90/p98, `dos_14_cortes.py`): la probabilidad
 cruda de estos modelos no está calibrada a la prevalencia real y el
 producto multiplica dos escalas. La "alerta global" del día (FWI medio
 contra climatología) se guarda como número aparte en el JSON.
 
-Además guarda, si existe, el mapa de la malla con el modelo de producción
+Guarda también, si existe, el mapa de la malla con el modelo de producción
 (`riesgo_hoy_<fecha>.npz`) para pintar los tres juntos.
 
 Uso:
-    python dos_riesgo_hoy.py                 # HOY y MAÑANA (IFS de hoy)
+    python dos_riesgo_hoy.py                 # hoy y mañana (IFS de hoy)
     python dos_riesgo_hoy.py --pasada 2026-08-20 --dias 0 1
 """
 
@@ -67,10 +68,10 @@ from dos_05_modelos import FEATS_CUANDO
 
 CORTES_PCTL = [30, 90, 98]
 NIVELES = ["BAJO", "MODERADO", "ALTO", "EXTREMO"]
-# Escala DISCRETA en vez del degradado continuo. Los cortes operativos
+# Escala discreta en vez del degradado continuo. Los cortes operativos
 # (p30/p90/p98, `dos_14_cortes.py`) son bordes duros del color, así que ALTO y
-# EXTREMO se ven como regiones y no como «un rojo algo más oscuro»; se parten
-# además BAJO y MODERADO en dos tonos cada uno para no perder la textura del
+# EXTREMO se ven como regiones y no como «un rojo algo más oscuro». BAJO y
+# MODERADO se parten en dos tonos cada uno para no perder la textura del
 # mapa, que es lo que se compara entre paneles.
 CORTES_MAPA = [0, 10, 30, 60, 90, 98, 100]
 COLORES_MAPA = ["#ffffd9", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#bd0026"]
@@ -195,9 +196,9 @@ def main(a):
               + (f" · unico~prod {res['spearman_unico_prod_malla']:.2f}"
                  if "spearman_unico_prod_malla" in res else ""), flush=True)
 
-        # Paneles de DIFERENCIA contra producción. Cuatro manchas rojas casi
-        # iguales no se comparan a ojo: el ojo no resta mapas. Lo que hay que
-        # ver es DÓNDE discrepa el candidato, y eso es una resta de
+        # Paneles de diferencia contra producción. Cuatro manchas rojas casi
+        # iguales no se comparan a ojo, porque el ojo no resta mapas. Lo que
+        # hay que ver es dónde discrepa el candidato, y eso es una resta de
         # percentiles con paleta divergente centrada en cero.
         if "pctl_prod_malla" in out:
             for nom in ("unico", "r10", "pareja"):
@@ -227,12 +228,12 @@ def main(a):
         for ax, (key, tit) in zip(ejes_niv, paneles):
             # interpolation="nearest" y dpi 165 (el panel mide 1.188 px, los
             # mismos que la malla): con el "antialiased" por defecto y dpi 130
-            # el render REMUESTREA y funde las celdas EXTREMO sueltas con sus
+            # el render remuestrea y funde las celdas EXTREMO sueltas con sus
             # vecinas. Medido el 23/08 sobre el mapa del 22: 8.816 píxeles en
             # color EXTREMO con el ajuste viejo contra 22.620 con este, y el
             # 74 % de las manchas EXTREMO son de 1-2 celdas, o sea que lo que
-            # se borraba era la mayoría de los avisos distintos. De regalo, el
-            # PNG pesa menos: colores planos comprimen mejor.
+            # se borraba era la mayoría de los avisos distintos. El PNG pesa
+            # menos, porque los colores planos comprimen mejor.
             im = ax.imshow(out[key], origin="lower" if ys[1] > ys[0] else "upper",
                            cmap=cmap_niv, norm=norm_niv, interpolation="nearest")
             capa_base.dibujar(ax, out[key].shape[1], out[key].shape[0],
@@ -249,7 +250,7 @@ def main(a):
             ax.set_title(tit, fontsize=11); ax.set_axis_off()
         for ax in rejilla[len(paneles) + len(difs):]:
             ax.set_axis_off()
-        # la barra de niveles cuelga SOLO de la fila de arriba: si se le pasan
+        # la barra de niveles cuelga solo de la fila de arriba: si se le pasan
         # también los ejes de abajo, matplotlib le roba sitio a la unión de
         # ambos y la barra se planta encima del panel de diferencia
         cb = fig.colorbar(im, ax=ejes_niv[:nc], shrink=0.85,

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""F11 - Que mira el r10: valores SHAP sobre el banco de evaluacion.
+"""F11 - Qué mira el r10: valores SHAP sobre el banco de evaluación.
 
 Modelo `donde_dia_effis_r10.ubj` (escalera de `dos_18_ratio.py`, en el disco
 externo `TFM_USB/modelos/`). Filas: el banco `eval_dia` de
-`dataset_effis.parquet` (veranos 2023 y 2024, 1.000 celdas al azar por dia +
+`dataset_effis.parquet` (veranos 2023 y 2024, 1.000 celdas al azar por día +
 las celdas EFFIS quemadas), que el modelo no vio al entrenar, unido a
 `celdas.parquet` como en dos_18. Se muestrean 6.000 filas (semilla 42) y se
 calcula SHAP con TreeExplainer. Izquierda: importancia media |SHAP| de las 15

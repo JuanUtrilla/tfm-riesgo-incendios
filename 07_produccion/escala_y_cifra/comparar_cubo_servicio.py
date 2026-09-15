@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""¿Se trasladan los cortes del cubo a los mapas servidos? (14/09/2026)
+"""Comprueba si los cortes del cubo se trasladan a los mapas servidos (14/09/2026).
 
 Solo lectura. Compara, mes a mes, el % de España en EXTREMO con los cortes de la
 escala absoluta calculados en el cubo (dos_27: EXTREMO >= 0.4066):

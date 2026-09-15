@@ -2,9 +2,9 @@
 """
 Descarga los perímetros de área quemada de EFFIS (Copernicus EMS) para España.
 
-Por qué: la etiqueta de validación por defecto son detecciones VIIRS, que
-mezclan incendio forestal con quema agrícola, industria y falsos positivos.
-EFFIS publica SUPERFICIE CARTOGRAFIADA a partir de MODIS/Sentinel-2: es una
+Por qué: la etiqueta por defecto para contrastar el modelo son detecciones
+VIIRS, que mezclan incendio forestal con quema agrícola, industria y falsos
+positivos. EFFIS publica superficie cartografiada a partir de MODIS/Sentinel-2: es una
 etiqueta mucho más cercana a lo que el modelo aprendió (EGIF).
 
 Servicio: WFS abierto, sin registro ni API key.
@@ -12,11 +12,11 @@ Servicio: WFS abierto, sin registro ni API key.
 Capas útiles (ver GetCapabilities): modis.ba.poly.season (temporada en curso),
 modis.ba.poly.<año> (2016…2025), effis.nrt.ba.poly (NRT).
 
-⚠️ LATENCIA: cartografiar un perímetro lleva días. Los 2-3 últimos días están
-sistemáticamente incompletos — no valides sobre ellos (ver VALIDACION.md).
+Latencia: cartografiar un perímetro lleva días. Los 2-3 últimos días están
+sistemáticamente incompletos; no conviene puntuar sobre ellos (ver VALIDACION.md).
 
 Licencia: datos EFFIS/Copernicus EMS, reutilizables citando la fuente
-(© European Union, Copernicus Emergency Management Service — EFFIS).
+(© European Union, Copernicus Emergency Management Service, EFFIS).
 
 Salida: data/effis_ba_<capa>.geojson (solo España) + resumen por consola.
 Uso: python3 descargar_effis.py [--capa season] [--pais ES]
@@ -57,7 +57,7 @@ def main():
     geo = descargar(args.capa)
     feats = [f for f in geo["features"]
              if f["properties"].get("COUNTRY") == args.pais]
-    for f in feats:                     # solo los campos que usamos
+    for f in feats:                     # solo los campos que se usan
         f["properties"] = {k: f["properties"].get(k) for k in CAMPOS}
 
     destino = RAIZ / "data" / f"effis_ba_{args.capa}_{args.pais}.geojson"

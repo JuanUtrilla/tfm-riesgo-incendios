@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 4: climatología del FWI por nodo, desde ERA5-Land.
+Pipeline de malla, módulo 4: climatología del FWI por nodo, desde ERA5-Land.
 
-NO TOCA PRODUCCIÓN. Escribe malla_data/clim_fwi_nodos.npz.
+No toca producción. Escribe malla_data/clim_fwi_nodos.npz.
 
-=============================================================================
-POR QUÉ ESTE MÓDULO ES EL QUE IMPORTA
-=============================================================================
+Por qué este módulo es el que importa
+-------------------------------------
 `fwi_pctl_local` es una división y todo el problema de producción fue que sus
 dos términos venían de fuentes distintas (numerador AEMET, denominador cubo).
-El invariante que hay que restaurar no es "usar la mejor fuente" sino
-**numerador y denominador de la MISMA fuente**.
+El invariante que hay que restaurar es que numerador y denominador salgan de
+la misma fuente, sea cual sea.
 
 Medido hoy (`malla_03c_aceptacion.py`, ago-sep 2024 fuera de muestra):
 
@@ -19,54 +18,52 @@ Medido hoy (`malla_03c_aceptacion.py`, ago-sep 2024 fuera de muestra):
         ERA5-Land crudo           0,3 %   ← ya resuelto
         AEMET (producción hoy)    3,3 %
 
-    pero ERA5-Land corre FRÍO: sesgo −3,83 y percentil mediano 31,0
+    pero ERA5-Land corre frío: sesgo −3,83 y percentil mediano 31,0
     frente a 42,9 de la referencia → infraalertaría.
 
-Ese sesgo NO se arregla con mapeos: se probaron dos y fuera de muestra
+Ese sesgo no se arregla con mapeos: se probaron dos y fuera de muestra
 empeoraban (el del FWI daba +5,78 de sesgo y subía la saturación a 1,4 %).
-Se arregla construyendo el denominador con ERA5-Land, y entonces **el
-desplazamiento se cancela por construcción**.
+Se arregla construyendo el denominador con ERA5-Land, y entonces el
+desplazamiento se cancela por construcción.
 
 Comprobado con los 58 meses ya en disco (2008-01→2012-10): frente a la
 referencia del cubo, la mediana va −3 a −9 (el sesgo frío esperado) pero el
-**p95 clava la referencia: +0,1 / −0,2 / −0,2 en jul/ago/sep**. La cola alta,
-que es donde viven las alertas, ya cuadra. Lo que aún no ha convergido es el
-tamaño muestral: de 4 a 5 años el percentil se mueve 2,4-4,7 puntos de media,
-y el suelo de saturación por discretización es 100/(n+1) — 0,66 % con 5 años
-frente a 0,46 % con los 7. De ahí que haya que terminar los 84 meses.
+p95 coincide con la referencia: +0,1 / −0,2 / −0,2 en jul/ago/sep. La cola
+alta, que es donde viven las alertas, ya cuadra. Lo que aún no ha convergido es
+el tamaño muestral: de 4 a 5 años el percentil se mueve 2,4-4,7 puntos de
+media, y el suelo de saturación por discretización es 100/(n+1): 0,66 % con 5
+años frente a 0,46 % con los 7. De ahí que haya que terminar los 84 meses.
 
-=============================================================================
-DISEÑO
-=============================================================================
-· 2008-2014, los MISMOS años que la climatología del cubo (`ANIOS_CLIM` en
+Diseño
+------
+· 2008-2014, los mismos años que la climatología del cubo (`ANIOS_CLIM` en
   `extraer_features_cubo.py`), elegidos en su día por ser previos al dataset
   2015-2020 y no contaminar el entrenamiento.
-· Años COMPLETOS, no solo temporada: el FWI es recursivo y necesita el
+· Años completos, no solo temporada: el FWI es recursivo y necesita el
   spin-up desde enero para que converjan DMC y DC.
-· Climatología POR NODO y POR MES, igual que `clim_fwi/<idema>.npz`, pero en
+· Climatología por nodo y por mes, igual que `clim_fwi/<idema>.npz`, pero en
   los 5.605 nodos en vez de en 705 estaciones.
-  ⚠️ 226 nodos (4,0 %) son costeros y su vecino más próximo cae en mar:
-  ERA5-Land no los cubre y quedarán a NaN. NO es cobertura del 100 %;
+  Ojo: 226 nodos (4,0 %) son costeros y su vecino más próximo cae en mar:
+  ERA5-Land no los cubre y quedarán a NaN. No es cobertura del 100 %;
   `malla_05` necesitará un vecino terrestre de respaldo para ellos.
 
-⚠️ DISCO. Quedan ~6,4 GB libres. El horario en crudo de 84 meses son ~5 GB, no
+Disco. Quedan ~6,4 GB libres. El horario en crudo de 84 meses son ~5 GB, no
 cabe con margen. Por eso cada mes se descarga, se agrega a diario, se extrae en
-los nodos y **se borra el horario acto seguido**: el pico es de un mes (~60 MB).
+los nodos y se borra el horario acto seguido: el pico es de un mes (~60 MB).
 
-RESUMIBLE: cada mes deja `_clim/diario_AAAAMM.npz`. Si se corta, se relanza el
+Resumible: cada mes deja `_clim/diario_AAAAMM.npz`. Si se corta, se relanza el
 mismo comando y continúa por el primer mes que falte.
 
-=============================================================================
-LA COLA DE CDS — POR QUÉ LA VERSIÓN ANTERIOR SE ATASCÓ EN 58/84
-=============================================================================
+La cola de CDS: por qué la versión anterior se atascó en 58/84
+--------------------------------------------------------------
 El 20/08 a las 09:35 el script relanzó los 26 meses pendientes y CDS los
-rechazó TODOS en cadena:
+rechazó todos en cadena:
 
     HTTP 400 · "The job has been rejected. Number queued requests for this
     dataset is temporarily limited. Please configure your scripts accordingly"
 
 Consultando la cola con la cuenta (`get_jobs`) se ve la causa exacta: había
-**5 trabajos propios en estado `accepted`** (2012-11 ×2, 2012-12, 2013-01,
+5 trabajos propios en estado `accepted` (2012-11 ×2, 2012-12, 2013-01,
 2013-06) encolados desde hacía dos horas. Con esos 5 ocupando sitio, CDS
 rechaza toda petición nueva sobre el mismo dataset. El `ThreadPoolExecutor`
 no lo veía: lanzaba, cobraba el rechazo como excepción, marcaba el mes como
@@ -74,23 +71,23 @@ no lo veía: lanzaba, cobraba el rechazo como excepción, marcaba el mes como
 
 Qué dice ECMWF (no publican el número, es dinámico):
   · "Limits are set on usage of CDS resources... changed from time to time
-    according to the current workload" — Climate Data Store documentation.
-  · Ante ESTE mismo error, soporte responde: "send the requests sequentially,
+    according to the current workload" (Climate Data Store documentation).
+  · Ante este mismo error, soporte responde: "send the requests sequentially,
     wait for the first one to finish before send the second one"
-    — forum.ecmwf.int/t/api-queued-requests/12203
+    (forum.ecmwf.int/t/api-queued-requests/12203).
   · Best practices de los data stores: tope de peticiones en paralelo, y
-    pasarse **penaliza tu prioridad en la cola**, no solo rechaza.
+    pasarse penaliza la prioridad en la cola, no solo rechaza.
   · "Submit small requests over very large and heavy requests to ensure your
     requests are not penalised in the CDS request queue."
 
 De ahí el diseño de abajo:
 
- 1. NADA de hilos. Un solo bucle que vigila la cola REAL del servidor.
+ 1. Nada de hilos. Un solo bucle que vigila la cola real del servidor.
  2. Tope propio de MAX_COLA=4 trabajos en `accepted`+`running` (el rechazo
     llegó con 5). Solo se envía si se está por debajo.
- 3. **Se ADOPTAN los trabajos que ya están en la cola** en vez de repetirlos:
+ 3. Se adoptan los trabajos que ya están en la cola en vez de repetirlos:
     un trabajo encolado sobrevive a la muerte del proceso y se recupera por
-    su jobID. Los 5 de arriba son meses que necesitamos — pedirlos otra vez
+    su jobID. Los 5 de arriba son meses que hacen falta; pedirlos otra vez
     sería tirar dos horas de cola y ocupar más sitio.
  4. Ante un rechazo, retroceso exponencial (5 min → 60 min) y el tope baja;
     se recupera solo tras varios envíos buenos.
@@ -142,7 +139,7 @@ def ruta_mes(anio, mes):
 
 
 def adopta(c, pend):
-    """Trabajos que YA están en el servidor para meses pendientes.
+    """Trabajos que ya están en el servidor para meses pendientes.
 
     Un trabajo encolado sobrevive a la muerte del proceso: repetirlo tira la
     cola ya consumida y encima ocupa otro hueco del tope. Devuelve
@@ -161,7 +158,7 @@ def adopta(c, pend):
             if k not in pend:
                 continue
             if k in vivos:
-                sobran.append(j["jobID"])      # ya teníamos uno para ese mes
+                sobran.append(j["jobID"])      # ya había uno para ese mes
             else:
                 vivos[k] = j["jobID"]
     for jid in sobran:                       # duplicados: liberan hueco

@@ -2,24 +2,25 @@
 """
 Prepara los datos del panel de validación contra MITECO.
 
-Toma las previsiones SELLADAS del colector y los incendios oficiales del MITECO
+Toma las previsiones selladas del colector y los incendios oficiales del MITECO
 (geocodificados por validar_miteco.py) y precalcula todo lo que necesita el
 panel HTML, para que este sea autocontenido y no dependa de ningún fichero
 externo ni de red.
 
-LA PREGUNTA CENTRAL QUE PERMITE RESPONDER
-Los CSV sellados no traen solo la probabilidad del modelo: traen también `fwi`
-(el índice canónico del sistema canadiense, el estándar internacional) y
-`fwi_pctl_local` (la contribución metodológica del TFM). Es decir, se puede
-comparar PROSPECTIVAMENTE, sobre incendios oficiales y con predicciones
-selladas por commit, si el modelo aporta sobre el índice que ya existe. Eso es
-la tesis del trabajo sometida a su prueba más dura.
+Qué pregunta responde
+Los CSV sellados traen la probabilidad del modelo y también `fwi` (el índice
+del sistema canadiense, el estándar internacional) y `fwi_pctl_local` (el
+percentil local, la aportación metodológica del TFM). Con eso se puede
+comparar de forma prospectiva, sobre incendios oficiales y con predicciones
+selladas por commit, si el modelo aporta algo sobre el índice que ya existe.
+Es una comprobación complementaria de temporada; la validación del trabajo es
+el replay de 2025-2026.
 
-CÓMO SE PUNTÚA (importante para leer el panel)
-La unidad es la ESTACIÓN-DÍA. Cada día, las ~684 estaciones se ordenan por
-score y se convierten a percentil DENTRO DE ESE DÍA. Después se agrupan todos
-los días. Así se mide lo que de verdad hace un operador: "hoy, ¿a qué zonas
-miro?", sin que un día de ola de calor —en el que todo el país puntúa alto—
+Cómo se puntúa (importa para leer el panel)
+La unidad es la estación-día. Cada día, las ~684 estaciones se ordenan por
+score y se convierten a percentil dentro de ese día. Después se agrupan todos
+los días. Así se mide lo que hace un operador cada mañana ("hoy, ¿a qué zonas
+miro?") sin que un día de ola de calor, en el que todo el país puntúa alto,
 arrastre la estadística. Es más exigente que agrupar las probabilidades crudas.
 
 Salida: dataset/dashboard_miteco.json  (no sobrescribe nada)
@@ -79,7 +80,7 @@ def etiquetar(prev: pd.DataFrame, fuegos_dia: pd.DataFrame) -> np.ndarray:
 
 
 def construir_tabla(tipo_re: str, fuegos: pd.DataFrame) -> pd.DataFrame:
-    """Tabla estación-día con la etiqueta MITECO y el percentil INTRA-DÍA de
+    """Tabla estación-día con la etiqueta MITECO y el percentil intra-día de
     cada score (0 = el de menos riesgo del día, 100 = el de más)."""
     filas = []
     for tipo, dia, df in previsiones(tipo_re):
@@ -117,8 +118,8 @@ def curva_ganancia(t: pd.DataFrame, clave: str, pasos: int = 101) -> list:
 def por_decil(t: pd.DataFrame, clave: str) -> list:
     """Tasa observada de incendio por decil de riesgo previsto (intra-día).
 
-    Es la prueba de que el orden significa algo: la tasa debería crecer de
-    forma monótona del decil 1 al 10.
+    Sirve para comprobar que el orden significa algo: la tasa debería crecer
+    de forma monótona del decil 1 al 10.
     """
     col = f"pctl_{clave}"
     base = float(t.label.mean())
@@ -168,10 +169,10 @@ def niveles_operativos(t: pd.DataFrame) -> list:
 def construir_panel(datos_json: str) -> None:
     """Inyecta los datos en la plantilla y escribe el panel autocontenido.
 
-    Se generan dos versiones del MISMO contenido:
-      · panel_validacion_miteco.html — autónomo (doctype + html/head/body), para
+    Se generan dos versiones del mismo contenido:
+      · panel_validacion_miteco.html: autónomo (doctype + html/head/body), para
         abrir con doble clic, como el resto de visores del proyecto.
-      · dataset/panel_miteco_artifact.html — solo el contenido, sin envoltorio,
+      · dataset/panel_miteco_artifact.html: solo el contenido, sin envoltorio,
         que es lo que espera el publicador de artifacts.
     El JSON va embebido: el panel no depende de red ni de ficheros externos.
     """
@@ -207,7 +208,7 @@ def main() -> None:
                     "pct": (h / max(1, h.sum()) * 100).round(2).tolist(),
                     "n": int(h.sum())}
 
-    # --- serie diaria: MITECO vs FIRMS (el hallazgo de pseudo-replicación) ---
+    # --- serie diaria: MITECO vs FIRMS (la pseudo-replicación de FIRMS) ------
     comp = pd.read_csv(DIR / "dataset" / "comparacion_miteco_vs_firms.csv")
     dias = [{"fecha": r.fecha, "n_miteco": int(r.mit_n),
              "n_focos_firms": int(r.firms_n_focos),

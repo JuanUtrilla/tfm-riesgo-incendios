@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 12: tabla maestra con ETIQUETA EFFIS (superficie quemada),
-la misma con la que se valida en operación.
+Dos modelos, paso 12: tabla maestra con etiqueta EFFIS (superficie quemada),
+la misma que se usa en el replay de validación.
 
-NO TOCA PRODUCCIÓN. Lee el cubo; escribe en el disco externo.
+No toca producción. Lee el cubo; escribe en el disco externo.
 
-=============================================================================
-POR QUÉ OTRA ETIQUETA
-=============================================================================
-`dos_09` midió la temporada 2026: el DÓNDE entrenado con igniciones EGIF se
-hunde en los megaincendios, y el entrenado con superficie quemada EFFIS
-(`dos_10`) empata con producción. La validación operativa (EFFIS, `puntuar_effis`)
-mide superficie quemada; el EGIF llega con 2-4 años de retraso y nunca
-servirá para validar. Así que se entrena con la etiqueta que sí se medirá.
+Por qué otra etiqueta
+---------------------
+`dos_09` midió la temporada 2026 sobre los perímetros EFFIS: el dónde
+entrenado con igniciones EGIF se hunde en los megaincendios, y el entrenado
+con superficie quemada EFFIS (`dos_10`) empata con producción. La comparación
+frente a EFFIS (`puntuar_effis`) mide superficie quemada; el EGIF llega con
+2-4 años de retraso y no sirve para medir sobre fechas recientes. Así que se
+entrena con la etiqueta que sí se va a medir.
 
-Positivo: celda con `is_fire`=1 (EFFIS ≥5 ha) en su PRIMER día (`is_fire` en
-t y no en t−1): es la FIREDATE del perímetro, exactamente lo que puntúa
-`quemadas()` en la validación. Un perímetro grande son cientos de celdas el
-mismo día: se limita a 30 por (día, bloque de 100 km) para que un megaincendio
-no sea la mitad del dataset. 2015-2024 (el cubo llega a 2024-12-31).
+Positivo: celda con `is_fire`=1 (EFFIS ≥5 ha) en su primer día (`is_fire` en
+t y no en t−1). Es la FIREDATE del perímetro, justo lo que puntúa
+`quemadas()`. Un perímetro grande son cientos de celdas el mismo día, así que
+se limita a 30 por (día, bloque de 100 km) para que un megaincendio no sea la
+mitad del dataset. Periodo 2015-2024 (el cubo llega a 2024-12-31).
 
 Negativos, los dos diseños de `dos_02`, 1:3 cada uno:
   cuando   misma celda, otro día de los años del mismo split
@@ -29,7 +29,7 @@ Se sortean 4 por positivo; los que caigan en `is_near_fire`=1 (fuego EFFIS a
 Split temporal: train 2015-2022 (incluye el año récord a propósito: es donde
 se aprende el megaincendio), val 2023, test 2024. La temporada 2026 es la
 prueba externa (`dos_09`). `eval_dia`: verano 2024 y 2023, 1.000 celdas al
-azar por día + todas las celdas EFFIS de primer día del día (hasta 60).
+azar por día más todas las celdas EFFIS de primer día de ese día (hasta 60).
 
 Salida: <externo>/dataset/maestra_effis.parquet
 """

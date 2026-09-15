@@ -2,19 +2,19 @@
 """
 Descarga las verdades-terreno para la evaluación operativa del modelo.
 
-Trae DOS fuentes, ninguna de las cuales toca el repo del colector (se guardan
-en dataset/ de este proyecto):
+Trae dos fuentes; ninguna toca el repo del colector (se guardan en dataset/ de
+este proyecto):
 
-1. EFFIS — perímetros de área quemada cartografiados (Copernicus EMS).
+1. EFFIS: perímetros de área quemada cartografiados (Copernicus EMS).
    WFS abierto, sin clave. Es la mejor etiqueta disponible hoy: geometría real
-   del incendio (no el centro de un municipio ni un píxel térmico), fecha
-   estimada de INICIO y superficie en hectáreas, que permite fijar un umbral de
+   del incendio (ni el centro de un municipio ni un píxel térmico), fecha
+   estimada de inicio y superficie en hectáreas, que permite fijar un umbral de
    completitud defendible en vez de asumir que la fuente lo ve todo.
-   ⚠️ Latencia: cartografiar un perímetro lleva días; los últimos 2-3 días están
-   sistemáticamente incompletos y NO deben validarse.
+   Ojo con la latencia: cartografiar un perímetro lleva días; los últimos 2-3
+   días están sistemáticamente incompletos y no deben validarse.
 
-2. FIRMS — detecciones VIIRS NOAA-20/21 del periodo de evaluación, para poder
-   reconstruir EVENTOS (clústeres) en vez de contar píxeles. La copia local
+2. FIRMS: detecciones VIIRS NOAA-20/21 del periodo de evaluación, para poder
+   reconstruir eventos (clústeres) en vez de contar píxeles. La copia local
    llega solo hasta 2026-07-15, antes de la ventana de previsiones selladas.
 
 Uso:

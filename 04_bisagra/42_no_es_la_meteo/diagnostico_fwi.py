@@ -2,11 +2,9 @@
 """
 De dónde sale el factor ~2 entre el FWI de entrenamiento y el de producción.
 
-NO TOCA PRODUCCIÓN. Escribe salida/diagnostico_fwi.json.
+No toca producción. Escribe salida/diagnostico_fwi.json.
 
-=============================================================================
-EL SÍNTOMA
-=============================================================================
+El síntoma
 `dataset/auditoria_train_serve.json` documenta un desplazamiento enorme en las
 features de más peso del modelo:
 
@@ -15,34 +13,30 @@ features de más peso del modelo:
     fwi_med_30d                21,4               52,1      3,29
     fwi_med_7d                 20,1               51,7      2,61
 
-PSI por encima de 0,25 ya se considera desplazamiento grave. El modelo recibe
-en operación un FWI que duplica el que vio al aprender. Es candidato serio a
-explicar por qué el AUC-ROC pasa de 0,89 en test a ~0,60 en operación.
+Un PSI por encima de 0,25 ya se considera desplazamiento grave. El modelo
+recibe en operación un FWI que duplica el que vio al aprender. Es candidato
+serio a explicar por qué el AUC-ROC pasa de 0,89 en test a ~0,60 en operación.
 
-(Una hipótesis previa —que fuese comparar entrenamiento de todo el año contra
-producción de verano— NO se sostiene: la auditoría ya estaba restringida a
-julio-agosto.)
+(Una hipótesis previa, que se estuviera comparando entrenamiento de todo el
+año contra producción de verano, no se sostiene: la auditoría ya estaba
+restringida a julio-agosto.)
 
-=============================================================================
-LA DESCOMPOSICIÓN
-=============================================================================
-Este script mide los tres eslabones sobre las MISMAS celdas y días:
+La descomposición
+Este script mide los tres eslabones sobre las mismas celdas y días:
 
- 1. MUESTRA. El conjunto de entrenamiento (23,7) está por debajo del propio
+ 1. Muestra. El conjunto de entrenamiento (23,7) está por debajo del propio
     cubo sobre España en julio (29-31). Los negativos se muestrean y salen
     con FWI 14,9 en pleno verano: la muestra no representa a España en
     verano, por diseño.
 
- 2. IMPLEMENTACIÓN. Con la MISMA meteo del cubo, el `FWI` del cubo da 31,0 y
-    `fwi_canadiense` —la función que SIRVE— da 43,6. Factor 1,41 con
+ 2. Implementación. Con la misma meteo del cubo, el `FWI` del cubo da 31,0 y
+    `fwi_canadiense` (la función que sirve) da 43,6. Factor 1,41 con
     correlación 0,925. Es el eslabón más grande y el más barato de arreglar.
 
- 3. FUENTE Y AÑO. De 43,6 a los 50,9 de producción queda 1,17: estaciones
+ 3. Fuente y año. De 43,6 a los 50,9 de producción queda 1,17: estaciones
     AEMET en vez de celdas del cubo, y 2026 en vez de 2018.
 
-=============================================================================
-LAS TRES FUENTES SOBRE LOS MISMOS DÍAS Y CELDAS (julio 2024, 300 nodos)
-=============================================================================
+Las tres fuentes sobre los mismos días y celdas (julio 2024, 300 nodos)
 No basta con mirar AEMET: la comparación honesta pone las tres fuentes en las
 mismas celdas y los mismos días.
 
@@ -52,25 +46,23 @@ mismas celdas y los mismos días.
     AEMET + fwi_canadiense (prod.)   50,9              x1,60 vs cubo
 
 Correlación con el cubo: 0,926-0,927 en los dos casos. La relación es fuerte
-pero desplazada, no un error aleatorio.
+pero desplazada; no es un error aleatorio.
 
 Dos lecturas:
 
-· El eslabón dominante es la IMPLEMENTACIÓN, no la fuente: con la MISMA meteo
+· El eslabón dominante es la implementación, no la fuente: con la misma meteo
   del cubo, `fwi_canadiense` da 1,33x. Y está documentado en el propio módulo:
-  el sistema canónico usa valores a MEDIODÍA y aquí se usa tmax/hrMin como
+  el sistema canónico usa valores a mediodía y aquí se usa tmax/hrMin como
   proxy. La cabecera de `fwi_canadiense` avisa de que ese sesgo "se cancela en
-  el percentil local" — y así es (PSI 0,29) — pero NADIE protege a las
-  features de NIVEL, que es donde pega (PSI 1,65).
+  el percentil local", y así es (PSI 0,29), pero nada protege a las features
+  de nivel, que es donde pega (PSI 1,65).
 
-· LA MALLA MEJORA ESTO, no lo empeora. ERA5-Land (39,2) queda más cerca del
+· La malla mejora esto, no lo empeora. ERA5-Land (39,2) queda más cerca del
   entrenamiento que AEMET (50,9): el desplazamiento pasa de x2,15 a x1,65.
   Es un beneficio de la migración que no estaba medido.
 
-=============================================================================
-RESUELTO: EL CUBO ES EL FWI DE LAS 13 UTC
-=============================================================================
-Con ERA5-Land HORARIO en disco se puede calcular el FWI con valores
+Resuelto: el cubo es el FWI de las 13 UTC
+Con ERA5-Land horario en disco se puede calcular el FWI con valores
 instantáneos de cada hora en vez del proxy, y buscar cuál reproduce el cubo
 (julio 2024, 300 nodos, mismos días):
 
@@ -83,47 +75,45 @@ instantáneos de cada hora en vez del proxy, y buscar cuál reproduce el cubo
 
     proxy tmax/hrMin (lo que se sirve)         39,2
 
-El cubo se reproduce con los valores de las 13 UTC — media tarde, la hora de
+El cubo se reproduce con los valores de las 13 UTC, media tarde, la hora de
 máximo peligro. Ni el mediodía canónico (25,1, demasiado bajo) ni el proxy de
 extremos diarios (39,2, demasiado alto).
 
-Por qué el proxy infla: `tmax` y `hr_min` son extremos del día que NO ocurren
+Por qué el proxy infla: `tmax` y `hr_min` son extremos del día que no ocurren
 a la vez. A las 13 UTC coinciden 29,6 °C con 34,7 % de HR; el proxy junta
 30,5 °C con 31,7 %, una combinación que no se da en ninguna hora real.
 
-CONSECUENCIA PRÁCTICA. El desplazamiento más grande de la auditoría no exige
-reentrenar: exige calcular el FWI que se SIRVE a las 13 UTC en vez de con
+Consecuencia práctica. El desplazamiento más grande de la auditoría no exige
+reentrenar: exige calcular el FWI que se sirve a las 13 UTC en vez de con
 extremos diarios. Eso reproduce por construcción la escala con la que el
 modelo aprendió. Hay datos horarios en las dos ramas: ERA5-Land los tiene y
 el colector de AEMET también.
 
-AVISO: `fwi_pctl_local` está hoy protegido porque numerador y climatología
-usan la MISMA receta. Si se cambia la receta hay que rehacer también la
-climatología a las 13 UTC — y el módulo 4 borra el horario tras agregarlo,
+Aviso: `fwi_pctl_local` está hoy protegido porque numerador y climatología
+usan la misma receta. Si se cambia la receta hay que rehacer también la
+climatología a las 13 UTC, y el módulo 4 borra el horario tras agregarlo,
 así que serían los 84 meses otra vez. Cambiar solo el nivel y dejar el
 percentil como está también es coherente: cada feature queda alineada con su
 propia referencia.
 
-ÁRBITRO YA NO NECESARIO PARA ESTO: EFFIS publica su propio FWI (capa WMS `mf010.fwi`) y sería
-la referencia independiente para decidir si el "bajo" es el cubo o el "alto"
-es fwi_canadiense. La consulta histórica por GetFeatureInfo no salió a la
-primera y queda pendiente. Los índices de CEMS no están en el CDS climático
-(solo `satellite-fire-radiative-power`): viven en el Early Warning Data Store,
-que necesita credenciales aparte.
+Árbitro, ya no necesario para esto: EFFIS publica su propio FWI (capa WMS
+`mf010.fwi`) y sería la referencia independiente para decidir si el "bajo"
+es el cubo o el "alto" es fwi_canadiense. La consulta histórica por
+GetFeatureInfo no salió a la primera y queda pendiente. Los índices de CEMS
+no están en el CDS climático (solo `satellite-fire-radiative-power`): viven
+en el Early Warning Data Store, que necesita credenciales aparte.
 
-=============================================================================
-LO QUE ESTO IMPLICA
-=============================================================================
+Lo que esto implica
 · El percentil está a salvo: `fwi_pctl_local` tiene PSI 0,29, porque numerador
   y denominador se calculan con la misma función a cada lado. Es justo el
-  invariante que arregló el módulo 4. Las features de NIVEL no tienen esa
+  invariante que arregló el módulo 4. Las features de nivel no tienen esa
   protección.
 
-· LA MALLA NO ARREGLA ESTO. También calcula el FWI con `fwi_canadiense`: su
+· La malla no arregla esto. También calcula el FWI con `fwi_canadiense`: su
   media el 13-ago-2026 fue 53,1, el mismo orden que los 50,9 de producción.
   Es un problema ortogonal al del IDW y sobrevive a la migración.
 
-· El arreglo barato es recalcular las columnas de NIVEL del entrenamiento con
+· El arreglo barato es recalcular las columnas de nivel del entrenamiento con
   la misma función que sirve. Mueve el entrenamiento de 23,7 a ~33 y cierra el
   eslabón 2 entero. Los eslabones 1 y 3 exigen rediseñar el muestreo, que ya
   es reentrenar de verdad.

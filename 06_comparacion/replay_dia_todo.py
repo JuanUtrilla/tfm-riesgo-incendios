@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Replay de UN día en condiciones de servicio, con los datos de archivo.
+"""Replay de un día en condiciones de servicio, con los datos de archivo.
+Variante de replay_dia.py que sustituye el r10 por el modelo entrenado con
+2015-2024 (dos_30_r10_todo.ubj) y escribe en salida_replay/ en vez de replay/.
 
 Reproduce lo que la cadena diaria habría publicado la mañana del día D:
   producción (riesgo_hoy.py, xgb_v2_prototipo) + candidatos (dos_riesgo_hoy.py:
@@ -9,7 +11,7 @@ Dos condiciones:
   ifs         reanálisis ERA5-Land hasta D−7, IFS archivado de D−6 a D  (servicio)
   reanalisis  reanálisis hasta el propio D                                (cota superior)
 
-NO toca ningún .py de los repos: corre sobre una copia en sandbox_replay/
+No toca ningún .py de los repos: corre sobre una copia en sandbox_replay/
 (salida propia) y parchea desde fuera: reanálisis truncado, `descarga` del IFS
 sustituida por el archivo, `firms_nrt` por `comparar_rankings.firms_dia`
 (ventana 7, cacheada desde los parquets de focos) y la fecha «hoy» de
@@ -23,7 +25,7 @@ Salida: replay/<temporada>/<condicion>/<fecha>.npz (prob_* de los 6 mapas),
 """
 import argparse, json, os, shutil, sys, time
 
-AQUI = "/home/charredgem/Desktop/Master/archivo_ifs"   # entradas, SOLO LECTURA
+AQUI = "/home/charredgem/Desktop/Master/archivo_ifs"   # entradas, solo lectura
 NUEVO = os.path.dirname(os.path.abspath(__file__))
 SANDBOX = f"{NUEVO}/sandbox"
 MODELO_NUEVO = "/home/charredgem/Desktop/Master/calibracion_si/sandbox/salida/dos_30_r10_todo.ubj"
@@ -115,7 +117,7 @@ def main():
     A.dias = dias; A.pasada = str(D.date())
     t1 = time.time(); rh.main(A); T["prod"] = time.time() - t1
     # --- 5. candidatos ----------------------------------------------------
-    dr.MODELO_R10 = MODELO_NUEVO          # <-- r10 entrenado con 2015-2024
+    dr.MODELO_R10 = MODELO_NUEVO          # r10 entrenado con 2015-2024
     t1 = time.time(); dr.main(A); T["candidatos"] = time.time() - t1
 
     # --- 6. recoger mapas y puntuar contra EFFIS --------------------------

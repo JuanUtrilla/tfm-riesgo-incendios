@@ -2,18 +2,18 @@
 """La pregunta del «si» (¿hoy hay aviso o no?), prerregistro 02/09/2026.
 
 Los mapas por percentil siempre pintan un 2 % de «extremo», también en enero, y
-el AUC por día solo existe en días con fuego. Aquí se fija un UMBRAL ABSOLUTO de
+el AUC por día solo existe en días con fuego. Aquí se fija un umbral absoluto de
 probabilidad por modelo y se aplica igual todos los días:
   u_k = percentil 98 de las probabilidades de todas las celdas de España en los
-        días de CALIBRACIÓN (jun-ago 2025, condición IFS; versión «barata»: la
+        días de calibración (jun-ago 2025, condición IFS; versión «barata»: la
         correcta calibraría en los veranos 2015-2024 del cubo, pendiente).
 Para cada día (todas las temporadas y condiciones disponibles, días de cero
 fuego incluidos): fracción de celdas ≥ u_k; «día con aviso» = fracción ≥ 2 %
 (el nivel medio del verano de calibración). Se cruza con «día con fuego»
 (≥1 incendio EFFIS; y ≥1 de ≥100 ha) en tabla 2×2, por periodo:
 calibración (jun-ago 2025, dentro de muestra), sep-oct 2025 y 2026 (fuera).
-Además: Spearman entre la fracción sobre umbral y las ha quemadas del día
-(con ceros), y lo mismo para el índice nacional de FWI (fwi_medio_pctl_clim del
+Se calcula también la Spearman entre la fracción sobre umbral y las ha quemadas
+del día (con ceros), y lo mismo para el índice nacional de FWI (fwi_medio_pctl_clim del
 json de cada día), que es la referencia sin modelo.
 Modelos: prod, cuando, pareja (probabilidad comparable entre días). El único
 queda fuera por construcción.
@@ -33,8 +33,8 @@ def main():
     import sys; sys.path.insert(0, f"{AQUI}/sandbox_replay"); os.chdir(f"{AQUI}/sandbox_replay")
     import config
     es_esp = xr.open_dataset(config.CUBO, decode_timedelta=False)["is_spain"].values.astype(bool).ravel()
-    sub = np.flatnonzero(es_esp)[::7]           # submuestra fija de celdas para el percentil pooled
-    # --- 1. umbral por modelo, pooled en los días de calibración -------------
+    sub = np.flatnonzero(es_esp)[::7]           # submuestra fija de celdas para el percentil agrupado
+    # --- 1. umbral por modelo, agrupado sobre los días de calibración --------
     vals = {k: [] for k in MODELOS}
     for f in sorted(glob.glob(f"{AQUI}/replay/2025/ifs/*.npz")):
         d = os.path.basename(f)[:-4]

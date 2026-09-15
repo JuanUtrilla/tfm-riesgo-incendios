@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
 """
-El cara a cara JUSTO: previsión contra previsión, 18 días.
+El cara a cara justo: previsión contra previsión, 18 días.
 
-NO TOCA PRODUCCIÓN. Escribe salida/ifs_historico.parquet (descarga) y
+No toca producción. Escribe salida/ifs_historico.parquet (descarga) y
 salida/rankings_justo.{csv,json} (evaluación).
 
-=============================================================================
-QUÉ CORRIGE
-=============================================================================
+Qué corrige
+-----------
 `comparar_rankings.py` comparó los rankings sellados del prototipo (que son
-PREVISIÓN) contra la malla alimentada con REANÁLISIS. La malla tenía
+previsión) contra la malla alimentada con reanálisis. La malla tenía
 retrovisor y aun así la diferencia no era significativa (+0,025 de AUC,
-IC95 [−0,023, +0,073]). Ese número es una cota superior, no un empate.
+IC95 [-0,023, +0,073]). Ese número es una cota superior, no un empate.
 
-Aquí la malla se reconstruye como lo que serviría de verdad: reanálisis hasta
-D−7 y previsión IFS los últimos 7 días, con el mapeo de cuantiles a la escala
+Aquí la malla se reconstruye como lo que se serviría en operación: reanálisis hasta
+D-7 y previsión IFS los últimos 7 días, con el mapeo de cuantiles a la escala
 de ERA5-Land. El mismo híbrido que monta `riesgo_hoy.py`, pero para fechas
-pasadas, con el IFS ARCHIVADO tal y como se emitió entonces.
+pasadas, con el IFS archivado tal y como se emitió entonces.
 
-=============================================================================
-LA CUOTA Y LA NOCHE
-=============================================================================
-Para los días objetivo 22-jul → 14-ago con L=6 hacen falta días de IFS del
+La cuota y la noche
+-------------------
+Para los días objetivo 22-jul a 14-ago con L=6 hacen falta días de IFS del
 16-jul al 14-ago: 30 días = 3 tramos de 14. Coste 5.605 nodos x 3 = 16.815
 unidades, contra 10.000 diarias. No cabe en un día.
 
@@ -31,11 +29,11 @@ retroceso hasta 90 minutos en vez de rendirse. La cuota se renueva a
 medianoche UTC y el proceso la coge solo. Es reanudable: si muere, se relanza
 y sigue por donde iba.
 
-El volumen en disco es irrelevante — 5.605 nodos x 30 días son menos de 1 MB.
+El volumen en disco es irrelevante (5.605 nodos x 30 días son menos de 1 MB).
 Lo que escasea es cuota, no espacio.
 
 Uso:
-    python comparar_rankings_justo.py --descargar    # déjalo toda la noche
+    python comparar_rankings_justo.py --descargar    # dejarlo toda la noche
     python comparar_rankings_justo.py --evaluar
 """
 
@@ -205,7 +203,7 @@ def evaluar():
     FULL = json.load(open(f"{config.MODELOS}/xgb_v2_prototipo_features.json"))
     modelo = xgb.XGBClassifier()
     modelo.load_model(f"{config.MODELOS}/xgb_v2_prototipo.ubj")
-    # 21/08/2026: los modelos de etiqueta EFFIS sobre el MISMO híbrido, para
+    # 21/08/2026: los modelos de etiqueta EFFIS sobre el mismo híbrido, para
     # que el cara a cara previsión-contra-previsión incluya a los candidatos
     import config_expansion as ce
     from dos_05_modelos import FEATS_CUANDO

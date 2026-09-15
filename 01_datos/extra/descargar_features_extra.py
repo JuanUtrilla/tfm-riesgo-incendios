@@ -6,7 +6,7 @@ Descarga y procesa las features "humanas/estructurales" del Modelo B que faltaba
 
 Idempotente: si un fichero ya existe y es válido (se puede leer con rasterio/geopandas
 sin error), no se vuelve a descargar. Pensado para lanzar con buena conexión y dejar
-correr — en un entorno con ancho de banda limitado, las 12 teselas WorldCover (~1GB)
+correr: en un entorno con ancho de banda limitado, las 12 teselas WorldCover (~1GB)
 + WorldPop (380MB) pueden tardar horas; con conexión normal son 5-10 minutos.
 
 Uso:
@@ -103,7 +103,7 @@ if tif_valido(pop_tif):
 else:
     print("  población: SALTADO (tif incompleto)")
 
-# uso del suelo — se muestrea tesela a tesela (sin fusionar en memoria: cada
+# uso del suelo: se muestrea tesela a tesela (sin fusionar en memoria: cada
 # tesela son 36000x36000 px, fusionar las 12 a la vez puede agotar la RAM)
 tiles_validas = [RAW / "worldcover" / f"ESA_WorldCover_10m_2021_v200_{t}_Map.tif" for t in TILES]
 tiles_validas = [t for t in tiles_validas if tif_valido(t)]

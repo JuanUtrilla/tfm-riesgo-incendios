@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 21: lo mismo que dos_20, pero ponderando por HECTÁREAS y
+Dos modelos, paso 21: lo mismo que dos_20, pero ponderando por hectáreas y
 separando fuegos grandes de pequeños.
 
 dos_20 contaba celdas quemadas: un conato de 1 ha y el incendio de 43.772 ha
-pesaban lo mismo por celda. Pero en la temporada 2026 de EFFIS los 35 fuegos
+pesaban lo mismo por celda. En la temporada 2026 de EFFIS los 35 fuegos
 de ≥500 ha son el 92 % de la superficie quemada y los 320 conatos de <30 ha
 el 0,9 %. Ordenar bien los conatos no sirve de nada operativamente; fallar un
-fuego grande se paga entero. Así que aquí:
+fuego grande se paga entero. Por eso aquí:
 
-  · cada incendio se rasteriza POR SEPARADO y sus hectáreas se reparten entre
+  · cada incendio se rasteriza por separado y sus hectáreas se reparten entre
     sus celdas (ha_celda = AREA_HA / nº de celdas del incendio), de modo que
     la suma sobre celdas devuelve la superficie real;
   · «cobertura_ha» = hectáreas dentro del top-k / hectáreas del día;
   · las tres clases (PEQUEÑO <30 ha, MEDIO 30-500, GRANDE ≥500) se miden por
     separado, en celdas y en incendios capturados;
-  · «incendios pillados» = % de incendios de la clase con AL MENOS una celda
-    dentro del top-k, que es la pregunta de guardia de verdad: ¿lo tenía yo
-    en el radar ese día?
+  · «incendios pillados» = % de incendios de la clase con al menos una celda
+    dentro del top-k, que es la pregunta que se hace en guardia: si ese
+    fuego estaba en el radar ese día.
 
-IC95 por bootstrap de DÍAS (unidad independiente). NO TOCA PRODUCCIÓN.
+IC95 por bootstrap de días (unidad independiente). No toca producción.
 Escribe salida/dos_21_hectareas.{json,csv,png}.
 """
 

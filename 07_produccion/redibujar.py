@@ -1,44 +1,42 @@
 #!/usr/bin/env python3
 """
-Re-dibuja mapas ya publicados con el formato definitivo, SIN reejecutar nada.
+Redibuja mapas ya publicados con el formato definitivo, sin reejecutar nada.
 
-NO TOCA PRODUCCIÓN, y tampoco toca los PNG publicados: escribe en
-`salida/rerender/` y se publica en `publicado/rerender/`. Los originales se
-quedan donde están, que son la traza de lo que se vio aquel día.
+No toca producción ni los PNG publicados: escribe en `salida/rerender/` y se
+publica en `publicado/rerender/`. Los originales se quedan donde están, porque
+son la traza de lo que se vio aquel día.
 
-=============================================================================
-POR QUÉ
-=============================================================================
+Por qué
+-------
 Los arreglos de render (escala discreta, `interpolation="nearest"` con dpi 165,
 leyenda única, marcas de EFFIS y MITECO rotuladas) entraron en la corrida del
 24/08/2026. Los mapas del 21, 22 y 23 se publicaron con el formato viejo, en el
 que el remuestreo del render fundía las celdas EXTREMO sueltas con sus vecinas
-—el 74 % de las manchas EXTREMO son de 1-2 celdas—, o sea que se borraba la
+(el 74 % de las manchas EXTREMO son de 1-2 celdas), o sea que se borraba la
 mayoría de los avisos distintos. Para la memoria hacen falta los seis días con
 el mismo formato.
 
 No hay que recalcular nada: `mapas_diarios/*.npz` (Release `estado`) guarda las
 probabilidades de los cuatro modelos, y el percentil se recalcula de ahí.
 
-=============================================================================
-LA VERDAD QUE SE DIBUJA ES LA DE AQUEL DÍA, NO LA DE HOY
-=============================================================================
-`capa_verdad` dibuja los incendios que EFFIS tiene cartografiados **en el
-momento de dibujar**. Re-dibujar hoy el mapa del 21/08 pintaría encima
-incendios que el 21 todavía no se conocían: quedaría un mapa más bonito y una
-figura deshonesta, porque el lector juzgaría el aviso con información que el
-sistema no tenía.
+La verdad que se dibuja es la de aquel día, no la de hoy
+--------------------------------------------------------
+`capa_verdad` dibuja los incendios que EFFIS tiene cartografiados en el
+momento de dibujar. Redibujar hoy el mapa del 21/08 pintaría encima incendios
+que el 21 todavía no se conocían: quedaría un mapa más bonito y una figura
+engañosa, porque el lector juzgaría el aviso con información que el sistema no
+tenía.
 
 Así que se filtra por fecha de conocimiento:
 
-  · **EFFIS**: solo los registros con `LASTUPDATE` anterior a la hora de la
-    corrida (04:00 UTC del propio día). Es una aproximación conservadora —
-    `LASTUPDATE` es la ÚLTIMA actualización, así que un incendio que ya
+  · EFFIS: solo los registros con `LASTUPDATE` anterior a la hora de la
+    corrida (04:00 UTC del propio día). Es una aproximación conservadora:
+    `LASTUPDATE` es la última actualización, así que un incendio que ya
     existiera pero se haya retocado después queda fuera. Dibuja de menos,
     nunca de más, que es el error que se puede defender.
-  · **MITECO**: solo partes de días anteriores. El parte del día D se publica
-    el D+1 hacia las 14 h, así que a las 04:00 del día D lo último conocido es
-    el parte del D−1.
+  · MITECO: solo partes de días anteriores. El parte del día D se publica el
+    D+1 hacia las 14 h, así que a las 04:00 del día D lo último conocido es el
+    parte del D-1.
 
 Uso:
     python redibujar.py --fechas 2026-08-21 2026-08-22 2026-08-23
@@ -69,7 +67,7 @@ def filtrar_verdad(corte, fuentes=(None, None)):
     Devuelve una función para restaurar los caminos originales.
     """
     orig = (capa_verdad.GEOJSON, capa_verdad.INCIDENTES)
-    # el catálogo del que se filtra ha de ser el MÁS COMPLETO que haya (el del
+    # el catálogo del que se filtra ha de ser el más completo que haya (el del
     # Release, no la copia local, que puede ir días por detrás): lo que decide
     # qué se dibuja es `LASTUPDATE`, no qué fichero se abra.
     capa_verdad.GEOJSON = fuentes[0] or capa_verdad.GEOJSON
@@ -105,7 +103,7 @@ def filtrar_verdad(corte, fuentes=(None, None)):
 
 
 def dibujar(fstr, npz_dir, dest, ds):
-    """El mismo lienzo 2×3 de `dos_riesgo_hoy`, a partir del npz del día."""
+    """Dibuja el mismo lienzo 2×3 de `dos_riesgo_hoy` a partir del npz del día."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt

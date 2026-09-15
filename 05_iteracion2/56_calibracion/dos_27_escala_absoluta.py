@@ -1,40 +1,39 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 27: escala ABSOLUTA de niveles para el mapa.
+Dos modelos, paso 27: escala absoluta de niveles para el mapa.
 
-NO TOCA PRODUCCIÓN NI NINGÚN REPO. Lee salida/dos_25_*; escribe
+No toca producción ni ningún repo. Lee salida/dos_25_*; escribe
 salida/dos_27_*.{csv,json,md}.
 
-=============================================================================
-EL PROBLEMA
-=============================================================================
-`dos_riesgo_hoy.py:68` pinta los niveles con percentiles DEL DÍA:
+El problema
+-----------
+`dos_riesgo_hoy.py:68` pinta los niveles con percentiles del día:
 
     CORTES_PCTL = [30, 90, 98]
     NIVELES = ["BAJO", "MODERADO", "ALTO", "EXTREMO"]
 
-Es decir, el 2 % superior del día es EXTREMO **siempre**, por construcción. Un
+Es decir, el 2 % superior del día es EXTREMO siempre, por construcción. Un
 martes muerto de febrero sale con la misma cantidad de rojo que el 15 de
 agosto, y el mapa se lee como «estas celdas van a arder». Medido sobre
 2015-2024: bajo ese mismo rojo, la puntuación absoluta del p98 de un día de
-invierno va de 0,032 a 0,965 — el mismo color, treinta veces más riesgo.
+invierno va de 0,032 a 0,965, es decir, el mismo color para treinta veces
+más riesgo.
 
-=============================================================================
-LO QUE HACE ESTE PASO
-=============================================================================
-Fija los cortes en la ESCALA DE PUNTUACIÓN, no en el ranking del día. El corte
-de EXTREMO es el percentil 98 de la distribución CLIMATOLÓGICA (todas las
+Lo que hace este paso
+---------------------
+Fija los cortes en la escala de puntuación, no en el ranking del día. El corte
+de EXTREMO es el percentil 98 de la distribución climatológica (todas las
 celdas de todos los días de 2015-2024), no el del día. Consecuencias:
 
-  · un día tranquilo simplemente NO TIENE rojo;
+  · un día tranquilo no tiene rojo;
   · un día excepcional puede tener mucho más del 2 %;
   · el rojo significa lo mismo en febrero que en agosto.
 
 Los cortes salen del histograma de `dos_25` (3.653 días × 5 modelos × 4.096
 bins), que ya está en disco: no hay que volver a tocar el cubo.
 
-Y como un color sin significado no arregla nada, cada banda se acompaña de su
-FRECUENCIA OBSERVADA DE QUEMA, contada sobre las mismas celdas que forman el
+Como un color sin significado no arregla nada, cada banda se acompaña de su
+frecuencia observada de quema, contada sobre las mismas celdas que forman el
 histograma (`es_sub`), con `quem` como numerador.
 
 Uso:
@@ -61,8 +60,8 @@ BORDE = np.r_[BINS, 1.0][1:]
 def cortes_climatologicos(hist):
     """Puntuación absoluta que deja por debajo el p30, p90 y p98 del clima.
 
-    Se acumula el histograma de TODOS los días: cada celda-día pesa lo mismo,
-    que es justo lo que el percentil del día destruye.
+    Se acumula el histograma de todos los días: cada celda-día pesa lo mismo,
+    que es justo lo que el percentil del día pierde.
     """
     pool = hist.sum(0)                       # (modelos, bins)
     cs = np.cumsum(pool, axis=-1)
@@ -101,7 +100,7 @@ def main():
         print(f"{nom:8} {c[0]:10.4f} {c[1]:9.4f} {c[2]:10.4f}")
 
     # --- qué significa cada banda: frecuencia observada de quema -----------
-    # `quem` lleva TODAS las celdas de `keep` que arden; el histograma solo
+    # `quem` lleva todas las celdas de `keep` que arden; el histograma solo
     # cuenta `es_sub`. Para que numerador y denominador hablen de la misma
     # población hay que quedarse con las quemadas que son `es_sub`.
     sub = cel[cel.es_sub][["iy", "ix"]].copy()
@@ -133,7 +132,7 @@ def main():
     print("\n=== QUÉ SIGNIFICA CADA COLOR (frecuencia observada de quema) ===")
     print(B.to_string(index=False))
 
-    # --- lo que de verdad se preguntaba: ¿desaparece el rojo en invierno? ---
+    # --- la pregunta de fondo: ¿desaparece el rojo en invierno? -------------
     d = pd.DataFrame({"fecha": dias})
     d["mes"] = d.fecha.dt.month
     d["regimen"] = d.mes.map(REGIMEN)

@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 32: la probabilidad por celda como PRODUCTO DE DOS CAPAS.
+Dos modelos, paso 32: la probabilidad por celda como producto de dos capas.
 
-NO TOCA PRODUCCIÓN NI NINGÚN REPO. Lee salida/dos_25_* y dos_26_*; escribe
+No toca producción ni ningún repo. Lee salida/dos_25_* y dos_26_*; escribe
 salida/dos_32_*.{csv,json}.
 
-=============================================================================
-DE DÓNDE VIENE
-=============================================================================
+De dónde viene
+--------------
 `dos_31` refutó la ventana móvil y dejó el diagnóstico correcto: la frecuencia
 observada en la punta de julio va del 0,00 % (2023) al 12,76 % (2022), mediana
-0,53 %, y esa variación **no está en la puntuación de la celda** sino en la
-intensidad del día. Ninguna curva puntuación→probabilidad puede seguirla.
+0,53 %, y esa variación está en la intensidad del día, no en la puntuación de
+la celda. Ninguna curva puntuación→probabilidad puede seguirla.
 
 La descomposición que sí puede es un producto de dos factores:
 
@@ -20,16 +19,16 @@ La descomposición que sí puede es un producto de dos factores:
                                   la capa «si»          la capa «dónde»
                                   (dos_26, por día)     (por celda, aquí)
 
-El segundo factor se calibra usando **solo los días grandes**, que es la
-población en la que la pregunta «¿cuál arde?» tiene sentido. El primero ya está
-calibrado en `dos_26`.
+El segundo factor se calibra usando solo los días grandes, que es la
+población en la que la pregunta «¿cuál arde?» tiene sentido. El primero se
+calibró en `dos_26` (el semáforo nacional que salía de ahí se descartó el
+14/09/2026; aquí se usa como factor del experimento).
 
-=============================================================================
-CÓMO SE EVALÚA, PARA QUE SEA COMPARABLE
-=============================================================================
-Mismo criterio que `dos_29` y `dos_31`: la punta es el **top 0,2 % de las
-celdas-día de cada mes ORDENADAS POR PUNTUACIÓN** —la selección no cambia, solo
-cambia el número que se les asigna— y se compara la probabilidad media predicha
+Cómo se evalúa, para que sea comparable
+---------------------------------------
+Mismo criterio que `dos_29` y `dos_31`: la punta es el top 0,2 % de las
+celdas-día de cada mes ordenadas por puntuación (la selección no cambia, solo
+cambia el número que se les asigna) y se compara la probabilidad media predicha
 con la frecuencia observada, resumiendo con |log10(pred/obs)|.
 
 Se comparan tres opciones sobre la misma punta:
@@ -127,7 +126,7 @@ def main():
             continue
         obs = cy[j] / cn[j]
 
-        # predicciones sobre la MISMA punta (bins >= j), pesadas por celdas-día
+        # predicciones sobre la misma punta (bins >= j), pesadas por celdas-día
         g_bin = ir_g.predict(BORDE[j:])
         u_bin = ir_u.predict(BORDE[j:])
         H = hist[em, k, j:].astype(float)          # (días del mes, bins)

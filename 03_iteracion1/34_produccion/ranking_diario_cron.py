@@ -5,9 +5,10 @@ Tarea diaria (cron): ranking nacional de riesgo + archivo histórico.
 Cada ejecución:
 1. Calcula el ranking de las ~705 estaciones (tiempo_real.evaluar_todas,
    forzando recálculo) para el último día completo.
-2. Lo archiva en prototipo/historico_predicciones/ranking_<fecha>.parquet —
-   ese archivo acumulado ES la validación PROSPECTIVA del TFM: predicciones
-   emitidas ANTES de los incendios, comparables a final del verano con FIRMS.
+2. Lo archiva en prototipo/historico_predicciones/ranking_<fecha>.parquet.
+   Ese archivo acumulado guarda las predicciones emitidas antes de los
+   incendios, comparables a final del verano con FIRMS (la validación del
+   trabajo es el replay de 2025-2026; esto es un registro de seguimiento).
 3. Escribe un resumen (y las estaciones en EXTREMO) en el log.
 
 Instalación (crontab -e):

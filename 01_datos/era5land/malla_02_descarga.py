@@ -1,45 +1,43 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 2: descarga de ERA5-Land desde CDS.
+Pipeline de malla, módulo 2: descarga de ERA5-Land desde CDS.
 
-NO TOCA PRODUCCIÓN. Escribe en `malla_data/`.
+No toca producción. Escribe en `malla_data/`.
 
-=============================================================================
-POR QUÉ CDS Y NO OPEN-METEO (medido el 19/08/2026)
-=============================================================================
+Por qué CDS y no Open-Meteo (medido el 19/08/2026)
+--------------------------------------------------
 La primera versión de este módulo tiraba de Open-Meteo. No da la cuota:
 su coste es nº de nodos × tramos de 14 días, o sea 250 × 8 = 2.000 unidades
 por lote y ~46.000 para la serie completa, contra un límite gratuito de 10.000
 al día. Reventaba la cuota por 4-5× solo con el reanálisis, y habría que
-pagarlo CADA día en un cron. No es una limitación cosmética: es bloqueante.
+pagarlo cada día en un cron. Es bloqueante.
 
-CDS además simplifica el diseño. Devuelve una CAJA lat/lon en la malla nativa
+CDS también simplifica el diseño. Devuelve una caja lat/lon en la malla nativa
 de 0,1°, no 5.605 consultas puntuales: se indexa igual que el cubo. El mapeo
 celda→nodo del módulo 1 pasa a ser celda→(iy,ix) de este NetCDF.
 
-CDS NO sirve para la previsión: encola las peticiones y no es de baja
+CDS no sirve para la previsión: encola las peticiones y no es de baja
 latencia. Para el historial da igual (ERA5-Land lleva ~6 días de retraso de
-todas formas), pero D y D+1 tendrán que venir del open data del ECMWF —
-módulo 2b.
+todas formas), pero D y D+1 tendrán que venir del open data del ECMWF
+(módulo 2b).
 
-=============================================================================
-AGREGACIÓN HORARIA → DIARIA, Y EL AVISO DE LA PRECIPITACIÓN
-=============================================================================
-CDS sirve ERA5-Land HORARIO; el modelo necesita diario. Las reglas replican
+Agregación horaria → diaria, y el aviso de la precipitación
+-----------------------------------------------------------
+CDS sirve ERA5-Land horario; el modelo necesita diario. Las reglas replican
 las del cubo:
 
     tmax, tmin   max/min de 2m_temperature
     hr_min       min de la HR horaria, derivada de T y punto de rocío (Magnus)
-    viento_max   max de sqrt(u²+v²) a 10 m  (máx. de MEDIAS horarias, NO racha:
+    viento_max   max de sqrt(u²+v²) a 10 m  (máx. de medias horarias, no racha:
                  el FWI explota con rachas, ISI ~ exp(0,05·v))
     prec         total diario de total_precipitation
 
-⚠️ `total_precipitation` de ERA5-Land es ACUMULADO desde las 00 UTC y se
-reinicia cada día. El total del día NO es la suma de los horarios —eso lo
-multiplicaría por ~24— sino el valor de las 00:00 del día SIGUIENTE. Aquí se
+Ojo: `total_precipitation` de ERA5-Land es acumulado desde las 00 UTC y se
+reinicia cada día. El total del día no es la suma de los horarios (eso lo
+multiplicaría por ~24) sino el valor de las 00:00 del día siguiente. Aquí se
 resuelve desplazando el sello temporal una hora hacia atrás antes de agrupar
-por día y tomando el máximo del acumulado. Este es EXACTAMENTE el error que
-produciría un sesgo frío del FWI como el diagnosticado en §6.
+por día y tomando el máximo del acumulado. Sumar los horarios es justo el
+error que produciría un sesgo frío del FWI como el diagnosticado en §6.
 
 El módulo trae `--verificar`, que contrasta lo agregado contra los diarios de
 Open-Meteo ya cacheados. Si la regla de la precipitación estuviera mal, ahí se
@@ -63,7 +61,7 @@ import config
 
 DIR = config.FUENTE
 DATA = config.SALIDA
-CRUDO = config.CRUDO_PROPIO       # las descargas NUEVAS caen en este repo
+CRUDO = config.CRUDO_PROPIO       # las descargas nuevas caen en este repo
 CRUDO_LECTURA = config.CRUDO      # los meses ya bajados en el original
 AREA = config.AREA
 VARIABLES = config.VARIABLES
@@ -77,7 +75,7 @@ def hr_desde_rocio(t_k, td_k):
 
 
 def cobertura(ruta):
-    """Días que REALMENTE tiene un fichero de CDS, con sidecar para no abrirlo
+    """Días que de verdad tiene un fichero de CDS, con sidecar para no abrirlo
     cada vez. Devuelve el último día del mes que contiene, o 0."""
     side = ruta + ".cobertura"
     if os.path.exists(side):
@@ -100,20 +98,20 @@ def cobertura(ruta):
 def pide_mes(anio, mes, dias):
     """Un mes de ERA5-Land horario, resumible.
 
-    ⚠️ EL MES EN CURSO CRECE. La versión anterior salía si el fichero existía,
+    Ojo: el mes en curso crece. La versión anterior salía si el fichero existía,
     y como el mes en curso se guarda con el mismo nombre, el reanálisis se
-    quedaba CONGELADO en el día en que se bajó por primera vez — sin error y
+    quedaba congelado en el día en que se bajó por primera vez, sin error y
     sin aviso. Con el cron, el mapa habría ido envejeciendo en silencio.
     (El fichero de agosto del repo original se llama `era5land_202608.nc` y
     solo tiene hasta el día 13.)
 
-    Ahora se comprueba la COBERTURA REAL, no la existencia del nombre, y un
+    Ahora se comprueba la cobertura real, no la existencia del nombre, y un
     mes incompleto se guarda con sufijo del último día para no pisar nada.
     """
     import cdsapi
     ultimo = max(dias)
     plano = f"era5land_{anio}{mes:02d}.nc"
-    # se REUTILIZA lo del repo original, pero solo si de verdad llega
+    # se reutiliza lo del repo original, pero solo si de verdad llega
     for base in (CRUDO, CRUDO_LECTURA):
         for nombre in (plano, f"era5land_{anio}{mes:02d}_h{ultimo:02d}.nc"):
             r = f"{base}/{nombre}"
@@ -139,7 +137,7 @@ def pide_mes(anio, mes, dias):
 
 
 def retira_parciales(anio, mes, ultimo):
-    """Los parciales ANTERIORES del mismo mes se mueven al disco externo.
+    """Los parciales anteriores del mismo mes se mueven al disco externo.
 
     21/08/2026: cada día el mes en curso se guardaba con un nombre nuevo
     (`_h14`, `_h15`, ...) sin retirar el anterior: ~60 MB de zip + ~60 MB de
@@ -196,7 +194,7 @@ def a_diario(ds):
         "viento_max": v.groupby(dia).max("valid_time"),
     })
     # precipitación: acumulada desde las 00 UTC y con reinicio diario. El total
-    # del día es el acumulado máximo, y las 00:00 pertenecen al día ANTERIOR.
+    # del día es el acumulado máximo, y las 00:00 pertenecen al día anterior.
     tp = ds["tp"] * 1000.0                                    # m → mm
     dia_p = (tp["valid_time"] - pd.Timedelta(hours=1)).dt.floor("D")
     out["prec"] = tp.groupby(dia_p).max("valid_time")

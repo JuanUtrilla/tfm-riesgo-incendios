@@ -1,30 +1,29 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 7: el mapa del día con DÓNDE × CUÁNDO, al lado del de
+Dos modelos, paso 7: el mapa del día con DÓNDE × CUÁNDO, al lado del de
 producción. Prototipo, no operativo.
 
-NO TOCA PRODUCCIÓN. Reutiliza la cadena de `riesgo_hoy.py` (reanálisis +
+No toca producción. Reutiliza la cadena de `riesgo_hoy.py` (reanálisis +
 IFS cacheado + features en nodos → celdas) y escribe salida/dos_07_mapa_<fecha>.*
 
-=============================================================================
-POR QUÉ ASÍ
-=============================================================================
+Por qué así
+-----------
 `riesgo_hoy.py` ya construye las 46 features por celda para el día D. Lo
-único que cambia aquí es QUÉ se hace con ellas:
+único que cambia aquí es qué se hace con ellas:
 
   prod        xgb_v2_prototipo sobre las 46 features (lo que se publica hoy)
   cuando      modelo `cuando` (solo dinámicas servibles) sobre sus 29 features
   donde       P(susceptibilidad) por celda, precalculada en `dos_05`
               (`dos_05_mapa_donde.npz`, variante con densidad 2008-14)
-  riesgo      donde × cuando — el producto, que en `dos_05` empata con la suma
+  riesgo      donde × cuando, el producto, que en `dos_05` empata con la suma
               de logits y gana a producción +0,08 de AUC dentro del día.
 
-El IFS NO se descarga: se usa la pasada ya cacheada (`--pasada`, por defecto
+El IFS no se descarga: se usa la pasada ya cacheada (`--pasada`, por defecto
 la última en salida/) para no pisar la cuota diaria de Open-Meteo que gasta
 el cron de las 05:00. Con la pasada del día 20 se sirven D=20 y D+1=21.
 
-La probabilidad del producto NO está calibrada (dos prevalencias de diseño
-distintas multiplicadas): se publica como PERCENTIL del día sobre las celdas
+La probabilidad del producto no está calibrada (dos prevalencias de diseño
+distintas multiplicadas): se publica como percentil del día sobre las celdas
 peninsulares, que es lo que usa el ranking operativo. Los cortes de nivel
 de producción no se aplican al nuevo mapa: harían falta los suyos.
 

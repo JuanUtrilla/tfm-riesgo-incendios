@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 0: una pasada por el cubo para medir la ETIQUETA real.
+Dos modelos, paso 0: una pasada por el cubo para medir la etiqueta real.
 
-NO TOCA PRODUCCIÓN. Lee `IberFire.nc` en solo lectura; escribe en expansión.
+No toca producción. Lee `IberFire.nc` en solo lectura; escribe en expansión.
 
-=============================================================================
-POR QUÉ
-=============================================================================
+Por qué
+
 La fase 1 del encargo (`PROMPT_DOS_MODELOS.md` §3) pide tres números que nadie
 ha medido todavía sobre la malla completa:
 
-  · prevalencia REAL de celda-día con fuego (frente al 25 % del diseño);
+  · prevalencia real de celda-día con fuego (frente al 25 % del diseño);
   · autocorrelación espacial (cuánto se parecen celdas vecinas) y temporal
     (cuánto persiste el fuego de un día al siguiente);
-  · densidad histórica por celda, que es la etiqueta natural del modelo DÓNDE.
+  · densidad histórica por celda, que es la etiqueta natural del modelo dónde.
 
 El cubo trae `is_fire` (celda quemada EFFIS ≥5 ha, diario, 2007-12 → 2024-12),
-que es además LA MISMA etiqueta con la que se valida en operación. Así que las
+que es la misma etiqueta con la que se valida en operación. Así que las
 tres cosas salen de una sola pasada por bloques de chunk [521,77,99].
 
 Qué se acumula (todo agregado, para no tener 6,8 GB en RAM):

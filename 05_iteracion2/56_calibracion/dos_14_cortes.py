@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 14: cortes de nivel BAJO/MODERADO/ALTO/EXTREMO para los
-mapas nuevos, calibrados con la temporada 2026.
+Dos modelos, paso 14: cortes de nivel BAJO/MODERADO/ALTO/EXTREMO para los
+mapas nuevos, medidos sobre los perímetros EFFIS de la temporada 2026.
 
-NO TOCA PRODUCCIÓN. Lee los mapas diarios de `dos_09` (disco externo) y
+No toca producción. Lee los mapas diarios de `dos_09` (disco externo) y
 EFFIS; escribe salida/dos_14_cortes.json.
 
-=============================================================================
-POR QUÉ POR PERCENTIL Y NO POR PROBABILIDAD
-=============================================================================
+Por qué por percentil y no por probabilidad
+-------------------------------------------
 Producción corta la probabilidad en 0,25/0,55/0,80. Esa probabilidad está a
-la prevalencia de diseño (25 %), no a la real (3·10⁻⁵), y el proyecto hermano
-midió que BAJO tenía más fuego que MODERADO. El producto de dos modelos
-además multiplica dos escalas distintas. Un corte por PERCENTIL DEL DÍA es
-estable entre modelos y entre días: «EXTREMO = el 2 % de celdas más alto de
-hoy» significa lo mismo siempre. El precio: el nivel no sube los días malos
-de toda España. Para eso está la ALERTA GLOBAL, que se deja como número
-aparte: el FWI medio del día contra su climatología.
+la prevalencia de diseño (25 %) y no a la real (3·10⁻⁵), y el proyecto
+hermano midió que BAJO tenía más fuego que MODERADO. El producto de dos
+modelos, encima, multiplica dos escalas distintas. Un corte por percentil
+del día es estable entre modelos y entre días: «EXTREMO = el 2 % de celdas
+más alto de hoy» significa lo mismo siempre. El precio es que el nivel no
+sube los días malos de toda España. Para eso queda la alerta global como
+número aparte: el FWI medio del día contra su climatología.
 
 Cortes elegidos para reproducir el reparto de producción el 20/08/2026
-(EXTREMO 2,3 %, ALTO ~8 %, MODERADO ~70 %): p98 / p90 / p30. Aquí se MIDE, en
-los 74 días de 2026, qué fracción de la superficie quemada cae en cada
+(EXTREMO 2,3 %, ALTO ~8 %, MODERADO ~70 %): p98 / p90 / p30. Aquí se mide,
+en los 74 días de 2026, qué fracción de la superficie quemada cae en cada
 nivel con cada mapa, para que el nivel tenga significado empírico:
 «EXTREMO concentró el X % de lo quemado ocupando el 2 % del territorio».
 """
@@ -54,7 +53,7 @@ def niveles(v):
 def main():
     ds = xr.open_dataset(config.CUBO, decode_timedelta=False)
     es = ds["is_spain"].values.astype(bool)
-    acum = {m: np.zeros((4, 2)) for m in MAPAS}     # [nivel] → (celdas, quemadas)
+    acum = {m: np.zeros((4, 2)) for m in MAPAS}     # por nivel: (celdas, quemadas)
     ha_nivel = {m: np.zeros(4) for m in MAPAS}
     n = 0
     for f in sorted(glob.glob(f"{ce.DATASET}/mapas_2026/*.npz")):

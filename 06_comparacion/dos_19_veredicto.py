@@ -1,48 +1,48 @@
 #!/usr/bin/env python3
 """
-Cómo va la temporada: la figura del veredicto.
+Cómo va la temporada 2026: la figura de seguimiento.
 
-NO TOCA PRODUCCIÓN. Lee lo que haya en `salida/` y escribe
-salida/dos_19_veredicto.{png,json}.
+No toca producción. Lee lo que haya en `salida/` y escribe
+salida/dos_19_veredicto.{png,json}. Es la figura del seguimiento en vivo de
+la temporada 2026; la validación del trabajo es el replay de 2025-2026.
 
-=============================================================================
-POR QUÉ UNA SERIE Y NO UN MAPA
-=============================================================================
-Los mapas contestan DÓNDE. «¿Cómo va el sistema?» es otra pregunta y su
-representación natural es una serie temporal, no una mancha de color: lo que
-importa es si la ventaja se sostiene día tras día y cuánto se ha estrechado
-el intervalo. Ese número existía desde julio, pero solo dentro de un JSON.
+Por qué una serie y no un mapa
+------------------------------
+Los mapas contestan dónde. «¿Cómo va el sistema?» es otra pregunta y su
+representación natural es una serie temporal: lo que importa es si la ventaja
+se sostiene día tras día y cuánto se ha estrechado el intervalo. Ese número
+existía desde julio, pero solo dentro de un JSON.
 
 Dos paneles:
 
-  ARRIBA   AUC dentro del día, día a día, de producción y de los candidatos,
-           con su media acumulada. El punto es ruidoso —un día con tres
-           celdas quemadas no dice nada— y por eso la línea gruesa es la
+  Arriba   AUC dentro del día, día a día, de producción y de los candidatos,
+           con su media acumulada. El punto es ruidoso (un día con tres
+           celdas quemadas no dice nada) y por eso la línea gruesa es la
            media, no el punto.
-  ABAJO    La diferencia PAREADA contra producción, acumulada: para cada día
+  Abajo    La diferencia pareada contra producción, acumulada: para cada día
            n se recalcula la media de las diferencias de los días 1..n y su
-           IC95 por bootstrap DE DÍAS. Es la lectura honesta del progreso:
-           la banda se estrecha con los días y el veredicto llega cuando deja
-           de tocar el cero. Si la banda todavía cruza el cero, no hay
-           veredicto por mucho que la media sea positiva.
+           IC95 por bootstrap de días. La banda se estrecha con los días y el
+           veredicto llega cuando deja de tocar el cero. Si la banda todavía
+           cruza el cero, no hay veredicto por mucho que la media sea
+           positiva.
 
-           AVISO METODOLÓGICO: mirar la banda cada día y cantar victoria el
+           Aviso metodológico: mirar la banda cada día y cantar victoria el
            primero en que despega del cero es *peeking*, y con 74 miradas
-           infla el falso positivo. La trayectoria es descriptiva —sirve para
-           ver si la ventaja es estable o la sostienen cuatro días— y el
-           número que vale es el IC del ÚLTIMO día, fijado de antemano al
+           infla el falso positivo. La trayectoria es descriptiva (sirve para
+           ver si la ventaja es estable o la sostienen cuatro días) y el
+           número que vale es el IC del último día, fijado de antemano al
            cierre de la temporada.
 
 Fuentes, y hay que distinguirlas porque no son igual de exigentes:
-  · `dos_09_temporada2026.csv` — la temporada RETROSPECTIVA (reanálisis para
+  · `dos_09_temporada2026.csv`: la temporada retrospectiva (reanálisis para
     todos: misma meteo, cara a cara limpio entre modelos, pero cota superior
     de lo que da la operación). Es la serie larga: 74 días.
-  · `puntuacion_effis.csv` — el juez diario en OPERACIÓN, con la previsión
-    que de verdad se publicó. Es el que vale, y empezó el 21/08, así que hoy
-    tiene pocos días; se dibuja encima con marcador hueco.
-  · `veredicto_miteco.csv` y `rankings_justo.csv` — los otros dos jueces, que
-    no son series comparables (uno es por incidente y el otro por estación):
-    van como texto en el pie, no como línea.
+  · `puntuacion_effis.csv`: la puntuación diaria en operación, con la
+    previsión publicada ese día. Empezó el 21/08, así que tiene pocos
+    días; se dibuja encima con marcador hueco.
+  · `veredicto_miteco.csv` y `rankings_justo.csv`: las otras dos puntuaciones,
+    que no son series comparables (una es por incidente y la otra por
+    estación): van como texto en el pie, no como línea.
 """
 
 import json
@@ -66,7 +66,7 @@ REF = "producción"
 
 
 def acumulada(dif, rng):
-    """Media de la diferencia y su IC95, recalculadas día a día."""
+    """Calcula la media de la diferencia y su IC95, recalculadas día a día."""
     m, lo, hi = [], [], []
     for n in range(1, len(dif) + 1):
         d = dif[:n]
@@ -84,10 +84,10 @@ def main():
     import matplotlib.pyplot as plt
 
     # La serie base es la retrospectiva si está (74 días, todos los modelos);
-    # si no —el caso de GitHub Actions, donde dos_09 no se ejecuta— se dibuja
-    # con el juez diario en operación, que es el que de verdad importa y el
-    # que irá creciendo. Nunca se mezclan en la misma línea: son bancos
-    # distintos (reanálisis contra previsión publicada).
+    # si no (el caso de GitHub Actions, donde dos_09 no se ejecuta) se dibuja
+    # con la puntuación diaria en operación, que es la que irá creciendo.
+    # Nunca se mezclan en la misma línea: son bancos distintos (reanálisis
+    # contra previsión publicada).
     op = None
     ruta_op = config.salida("puntuacion_effis.csv")
     if os.path.exists(ruta_op):

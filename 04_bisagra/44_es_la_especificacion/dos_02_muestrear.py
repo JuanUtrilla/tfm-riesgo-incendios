@@ -1,43 +1,42 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 2: la tabla maestra con los TRES diseños de muestreo.
+Dos modelos, paso 2: la tabla maestra con los tres diseños de muestreo.
 
-NO TOCA PRODUCCIÓN. Lee EGIF y cubo; escribe en expansión.
+No toca producción. Lee EGIF y cubo; escribe en expansión.
 
-=============================================================================
-POR QUÉ OTRO MUESTREADOR
-=============================================================================
+Por qué otro muestreador
+
 `muestrear_dataset.py` (repo original) empareja cada incendio con tres días
-aleatorios de la MISMA celda. `CUANDO_Y_DONDE.md` midió la consecuencia: el
+aleatorios de la misma celda. `CUANDO_Y_DONDE.md` midió la consecuencia: el
 98,8 % de las celdas tiene exactamente un 25 % de positivos, así que el modelo
-no puede aprender el DÓNDE. Este script produce, en una sola tabla y con un
+no puede aprender el dónde. Este script produce, en una sola tabla y con un
 campo `disenio`, todo lo que hace falta para comparar diseños con el mismo
 pipeline de features:
 
-  cuando   la muestra maestra v1 TAL CUAL (78.065 filas, id_muestra v1
+  cuando   la muestra maestra v1 tal cual (78.065 filas, id_muestra v1
            conservado en `id_v1`). Se re-extraen sus features con el mismo
            código que los demás, para que la comparación sea limpia.
-  donde    cada incendio EGIF (celda X, día D) + 3 celdas AL AZAR de España
-           el MISMO día D. Uniforme sobre las 498.530 celdas: es literalmente
+  donde    cada incendio EGIF (celda X, día D) + 3 celdas al azar de España
+           el mismo día D. Uniforme sobre las 498.530 celdas: es literalmente
            la pregunta operativa («¿cuál de estas arde hoy?»). Se rechaza una
            celda si hay un incendio EGIF a <12,5 km en ±10 días (mismo buffer
            que el diseño original), para no etiquetar como ausencia lo que es
            un incendio en curso.
   eval_dia verano (1-jun → 30-sep) de 2019 (val), 2020 (test) y 2022 (año
-           récord, FUERA del EGIF: solo verdad-terreno EFFIS). Por día:
+           récord, fuera del EGIF: solo verdad-terreno EFFIS). Por día:
            1.000 celdas al azar + todos los positivos EGIF del día + hasta 40
            celdas con `is_fire` (EFFIS ≥5 ha) del día. Es el banco de pruebas
-           del AUC DENTRO DEL DÍA (`PROMPT_DOS_MODELOS.md` §6), y NO entra en
+           del AUC dentro del día (`PROMPT_DOS_MODELOS.md` §6), y no entra en
            ningún entrenamiento.
 
-El diseño MIXTO (mitad cuándo / mitad dónde) no necesita filas propias: se
+El diseño mixto (mitad cuándo / mitad dónde) no necesita filas propias: se
 monta en el entrenamiento submuestreando `cuando` y `donde`.
 
 Etiquetas en `eval_dia`:
   label_egif   1 si hay ignición EGIF en esa celda ese día
   label_effis  1 si `is_fire`=1 en esa celda ese día (se rellena en el paso 3
                desde el cubo, junto con `is_near_fire`)
-  primer_dia   1 si `is_fire`=1 y el día anterior no (aproxima la IGNICIÓN;
+  primer_dia   1 si `is_fire`=1 y el día anterior no (aproxima la ignición;
                `is_fire` persiste un 51 % al día siguiente, `dos_00`)
 
 Salida: EXPANSION/dataset/maestra_dos.parquet
@@ -81,7 +80,7 @@ def main():
     iy_esp, ix_esp = np.where(esp)
     tr = Transformer.from_crs("EPSG:3035", "EPSG:4326", always_xy=True)
 
-    # ---- 1. diseño CUANDO: la v1 tal cual ---------------------------------
+    # ---- 1. diseño cuando: la v1 tal cual ---------------------------------
     v1 = pd.read_parquet(V1)
     cuando = pd.DataFrame({
         "disenio": "cuando", "id_v1": v1["id_muestra"].values,
@@ -92,8 +91,8 @@ def main():
     pos = cuando[cuando["label"] == 1].copy()
     print(f"cuando: {len(cuando):,} filas · positivos {len(pos):,}")
 
-    # ---- 2. diseño DONDE: mismo día, otra celda -----------------------------
-    # árbol de TODOS los incendios EGIF 2015-2020 (coincide con los positivos
+    # ---- 2. diseño donde: mismo día, otra celda -----------------------------
+    # árbol de todos los incendios EGIF 2015-2020 (coincide con los positivos
     # v1 deduplicados; la deduplicación no cambia el buffer)
     fx, fy = xs[pos["ix"].values], ys[pos["iy"].values]
     fd = pos["fecha"].values.astype("datetime64[D]").astype(int)
@@ -122,14 +121,14 @@ def main():
     donde["disenio"] = "donde"
     donde["label"] = np.int8(0)
     donde = donde.drop_duplicates(["fecha", "ix", "iy"])
-    # los positivos del diseño dónde son los MISMOS incendios
+    # los positivos del diseño dónde son los mismos incendios
     pos_d = pos.copy()
     pos_d["disenio"] = "donde"
     pos_d = pos_d.drop(columns=["id_v1"])
     donde = pd.concat([pos_d, donde], ignore_index=True)
     print(f"donde: {len(donde):,} filas · rechazos por buffer {n_rech:,}")
 
-    # ---- 3. EVAL_DIA ----------------------------------------------------------
+    # ---- 3. eval_dia ----------------------------------------------------------
     tiempos = ds["time"].values.astype("datetime64[D]")
     t0 = tiempos[0].astype(int)
     dias = [d for a in ANIOS_EVAL

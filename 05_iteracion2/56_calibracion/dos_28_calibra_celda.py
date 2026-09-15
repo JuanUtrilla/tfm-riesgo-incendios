@@ -1,45 +1,42 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 28: calibrar la probabilidad POR CELDA.
+Dos modelos, paso 28: calibrar la probabilidad por celda.
 
-NO TOCA PRODUCCIÓN NI NINGÚN REPO. Lee salida/dos_25_* y dos_27_cortes.json;
+No toca producción ni ningún repo. Lee salida/dos_25_* y dos_27_cortes.json;
 escribe salida/dos_28_*.{csv,json,md}.
 
-=============================================================================
-QUÉ PREGUNTA CONTESTA
-=============================================================================
+Qué pregunta contesta
+---------------------
 `dos_26` calibró el «si» (¿hoy es día grande?). Esto calibra el «dónde»: qué
-probabilidad tiene ESTA celda de arder HOY.
+probabilidad tiene esta celda de arder hoy.
 
-Hace falta porque la puntuación del modelo NO es una probabilidad. Los modelos
+Hace falta porque la puntuación del modelo no es una probabilidad. Los modelos
 se entrenaron con submuestreo de negativos (1:3 el único, 1:10 el r10), así que
-su salida vive en la prevalencia del entrenamiento, no en la real. Una celda
+su salida vive en la prevalencia del entrenamiento y no en la real. Una celda
 que marca 0,8 no es un 80 %: es «0,8 en una población donde 1 de cada 4 ardía».
-Sin este paso, el mapa solo admite lectura ordinal —y por eso se lee como «van
+Sin este paso, el mapa solo admite lectura ordinal, y por eso se lee como «van
 a arder».
 
-=============================================================================
-POR QUÉ NO LA CORRECCIÓN ANALÍTICA
-=============================================================================
+Por qué no la corrección analítica
+----------------------------------
 El atajo de Elkan / King-Zeng / Dal Pozzolo (p = βp_s/(βp_s − p_s + 1)) no vale
 para árboles: arXiv 2412.16209 concluye que la prevalencia estimada depende del
-nº de predictores y del ratio, y que los árboles pueden estar sesgados HACIA la
-minoritaria. Aquí no hace falta ningún atajo: tenemos el censo. El histograma
-de `dos_25` da el DENOMINADOR exacto (celdas-día por bin de puntuación) y
-`quem` el NUMERADOR (celdas que ardieron, con su puntuación). P(arde | s) se
-mide, no se deduce.
+número de predictores y del ratio, y que los árboles pueden estar sesgados hacia
+la minoritaria. Aquí no hace falta ningún atajo porque se tiene el censo. El
+histograma de `dos_25` da el denominador exacto (celdas-día por bin de
+puntuación) y `quem` el numerador (celdas que ardieron, con su puntuación).
+P(arde | s) se mide directamente.
 
-=============================================================================
-CÓMO
-=============================================================================
-· Numerador y denominador sobre la MISMA población: `es_sub`, la submuestra
+Cómo
+----
+· Numerador y denominador sobre la misma población: `es_sub`, la submuestra
   1-de-5 que forma el histograma. `quem` trae también celdas de fuera (las que
   arden alguna vez y entraron en `keep`); esas se descartan aquí, porque su
   denominador no está en el histograma.
 · Partición de `dos_26`, sin tocar: calibración 2015-2021 · validación
-  2022-2023 · TEST 2024 intacto.
-· Calibración BETA (Kull et al. 2017) sobre los conteos por bin, con peso =
-  nº de celdas-día. Misma familia que `dos_26`, por coherencia. La curva
+  2022-2023 · test 2024 intacto.
+· Calibración beta (Kull et al. 2017) sobre los conteos por bin, con peso =
+  número de celdas-día. Misma familia que `dos_26`, por coherencia. La curva
   empírica por bin se guarda aparte como comprobación de fiabilidad.
 
 Uso:
@@ -89,17 +86,17 @@ def aplica(lr, s):
 
 
 def iso_ajusta(n, y):
-    """Calibración ISOTÓNICA sobre los conteos por bin. Es la que se usa.
+    """Calibración isotónica sobre los conteos por bin. Es la que se usa.
 
-    POR QUÉ AQUÍ SÍ Y EN `dos_26` NO. Allí se rechazó por tres razones que no
+    Por qué aquí sí y en `dos_26` no. Allí se rechazó por tres razones que no
     se cumplen en este paso: había 822 positivos a nivel de día (aquí 12.897
     celdas quemadas sobre 365 millones de celdas-día, agrupadas en 4.096 bins
     con denominador exacto), la escalera importaba porque de la curva se
-    extraía un CORTE (aquí se publica la curva entera), y sobraba familia
-    paramétrica porque el dato era escaso.
+    extraía un corte (aquí se publica la curva entera), y con un dato escaso
+    convenía una familia paramétrica.
 
-    Y sobre todo: la beta NO VALE para esta forma. Ajustada sin restricción
-    da coeficiente NEGATIVO en −log(1−s) en los cinco modelos (p. ej. r10:
+    Y sobre todo: la beta no vale para esta forma. Ajustada sin restricción
+    da coeficiente negativo en −log(1−s) en los cinco modelos (p. ej. r10:
     [2,928, −1,737]), y una beta solo es monótona creciente con ambos ≥ 0. La
     curva se desplomaba al acercarse a s=1: la celda de puntuación máxima
     salía con probabilidad 0,000 %. La isotónica es monótona por construcción.
@@ -165,7 +162,7 @@ def main():
                             tasa_base_pct=round(100 * base, 5),
                             brier=br, bss_vs_base=round(1 - br / br0, 4)))
 
-        # fiabilidad en TEST: deciles de POBLACIÓN sobre las celdas-día
+        # fiabilidad en test: deciles de población sobre las celdas-día
         n, y = cnt["test"]
         cs = np.cumsum(n)
         for i, (lo, hi) in enumerate(zip(np.r_[0, cs[-1] * np.arange(1, 10) / 10],

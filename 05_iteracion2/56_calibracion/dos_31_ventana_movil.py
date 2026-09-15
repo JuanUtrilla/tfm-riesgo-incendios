@@ -1,30 +1,28 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 31: calibración por celda con VENTANA MÓVIL.
+Dos modelos, paso 31: calibración por celda con ventana móvil.
 
-NO TOCA PRODUCCIÓN NI NINGÚN REPO. Lee salida/dos_25_*; escribe
+No toca producción ni ningún repo. Lee salida/dos_25_*; escribe
 salida/dos_31_*.{csv,json}.
 
-=============================================================================
-QUÉ PROBLEMA ATACA
-=============================================================================
-`dos_29` calibra por mes con un bloque FIJO de años (2015-2021) y deja el error
-típico de la punta en 1,8x. Pero **julio infrapredice por 7x** (0,88 % contra
+Qué problema ataca
+------------------
+`dos_29` calibra por mes con un bloque fijo de años (2015-2021) y deja el error
+típico de la punta en 1,8x. Pero julio infrapredice por 7x (0,88 % contra
 6,22 % observado), y julio es el mes que concentra más superficie quemada.
 
-La causa está identificada (`LIMITACIONES.md` §9): la ventana 2015-2021 **no
-contiene ningún año extremo**, y el periodo de evaluación sí. 2022 aporta por sí
+La causa está identificada (`LIMITACIONES.md` §9): la ventana 2015-2021 no
+contiene ningún año extremo, y el periodo de evaluación sí. 2022 aporta por sí
 solo más celdas quemadas en dos años (6.500) que los siete de calibración juntos
 (5.695). Un bloque fijo que empieza en 2015 arrastra para siempre una década
 menos incendiaria que el presente.
 
-La hipótesis de este paso: **calibrar con los K años ANTERIORES a cada año
-evaluado**, en vez de con un bloque fijo, sigue la deriva de la tasa base y
+La hipótesis de este paso: calibrar con los K años anteriores a cada año
+evaluado, en vez de con un bloque fijo, sigue la deriva de la tasa base y
 corrige la infrapredicción.
 
-=============================================================================
-CÓMO
-=============================================================================
+Cómo
+----
 Para cada año Y de evaluación (2022, 2023, 2024) y cada ventana K:
 
     curva = isotónica ajustada con los años [Y-K, Y-1], estratificada por mes
@@ -38,8 +36,8 @@ K = 3, 5, 7 y «todo lo anterior». K=7 evaluando 2022 equivale al bloque fijo d
 `dos_29`, así que la comparación es directa.
 
 Criterio, el mismo que `dos_29`: mediana de |log10(predicha/observada)| en el
-top 0,2 % de cada mes. Se reporta aparte el error SOLO en jun-sep, que es lo
-que de verdad importa (el 66 % de las celdas quemadas).
+top 0,2 % de cada mes. Se reporta aparte el error solo en jun-sep, que es lo
+que más pesa (el 66 % de las celdas quemadas).
 
 Uso:
     python dos_31_ventana_movil.py

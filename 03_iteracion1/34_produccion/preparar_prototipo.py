@@ -3,15 +3,16 @@
 Precálculo por estación AEMET para el prototipo en tiempo real (se ejecuta 1 vez).
 
 Para cada estación del colector horario 2026:
-1. Celda IberFire (EPSG:3035) — se descartan las fuera de la malla (Canarias).
-2. Estáticas de la celda (elevación…CLC 2018, popdens 2020) — mismas defs que el pipeline.
-3. Climatología FWI-propio 2008-2014 por mes: se corre `fwi_canadiense` sobre la
-   meteo del CUBO en esa celda (spin-up desde 2007) y se guardan los valores por
-   mes → el percentil en tiempo real compara nuestro-FWI con nuestro-FWI (el
-   sesgo de implementación se cancela).
-4. Climatología mensual de vegetación 2020-2024 (ndvi, lai, swi010, lst) — proxy
+1. Celda IberFire (EPSG:3035); se descartan las que caen fuera de la malla (Canarias).
+2. Estáticas de la celda (elevación…CLC 2018, popdens 2020), con las mismas
+   definiciones que el pipeline.
+3. Climatología del FWI propio 2008-2014 por mes: se corre `fwi_canadiense` sobre la
+   meteo del cubo en esa celda (spin-up desde 2007) y se guardan los valores por
+   mes, de modo que el percentil en tiempo real compara el FWI propio con el FWI
+   propio y el sesgo de implementación se cancela.
+4. Climatología mensual de vegetación 2020-2024 (ndvi, lai, swi010, lst), proxy
    de las features no observables en tiempo real.
-5. Autorregresivas EGIF (hasta 2020, congeladas — caveat documentado).
+5. Autorregresivas EGIF (hasta 2020, congeladas; limitación documentada).
 
 Salida: prototipo/estaciones_prototipo.parquet (1 fila/estación, listas por mes
 serializadas) + prototipo/clim_fwi/<idema>.npz (climatología FWI por mes).
@@ -101,7 +102,7 @@ def main():
     veg_cols, auto_cols = [], []
     for n, f in enumerate(est.itertuples()):
         iy, ix = int(f.iy), int(f.ix)
-        # FWI propio sobre meteo del cubo (spin-up 2007-12→, guardamos 2008-14)
+        # FWI propio sobre meteo del cubo (spin-up desde 2007-12; se guarda 2008-14)
         t = ds["t2m_max"].isel(y=iy, x=ix, time=idx_spin).values
         h = ds["RH_min"].isel(y=iy, x=ix, time=idx_spin).values
         w = ds["wind_speed_max"].isel(y=iy, x=ix, time=idx_spin).values * 3.6

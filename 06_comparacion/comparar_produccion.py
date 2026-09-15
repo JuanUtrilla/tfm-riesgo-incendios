@@ -1,33 +1,31 @@
 #!/usr/bin/env python3
 """
-La comparación que decide: malla contra producción, EL MISMO DÍA.
+La comparación que decide: malla contra producción, el mismo día.
 
-NO TOCA PRODUCCIÓN. Lee el .npz que deja `mapa_riesgo_hoy.py` y el que deja
+No toca producción. Lee el .npz que deja `mapa_riesgo_hoy.py` y el que deja
 `riesgo_hoy.py`. Escribe salida/comparacion_<fecha>.png y .json.
 
-=============================================================================
-QUÉ AÑADE ESTO A LO YA MEDIDO
-=============================================================================
-Todo lo anterior compara la malla contra el CUBO en 2024. Eso demuestra que
+Qué añade esto a lo ya medido
+-----------------------------
+Todo lo anterior compara la malla contra el cubo en 2024. Eso demuestra que
 la meteo de los nodos reproduce la referencia con la que se entrenó el modelo,
-pero no dice nada sobre el sistema que está en producción HOY, que usa otra
+pero no dice nada sobre el sistema que está en producción hoy, que usa otra
 fuente (estaciones AEMET), otra interpolación (IDW k=8) y otro denominador
 (la climatología del cubo).
 
-Aquí se comparan los dos mapas sobre las MISMAS celdas y el MISMO día. Es lo
+Aquí se comparan los dos mapas sobre las mismas celdas y el mismo día. Es lo
 único que responde "¿qué cambia para quien mira el mapa?".
 
-=============================================================================
-QUÉ SE PUEDE Y QUÉ NO SE PUEDE COMPARAR
-=============================================================================
-Producción solo guarda la probabilidad, no las features. Así que aquí NO se
-puede contrastar `fwi_pctl_local` entre los dos —para eso están los módulos
-3c y 02b— sino la SALIDA: la probabilidad por celda y el reparto por niveles,
+Qué se puede y qué no se puede comparar
+---------------------------------------
+Producción solo guarda la probabilidad, no las features. Así que aquí no se
+puede contrastar `fwi_pctl_local` entre los dos (para eso están los módulos
+3c y 02b), solo la salida: la probabilidad por celda y el reparto por niveles,
 que es lo que se publica.
 
 Tampoco se mide acierto. La verdad-terreno del día son las detecciones FIRMS,
-pero FIRMS NRT entra como FEATURE en los dos mapas: usarla de juez sería
-circular. Esto mide ACUERDO, no habilidad. La habilidad está medida en
+pero FIRMS NRT entra como feature en los dos mapas: usarla de referencia sería
+circular. Esto mide acuerdo, no habilidad. La habilidad está medida en
 `malla_05b_evaluacion.py` con FIRMS del propio día sobre 2024.
 
 Uso: python comparar_produccion.py [AAAA-MM-DD]

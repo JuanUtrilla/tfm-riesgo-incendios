@@ -3,21 +3,21 @@
 Validación out-of-time 2021-2024: eventos de incendio FIRMS vs riesgo del modelo.
 
 El modelo entrenó con 2015-2018 (val 2019, test 2020). El cubo IberFire llega a
-dic-2024 → 2021-2024 es un banco de pruebas con las features EXACTAS del
-entrenamiento y verdad-terreno independiente del EGIF (incompleto esos años).
+dic-2024, así que 2021-2024 es un banco de pruebas con las mismas features del
+entrenamiento y una verdad-terreno independiente del EGIF (incompleto esos años).
 
-Fase 1 — eventos: DBSCAN espacio-temporal sobre las detecciones FIRMS 2021-2024
-  (x,y en km; el tiempo escalado 2,5 km/día; eps=6, es decir ~6 km / ~2,4 días),
+Fase 1, eventos: DBSCAN espacio-temporal sobre las detecciones FIRMS 2021-2024
+  (x,y en km; el tiempo escalado a 2,5 km/día; eps=6, es decir ~6 km / ~2,4 días),
   tras eliminar fuentes estáticas industriales (píxel de 0,01° con detecciones
   en >15 días distintos del cuatrienio) y detecciones de baja confianza ya
   filtradas aguas arriba. Se descartan eventos fuera de la malla peninsular.
 
-Fase 2 — modelo: para cada evento, serie DIARIA de probabilidad del modelo de
+Fase 2, modelo: para cada evento, serie diaria de probabilidad del modelo de
   producción (xgb_v2_prototipo) en su celda durante todo el año del evento,
   con las mismas definiciones de features del pipeline (ventanas excluyendo el
   día, percentil local 2008-14, FIRMS frp de archivo con ventana [D-7,D-1],
   rayos WGLC hasta 2023 y 0 en 2024, autorregresivas EGIF congeladas en 2020).
-  → prob del día de inicio, percentil de esa prob dentro del año, serie anual.
+  Se guarda la prob del día de inicio, su percentil dentro del año y la serie anual.
 
 Salidas: dataset/eventos_firms_2021_2024.parquet (1 fila/evento)
          viz_data/eventos_firms_series.json (series anuales para el visor)

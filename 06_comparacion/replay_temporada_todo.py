@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Bucle de temporada sobre replay_dia.py: reanudable (salta los días con npz
-en replay/<año>/<condicion>/), sin PNG, 8 hilos. Uso:
-   python replay_temporada.py --anio 2025 --condicion ifs [--ini --fin]"""
+"""Bucle de temporada sobre replay_dia_todo.py (r10 entrenado con 2015-2024):
+reanudable (salta los días con npz en salida_replay/<año>/<condicion>/), sin
+PNG, 8 hilos. Uso:
+   python replay_temporada_todo.py --anio 2025 --condicion ifs [--ini --fin]"""
 import argparse, os, subprocess, sys, time
 import pandas as pd
 AQUI = os.path.dirname(os.path.abspath(__file__))

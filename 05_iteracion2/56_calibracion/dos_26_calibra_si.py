@@ -1,51 +1,52 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 26: calibrar el «si» (aviso de día) con 2015-2024.
+Dos modelos, paso 26: calibrar el «si» (aviso de día) con 2015-2024.
 
-NO TOCA PRODUCCIÓN. Lee salida/dos_25_hist.npz y el cubo; escribe
+No toca producción. Lee salida/dos_25_hist.npz y el cubo; escribe
 salida/dos_26_*.{csv,json,md,png}.
 
-=============================================================================
-QUÉ PREGUNTA CONTESTA
-=============================================================================
+Nota (14/09/2026): el semáforo nacional que salía de esta calibración se
+evaluó y se descartó; el script se conserva como registro del experimento y
+de sus números.
+
+Qué pregunta contesta
+---------------------
 `replay_si.py` fijó el umbral con jun-ago 2025: 92 días, 86 con fuego. Con esa
-prevalencia el umbral no se estima, se extrapola — y la tabla 2×2 es
-degenerada. Aquí hay 3.653 días con la variación real de la tasa base, días de
-cero incluidos.
+prevalencia el umbral no se estima, se extrapola, y la tabla 2×2 queda
+degenerada. Aquí hay 3.653 días con la variación real de la tasa base, días
+de cero incluidos.
 
 Tres cosas que la literatura obliga a cambiar respecto al plan original:
 
-1. DOS REGÍMENES, NO UNO. En 2015-2024 el 33,9 % de los días de nov-mar
+1. Dos regímenes en vez de uno. En 2015-2024 el 33,9 % de los días de nov-mar
    tienen fuego, y el 85,6 % de las celdas quemadas de dic-abr caen en el
    noroeste (14,4 % del territorio): es la temporada de quemas pastorales de
    Galicia-Asturias-León, con conductor de ignición y no de sequía. La UE
    calibra el FWI con escalas distintas para verano e invierno por esto mismo.
-   Un umbral único todo el año no es conservador, es ciego medio año.
+   Un umbral único todo el año queda ciego medio año.
 
-2. CALIBRACIÓN BETA, NO ISOTÓNICA NI ANALÍTICA. La corrección analítica del
-   submuestreo (Elkan/King-Zeng/Dal Pozzolo, p = βp_s/(βp_s − p_s + 1)) NO
-   vale para árboles: arXiv 2412.16209 muestra que la prevalencia estimada
-   depende del nº de predictores y del ratio, y que los árboles pueden estar
-   sesgados HACIA la minoritaria. Isotónica sobreajusta con pocos positivos y
-   da una escalera — pésimo si lo que se extrae es un corte. Beta (Kull et
-   al. 2017) es de tres parámetros y se aprende del dato.
+2. Calibración beta en vez de isotónica o analítica. La corrección analítica
+   del submuestreo (Elkan/King-Zeng/Dal Pozzolo, p = βp_s/(βp_s − p_s + 1))
+   no vale para árboles: arXiv 2412.16209 muestra que la prevalencia estimada
+   depende del número de predictores y del ratio, y que los árboles pueden
+   estar sesgados hacia la minoritaria. La isotónica sobreajusta con pocos
+   positivos y da una escalera, lo peor si lo que se extrae es un corte. Beta
+   (Kull et al. 2017) es de tres parámetros y se aprende del dato.
 
-3. BRIER SOLO NO VALE. Bajo desbalanceo el Brier lo domina la tasa base. Se
-   reporta BSS contra la climatología del día del año, diagrama de fiabilidad
-   con bines de igual POBLACIÓN, y SEDI (Ferro & Stephenson 2011), que es
-   independiente de la tasa base y no degenera con la rareza.
+3. El Brier solo no basta. Bajo desbalanceo el Brier lo domina la tasa base.
+   Se reporta BSS contra la climatología del día del año, diagrama de
+   fiabilidad con bines de igual población, y SEDI (Ferro & Stephenson 2011),
+   que es independiente de la tasa base y no degenera con la rareza.
 
-=============================================================================
-PARTICIÓN (no se toca después)
-=============================================================================
-  calibración 2015-2021 · validación 2022-2023 · TEST 2024 intacto
+Partición (no se toca después)
+------------------------------
+  calibración 2015-2021 · validación 2022-2023 · test 2024 intacto
 El umbral se elige en calibración, se mira en validación y se reporta en test.
 
-=============================================================================
-OBJETIVO DEL DÍA
-=============================================================================
-«¿arde algo?» no es una pregunta: en jun-sep el 56,5 % de los días tienen
-fuego y en jul-ago el 63-76 %. El objetivo por defecto es DÍA GRANDE: ≥5
+Objetivo del día
+----------------
+«¿Arde algo?» apenas discrimina: en jun-sep el 56,5 % de los días tienen
+fuego y en jul-ago el 63-76 %. El objetivo por defecto es el día grande: ≥5
 celdas EFFIS de primer día en España (≥500 ha), que en 2015-2024 pasa el
 10,6 % de los días. Se puede cambiar con --umbral-dia.
 
@@ -83,10 +84,10 @@ MIN_AVISOS = 20
 
 # --------------------------------------------------------------------------
 def verdad_diaria(dias):
-    """Celdas EFFIS de PRIMER DÍA por jornada, nacional y noroeste.
+    """Celdas EFFIS de primer día por jornada, nacional y noroeste.
 
     Pasada ligera sobre `is_fire` bloque a bloque: primer día = is_fire en t y
-    no en t−1, que es lo que puntúa `quemadas()` en la validación operativa.
+    no en t−1, que es lo que puntúa `quemadas()` al comparar con EFFIS.
     """
     import os
     f = f"{SAL}_verdad.csv"
@@ -177,15 +178,15 @@ def climatologia(d, vent=31):
 
     Dos cuidados, y los dos importan (05/09/2026):
 
-    1. SOLO AÑOS DE CALIBRACIÓN. La media cruda por `doy` sobre los 10 años
-       incluía 2024 en su propia referencia. No contamina el modelo —la beta
-       se ajusta con 2015-2021— pero sí el baseline contra el que se mide la
-       habilidad, y este capítulo no deja pasar fugas.
-    2. SUAVIZADA. Con 7 años por `doy` la media cruda solo puede valer
-       0, 1/7, 2/7… : memoriza el ruido y se convierte en una referencia
+    1. Solo años de calibración. La media cruda por `doy` sobre los 10 años
+       incluía 2024 en su propia referencia. No contamina el modelo (la beta
+       se ajusta con 2015-2021), pero sí el baseline contra el que se mide la
+       habilidad, y eso es una fuga.
+    2. Suavizada. Con 7 años por `doy` la media cruda solo puede valer
+       0, 1/7, 2/7…: memoriza el ruido y se convierte en una referencia
        imbatible por accidente. Medido: Brier 0,1454 la cruda contra 0,1617
-       la honesta, y por eso TODOS los modelos daban BSS negativo en verano.
-       Una ventana centrada de 31 días es la práctica estándar para
+       la honesta, y por eso todos los modelos daban BSS negativo en verano.
+       Una ventana centrada de 31 días es la práctica habitual para
        climatologías diarias y deja la estacionalidad intacta (0,028-0,438).
 
     El `doy` 366 se rellena por interpolación: solo existe en bisiestos.
@@ -224,10 +225,10 @@ def sedi(y, aviso):
 def indices_boot(n, rng, bloque=1):
     """Índices de remuestreo. `bloque=1` es el bootstrap iid de la casa.
 
-    Con `bloque>1` es un bootstrap por BLOQUES MÓVILES: se remuestrean tramos
+    Con `bloque>1` es un bootstrap por bloques móviles: se remuestrean tramos
     de días consecutivos en vez de días sueltos. Hace falta mirarlo porque los
-    días no son independientes —un incendio grande dura varios días y el
-    tiempo persiste—, y el iid, que supone independencia, estrecha los
+    días no son independientes (un incendio grande dura varios días y el
+    tiempo persiste), y el iid, que supone independencia, estrecha los
     intervalos. Dentro de un régimen los días son contiguos salvo el salto de
     un año al siguiente; el bloque cruza esos saltos alguna vez, y es una
     aproximación asumida.
@@ -252,7 +253,7 @@ def sedi_vec(Y, A):
 
 
 def ic_sedi_bss(y, pm, u, clim, rng, bloque=1):
-    """IC percentil al 95 % de SEDI y BSS, con el umbral FIJO.
+    """IC percentil al 95 % de SEDI y BSS, con el umbral fijo.
 
     El umbral no se vuelve a elegir en cada remuestra: forma parte del sistema
     ya entrenado, y reelegirlo mediría la variabilidad del procedimiento, no
@@ -272,7 +273,7 @@ def ic_sedi_bss(y, pm, u, clim, rng, bloque=1):
 
 
 def fiabilidad(p, y, nbin=10):
-    """Diagrama de fiabilidad con bines de igual POBLACIÓN (no de anchura)."""
+    """Diagrama de fiabilidad con bines de igual población (no de anchura)."""
     o = np.argsort(p)
     trozos = np.array_split(o, nbin)
     return pd.DataFrame([{"n": len(t), "p_medio": p[t].mean(),
@@ -335,16 +336,16 @@ def main():
             for nomp, msk in (("calib", ca), ("val", va), ("test", te)):
                 y = d.y[msk].values
                 pm = p[msk]
-                # umbral elegido SOLO en calibración: máximo SEDI, pero
+                # umbral elegido solo en calibración: máximo SEDI, pero
                 # exigiendo que la tabla 2x2 sea estimable (05/09/2026).
                 #
                 # SEDI premia el pronóstico rarísimo y perfecto: sin la
                 # restricción, `pareja/verano` elegía un umbral con 3 avisos
                 # en 854 días (3 aciertos, precisión 1,0) que en test daba
-                # CERO avisos y SEDI 0; a `prod/transicion` le pasaba igual
+                # cero avisos y SEDI 0; a `prod/transicion` le pasaba igual
                 # con 6. Con celdas de la tabla casi vacías el índice no es
-                # estimable —su varianza explota— y además un aviso que salta
-                # tres veces en siete años no es un producto operativo.
+                # estimable (su varianza explota), y un aviso que salta tres
+                # veces en siete años tampoco sirve como producto operativo.
                 if nomp == "calib":
                     reja = np.unique(np.quantile(pm, np.linspace(0.5, 0.999, 200)))
                     viables = reja[[(pm >= t).sum() >= MIN_AVISOS for t in reja]]

@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 17: ¿mejora el mapa una capa de "YA QUEMADO"? Evaluado
-sobre julio-agosto de 2026 contra EFFIS, con los mapas diarios ya calculados.
+Dos modelos, paso 17: ¿mejora el mapa una capa de "ya quemado"? Medido
+sobre julio-agosto de 2026 contra los perímetros EFFIS, con los mapas diarios
+ya calculados.
 
-NO TOCA PRODUCCIÓN. Lee mapas_2026 (disco externo) y el geojson de EFFIS;
+No toca producción. Lee mapas_2026 (disco externo) y el geojson de EFFIS;
 escribe salida/dos_17_capa_quemado.json.
 
-=============================================================================
-QUÉ SE PRUEBA
-=============================================================================
+Qué se prueba
+-------------
 `ESTUDIO_COMBUSTIBLE_CONSUMIDO.md` midió que los modelos siguen dando
 percentil ~72 a una celda dos semanas después de quemarse. Aquí se aplica una
-capa "ya quemado" como POSTPROCESO del mapa (las celdas marcadas bajan al
+capa "ya quemado" como postproceso del mapa (las celdas marcadas bajan al
 fondo del ranking) y se mide si el mapa mejora o empeora. Variantes:
 
   capa       qué celdas se apagan
@@ -21,9 +21,9 @@ fondo del ranking) y se mide si el mapa mejora o empeora. Variantes:
   firms_N    con detección VIIRS en la propia celda en los últimos N días
              (es lo que habría en tiempo real sin esperar a EFFIS)
 
-Dos verdades-terreno, porque la respuesta depende de qué se quiera acertar:
-  todo       celdas con FIREDATE ese día (lo que juzga `puntuar_effis`)
-  nuevos     solo perímetros que NO tocan (≤1 km) ningún perímetro de los
+Dos verdades terreno, porque la respuesta depende de qué se quiera acertar:
+  todo       celdas con FIREDATE ese día (lo que puntúa `puntuar_effis`)
+  nuevos     solo perímetros que no tocan (≤1 km) ningún perímetro de los
              30 días anteriores: igniciones nuevas, no crecimiento ni
              reactivación de un complejo ya en marcha.
 

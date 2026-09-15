@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""F10 - Percentil del dia frente a escala absoluta: verano y fuera de temporada.
+"""F10 - Percentil del día frente a escala absoluta: verano y fuera de temporada.
 
-Dos dias del replay de 2025 con el r10 (`archivo_ifs/replay/2025/ifs/`): el
+Dos días del replay de 2025 con el r10 (`archivo_ifs/replay/2025/ifs/`): el
 13 de agosto (pleno verano) y el 29 de octubre (fuera de temporada). Columna
-izquierda: niveles por percentil del dia, como sirve hoy la cadena
-(p30/p90/p98). Columna derecha: los cortes absolutos de
+izquierda: niveles por percentil del día (p30/p90/p98, el mapa «dónde mirar»
+de la cadena). Columna derecha: los
+cortes absolutos del cubo, de
 `05_iteracion2/56_calibracion/dos_27_escala_absoluta.py` (MODERADO >= 0,0018,
-ALTO >= 0,0736, EXTREMO >= 0,4066) y el semaforo del dia, que se enciende si el
+ALTO >= 0,0736, EXTREMO >= 0,4066), y el semáforo del día, que se enciende si el
 p98 de la pareja supera 0,076 (umbral de invierno-primavera de dos_26 en
-escala cruda; el de verano es 0,064).
+escala cruda; el de verano es 0,064). Es la versión con semáforo; el semáforo
+se retiró el 14/09/2026 y la versión sin él, con los cortes calibrados sobre
+los mapas servidos, es `07_produccion/escala_y_cifra/fig3_dos_mapas.py`.
 Uso:  python f10_percentil_vs_absoluto.py   [TFM_ARCHIVO=<ruta a archivo_ifs>]
 """
 import os

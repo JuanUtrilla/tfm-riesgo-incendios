@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Escala absoluta y cifra del día calibradas sobre los mapas SERVIDOS (opción 1).
+"""Escala absoluta y cifra del día calibradas sobre los mapas servidos (opción 1).
 
 Solo lectura. Entradas: archivo_ifs/replay/<año>/ifs/<fecha>.npz (prob_r10, float16,
 el mismo camino de servicio que la cadena diaria), verdad_<año>/<fecha>.npz y

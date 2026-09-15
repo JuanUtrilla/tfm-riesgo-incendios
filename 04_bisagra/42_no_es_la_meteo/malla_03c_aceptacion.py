@@ -2,14 +2,14 @@
 """
 Módulo 3c: prueba de aceptación del mapeo del FWI. Dos comprobaciones.
 
-NO SOBRESCRIBE NADA. Escribe dataset/malla_03c_aceptacion.json.
+No sobrescribe nada. Escribe dataset/malla_03c_aceptacion.json.
 
-(1) FUERA DE MUESTRA. En 3b el mapeo se ajustó y se evaluó sobre jun-sep 2024:
-    para el sesgo eso es CIRCULAR (un mapeo de cuantiles anula el sesgo sobre
+(1) Fuera de muestra. En 3b el mapeo se ajustó y se evaluó sobre jun-sep 2024:
+    para el sesgo eso es circular (un mapeo de cuantiles anula el sesgo sobre
     su propio periodo de ajuste por construcción). Aquí se ajusta con jun-jul
-    y se evalúa con ago-sep, que es lo que de verdad haría producción.
+    y se evalúa con ago-sep, que es lo que haría producción.
 
-(2) LA MÉTRICA QUE DECIDE. Saturación de `fwi_pctl_local` contra `clim_fwi`,
+(2) La métrica que decide. Saturación de `fwi_pctl_local` contra `clim_fwi`,
     el denominador real de producción. Es la métrica con la que empezó todo:
 
         referencia (cubo)          0,2 %
@@ -17,13 +17,13 @@ NO SOBRESCRIBE NADA. Escribe dataset/malla_03c_aceptacion.json.
         IFS híbrido crudo          2,2 %
         AEMET (producción hoy)     3,3 %
 
-    Con el máximo del FWI clavado en 107,2 (= el del cubo), debería aterrizar
-    en el nivel de la referencia.
+    Con el máximo del FWI clavado en 107,2 (= el del cubo), debería quedar en
+    el nivel de la referencia.
 
-Se mide además la variante de diseño que hace innecesario el mapeo para las
+Se mide también la variante de diseño que hace innecesario el mapeo para las
 dos features del percentil: usar como denominador la climatología construida
 con ERA5-Land en vez de la del cubo. Aquí se aproxima con los propios datos
-2024 (muestra corta, es indicativo, no definitivo).
+2024 (muestra corta; es indicativo, no definitivo).
 
 Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_03c_aceptacion.py
 """
@@ -81,7 +81,7 @@ def main():
 
     ref, mio = fwi_m(C, C["prec"]), fwi_m(L, L["prec"])
 
-    # mapeo ajustado SOLO con junio-julio
+    # mapeo ajustado solo con junio-julio
     a, b = ref[fit].ravel(), mio[fit].ravel()
     o = np.isfinite(a) & np.isfinite(b)
     xs, ys = np.quantile(b[o], Q), np.quantile(a[o], Q)

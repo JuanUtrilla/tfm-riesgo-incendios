@@ -2,45 +2,39 @@
 """
 Módulo 2b, paso 3: corregir la rama de previsión. ¿Queda producción viable?
 
-NO TOCA PRODUCCIÓN. Escribe salida/prueba_correccion.json.
+No toca producción. Escribe salida/prueba_correccion.json.
 
-=============================================================================
-DE DÓNDE VIENE
-=============================================================================
+De dónde viene
     paso 1  IFS puro    / clim ERA5-Land → 2,18 %   (referencia: 0,23 %)
     paso 2  híbrido L=6 / clim ERA5-Land → 2,05 %
 
 El paso 2 refutó el supuesto del repo original de que la memoria larga del FWI
 absorbería la rama de previsión: con solo 3 días de IFS ya se llega a 1,91 %.
-La memoria está en DC y DMC, pero el valor DIARIO lo manda el FFMC, cuya
+La memoria está en DC y DMC, pero el valor diario lo manda el FFMC, cuya
 constante de tiempo son horas. La rama de previsión domina.
 
-=============================================================================
-LA CORRECCIÓN, Y POR QUÉ ESTA
-=============================================================================
+La corrección, y por qué esta
 El problema es el de siempre en este proyecto: numerador y denominador de
 distribuciones distintas. El denominador es la climatología de ERA5-Land; el
 numerador, en la rama de previsión, es IFS. No coinciden y la división satura.
 
-Ya no se puede arreglar por la vía del módulo 4 —reconstruir el denominador—
+Ya no se puede arreglar por la vía del módulo 4 (reconstruir el denominador)
 porque no existe una climatología de IFS de siete años, ni la va a haber: es
 un modelo operativo que cambia de ciclo. Así que se arregla por el otro lado,
 llevando el numerador a la escala del denominador con un mapeo de cuantiles,
 que es monótono y por tanto conserva el ranking.
 
 Es la misma herramienta del módulo 3b, pero con el par correcto: allí se mapeó
-ERA5-Land → cubo, y el módulo 5 midió que eso EMPEORA (−3,2 pts de percentil)
+ERA5-Land → cubo, y el módulo 5 midió que eso empeora (−3,2 pts de percentil)
 porque el cubo ya no es el denominador de nada. Aquí se mapea híbrido →
 ERA5-Land, que sí es el denominador real.
 
-=============================================================================
-SIN CIRCULARIDAD
-=============================================================================
+Sin circularidad
 Un mapeo de cuantiles anula por construcción la diferencia de distribución
-sobre su propio periodo de ajuste. Evaluarlo ahí no mide nada — es el error
+sobre su propio periodo de ajuste. Evaluarlo ahí no mide nada; es el error
 que el módulo 3c detectó y corrigió en su día.
 
-Aquí se ajusta con JUNIO-JULIO y se evalúa con AGOSTO-SEPTIEMBRE, que es lo
+Aquí se ajusta con junio-julio y se evalúa con agosto-septiembre, que es lo
 que haría producción: mapeo fijo, días nuevos. Los tres brazos se evalúan
 sobre los mismos días de ago-sep para que las cifras sean comparables.
 

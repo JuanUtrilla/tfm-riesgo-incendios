@@ -1,8 +1,8 @@
-"""Ajustes compartidos por los scripts de figuras de la seccion de modelado.
+"""Ajustes compartidos por los scripts de figuras de la sección de modelado.
 
 Todas las figuras salen a ../ en PNG de 300 dpi, con ancho pensado para el
-ancho de pagina de la memoria (16 cm), sin titulo dentro de la figura (el
-titulo va en el pie) y con la paleta Okabe-Ito, segura para daltonismo.
+ancho de página de la memoria (16 cm), sin título dentro de la figura (el
+título va en el pie) y con la paleta Okabe-Ito, segura para daltonismo.
 
 Rutas: RAIZ es la carpeta que contiene los repositorios de trabajo. Se puede
 fijar con la variable de entorno TFM_RAIZ.

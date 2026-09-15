@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Reanálisis ERA5-Land INCREMENTAL para la cadena en GitHub Actions.
+Reanálisis ERA5-Land incremental para la cadena en GitHub Actions.
 
 `malla_02_descarga.py` re-agrega cada día todos los meses desde el 1-may a
 partir de los horarios en `_cds/` (60 MB por mes). En GitHub no hay disco
 persistente y volver a bajar 4 meses de CDS cada día es inviable (cola).
-Aquí se baja SOLO el mes en curso (hasta D−6), se agrega a diario con la
+Aquí se baja solo el mes en curso (hasta D−6), se agrega a diario con la
 misma `a_diario`, y se funde con el `era5land_diario.nc` acumulado que vino
 del Release (`gh_estado.py pull`): se sustituyen los días de ese mes y se
 conserva el resto. Al cambiar de mes, el mes anterior ya está completo en el
 acumulado y no se vuelve a pedir.
 
-El horario del mes en curso NO se conserva en GitHub (se regenera cada día;
+El horario del mes en curso no se conserva en GitHub (se regenera cada día;
 la regla de no borrar ERA5 aplica al portátil, donde sigue `malla_02`).
 Primer día del mes: CDS aún no tiene datos (D−6 cae en el mes anterior) y
 el script sale sin hacer nada: el acumulado ya cubre hasta D−6.
@@ -32,14 +32,15 @@ ACUM = config.salida("era5land_diario.nc")
 
 
 def comprobar(f, fin):
-    """El acumulado tiene que llegar a D−6 SIN huecos, o parar en rojo.
+    """El acumulado tiene que llegar a D−6 sin huecos, o parar en rojo.
 
     Antes se comprobaba solo que el paso terminase. Si el CDS devuelve el mes
     a medias, el script salía en verde y la cadena construía los mapas del día
     sobre un reanálisis con hueco, en silencio: el fallo no se ve en el mapa,
-    se ve semanas después en el juez. Un reanálisis corto es peor que un paso
-    en rojo, porque el rojo se arregla y el hueco se publica. (31/08/2026,
-    tras quedarse el acumulado en el 15-ago por una incidencia de estado.)
+    se ve semanas después al contrastar con EFFIS. Un reanálisis corto es peor
+    que un paso en rojo, porque el rojo se arregla y el hueco se publica.
+    (31/08/2026, tras quedarse el acumulado en el 15-ago por una incidencia
+    de estado.)
     """
     falta = pd.date_range(f.min(), fin, freq="D").difference(f)
     if len(falta):
@@ -78,13 +79,7 @@ def main():
     os.replace(ACUM + ".tmp", ACUM)
     f = pd.to_datetime(out["fecha"].values)
     print(f"  era5land_diario.nc: {f.min().date()} → {f.max().date()} ({len(f)} días)")
-    # Comprobar la COBERTURA, no solo que el paso terminó. Si el CDS devuelve
-    # el mes a medias, hasta ahora el script salía en verde y la cadena
-    # construía los mapas del día sobre un reanálisis con hueco, en silencio:
-    # el fallo no se ve en el mapa, se ve semanas después en el juez. Un
-    # reanálisis corto es peor que un paso en rojo, porque el rojo se arregla
-    # y el hueco se publica. (31/08/2026, tras quedarse el acumulado en el
-    # 15-ago por una incidencia de estado.)
+    # comprobar la cobertura, no solo que el paso terminó (ver `comprobar`)
     comprobar(f, fin)
     # el horario del mes en curso no hace falta más
     import shutil

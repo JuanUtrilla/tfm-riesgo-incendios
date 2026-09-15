@@ -1,29 +1,28 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 3: features de la tabla maestra (cubo + historia).
+Dos modelos, paso 3: features de la tabla maestra (cubo + historia).
 
-NO TOCA PRODUCCIÓN. Lee cubo, EGIF, FIRMS y WGLC; escribe en expansión.
+No toca producción. Lee cubo, EGIF, FIRMS y WGLC; escribe en expansión.
 
-=============================================================================
-POR QUÉ SE REUTILIZA EL EXTRACTOR ORIGINAL Y NO SE REESCRIBE
-=============================================================================
-Las features tienen que ser EXACTAMENTE las del modelo en producción para que
-la comparación sea del diseño de muestreo y no de la receta de features. Por
-eso `procesar_bloque` y `extraer_estaticas` se importan de
-`extraer_features_cubo.py` del repo original (solo lectura, con importlib: no
-se copia el código, así no puede divergir). La historia (EGIF/FIRMS/rayos) sí
-está copiada de `extraer_features_historia.py` porque allí vive dentro de
+Por qué se reutiliza el extractor original en vez de reescribirlo
+-----------------------------------------------------------------
+Las features tienen que ser exactamente las del modelo en producción para que
+la comparación mida el diseño de muestreo y no la receta de features. Por eso
+`procesar_bloque` y `extraer_estaticas` se importan de
+`extraer_features_cubo.py` del repo original (solo lectura, con importlib: al
+no copiar el código no puede divergir). La historia (EGIF/FIRMS/rayos) sí
+está copiada de `extraer_features_historia.py`, porque allí vive dentro de
 `main()` y no es importable; la lógica es la misma línea a línea.
 
 Dos diferencias deliberadas respecto al original:
-  · PARALELO. 530k filas en vez de 78k: los 144 bloques del cubo van a 8
+  · Paralelo. 530k filas en vez de 78k: los 144 bloques del cubo van a 8
     procesos y las celdas únicas de la historia a 12. El original era serial.
-  · `popdens` del año de la fila NO existe para 2022 (el cubo llega a 2020):
-    se usa 2020, que es exactamente lo que sirve producción (congelado).
+  · `popdens` del año de la fila no existe para 2022 (el cubo llega a 2020):
+    se usa 2020, que es lo que sirve producción (congelado).
 
 Salidas (expansión): features_cubo_dos.parquet, features_historia_dos.parquet,
 y la tabla final dataset_dos.parquet (maestra + features + vpd_max + dia_anio),
-con los negativos de `cuando`/`donde` que caen en `is_near_fire`=1 ELIMINADOS,
+con los negativos de `cuando`/`donde` que caen en `is_near_fire`=1 eliminados,
 igual que hacía `ensamblar_dataset.py`. En `eval_dia` no se elimina nada: en
 operación nadie filtra celdas, y `label_effis` se toma del propio cubo.
 """
@@ -227,7 +226,7 @@ def main():
     assert len(out) == len(df)
     out["vpd_max"] = vpd_kpa(out["t2m_max"], out["rh_min"])
     out["dia_anio"] = pd.DatetimeIndex(out["fecha"]).dayofyear
-    # label_effis desde el cubo para TODAS las filas (en eval ya venía)
+    # label_effis desde el cubo para todas las filas (en eval ya venía)
     out["label_effis"] = out["is_fire_dia"].fillna(0).astype(np.int8)
     amb = (out["disenio"] != "eval_dia") & (out["label"] == 0) & \
           (out["is_near_fire_dia"] == 1)

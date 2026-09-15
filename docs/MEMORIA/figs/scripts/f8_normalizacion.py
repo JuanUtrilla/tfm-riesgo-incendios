@@ -2,10 +2,10 @@
 """Figura 8: por qué el FWI entra normalizado a la climatología de la celda.
 
 En los días de incendio del split de entrenamiento (2015-2018), el FWI
-ABSOLUTO mediano va de 3 en Asturias a 41 en Andalucía: un umbral único no
-existe. El mismo dato en PERCENTIL LOCAL —frente a la climatología de la propia
-celda— se concentra entre 72 y 92 en todas. Es el argumento de
-`fwi_pctl_local`, y el mismo que sostiene `fwi_anom_sigma`.
+absoluto mediano va de 3 en Asturias a 41 en Andalucía: no hay un umbral único
+que valga para todas. El mismo dato en percentil local (frente a la
+climatología de la propia celda) se concentra entre 72 y 92 en todas. Ese es
+el argumento de `fwi_pctl_local`, y el mismo que justifica `fwi_anom_sigma`.
 
 Solo train, para que ninguna decisión de diseño mire a val/test.
 

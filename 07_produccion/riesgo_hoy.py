@@ -1,63 +1,61 @@
 #!/usr/bin/env python3
 """
-Mapa nacional de riesgo para HOY (D) y MAÑANA (D+1) — sin IDW.
+Mapa nacional de riesgo para hoy (D) y mañana (D+1), sin IDW.
 
-NO TOCA PRODUCCIÓN. Escribe salida/riesgo_hoy_<fecha>.png y .npz.
+No toca producción. Escribe salida/riesgo_hoy_<fecha>.png y .npz.
 
-=============================================================================
-QUÉ SUSTITUYE
-=============================================================================
+Qué sustituye
+-------------
 `mapa_riesgo_hoy.py` calcula las 21 features meteo por estación AEMET y las
 interpola a la malla de 1 km con IDW k=8, con corrección de altitud. Ese paso
-nunca se validó, depende de que ~690 estaciones reporten (16 % sin viento) y
-hace que `fwi_pctl_local` divida numerador AEMET entre denominador del cubo:
+nunca se validó, depende de que unas 690 estaciones reporten (16 % sin viento)
+y hace que `fwi_pctl_local` divida numerador AEMET entre denominador del cubo:
 satura al 3,30 %.
 
 Aquí la meteo se calcula en los 5.605 nodos de la malla nativa de ERA5-Land y
-cada celda de 1 km toma el valor de SU nodo. Sin interpolación y sin huecos.
+cada celda de 1 km toma el valor de su nodo. Sin interpolación y sin huecos.
 
-TODO LO DEMÁS SE MANTIENE IGUAL que en producción, a propósito: vegetación y
+Todo lo demás se mantiene igual que en producción, a propósito: vegetación y
 LST de la climatología mensual 2020-24 del cubo, estáticas y CLC del cubo,
-EGIF mismo-mes, FIRMS NRT en malla, rayos=0, y el MISMO modelo
+EGIF mismo-mes, FIRMS NRT en malla, rayos=0, y el mismo modelo
 (`xgb_v2_prototipo`, 46 features). Lo único que cambia es de dónde sale la
 meteo, que es lo que se quiere medir.
 
-=============================================================================
-LAS DOS RAMAS Y LA CORRECCIÓN
-=============================================================================
+Las dos ramas y la corrección
+-----------------------------
     ... 1-may ... D-7 │ D-6 ... D, D+1
         ERA5-Land     │      IFS
      (era5land_diario)│  (malla_02b_ifs)
 
 El FWI es recursivo: se corre sobre el reanálisis guardando (FFMC, DMC, DC) y
-se REANUDA desde el estado del último día de reanálisis para avanzar la rama
+se reanuda desde el estado del último día de reanálisis para avanzar la rama
 de previsión. No se recalcula desde cero ni se parte la recursión.
 
-La rama de previsión NO se sirve cruda. Medido en `malla_02b_hibrido.py`: el
+La rama de previsión no se sirve cruda. Medido en `malla_02b_hibrido.py`: el
 híbrido crudo satura al 2,05 % contra 0,23 % del reanálisis, y no lo salva la
 memoria del FWI (con 3 días de IFS ya está el 83 % del daño; el valor diario
 lo manda el FFMC, cuya constante de tiempo son horas). Se corrige con el mapeo
 de cuantiles a la escala de ERA5-Land, que es el denominador real:
 2,46 % → 0,41 % fuera de muestra, contra 0,31 % de la referencia.
 
-El mapeo es monótono, así que NO altera el orden del ranking dentro de un día,
+El mapeo es monótono, así que no altera el orden del ranking dentro de un día,
 que es lo único que usa el producto operativo.
 
-=============================================================================
-LÍMITES CONOCIDOS
-=============================================================================
+Límites conocidos
+-----------------
 · El mapeo actual se ajustó con 120 nodos y solo con 2024. Reajustarlo con los
   5.605 y más de una temporada está pendiente.
 · Solo se mapea el FWI. Las otras variables del IFS (tmax, hr_min, viento,
-  precipitación) entran crudas en el modelo. Módulo 3b midió que corregir la
-  SALIDA gana a corregir las entradas, pero para estas cuatro no está medido.
+  precipitación) entran crudas en el modelo. El módulo 3b midió que corregir
+  la salida gana a corregir las entradas, pero para estas cuatro no está
+  medido.
 · `dias_sin_lluvia` mira 120 días y la serie disponible es más corta; el
   truncado afecta al 0,30 % de celdas (medido en el módulo 5).
 · 226 nodos costeros (4,0 %) no tienen dato ERA5-Land y heredan el nodo
   terrestre más cercano, entero.
 
 Uso:
-    python riesgo_hoy.py                # HOY y MAÑANA
+    python riesgo_hoy.py                # hoy y mañana
     python riesgo_hoy.py --dias 0
 """
 
@@ -79,7 +77,7 @@ import config
 import malla_02b_ifs as ifsmod
 
 # Las claves viven en el .env del repo original. Sin esto, FIRMS_MAP_KEY no
-# está en el entorno y las features de FIRMS salen a CERO, mientras que
+# está en el entorno y las features de FIRMS salen a cero, mientras que
 # producción sí las carga (vía `tiempo_real`): la comparación quedaría
 # trucada justo en las celdas con fuego activo, que es donde se decide.
 load_dotenv(f"{config.FUENTE}/.env")
@@ -136,7 +134,7 @@ def series_nodos(objetivos):
     S["tmin"] = np.vstack([R["tmin"],
                            np.repeat(R["tmin"][-1:], len(nuevas), axis=0)])
 
-    # --- FWI: reanálisis con estado, y la previsión reanudando desde él -----
+    # FWI: reanálisis con estado, y la previsión reanudando desde él
     print(f"  FWI en {nn:,} nodos...", flush=True)
     nre = len(f_re)
     fwi = np.full((len(fechas), nn), np.nan)

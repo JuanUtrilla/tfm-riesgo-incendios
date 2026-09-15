@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Métricas con tolerancia espacial (a posteriori, NO prerregistradas): la verdad
+"""Métricas con tolerancia espacial (a posteriori, no prerregistradas): la verdad
 del día se dilata a un radio de R km (celda positiva si hay celda quemada EFFIS
 ese día a ≤R km, ventana cuadrada de 2R+1 celdas) y se recalcula, por modelo y
 día, el AUC, la captura en el top-2 % (fracción de celdas positivas dilatadas

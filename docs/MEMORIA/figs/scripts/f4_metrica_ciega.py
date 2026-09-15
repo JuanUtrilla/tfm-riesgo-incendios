@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""F4 - La misma pareja de modelos bajo dos metricas.
+"""F4 - La misma pareja de modelos bajo dos métricas.
 
-Lee `salida/dos_05_metricas.json` (iteracion 2, paso 5). Sin recomputo.
+Lee `salida/dos_05_metricas.json` (iteración 2, paso 5). No recalcula nada.
   · AUC caso-control: cada modelo en el banco de su propio diseño
     (`auc_global_test_caso_control`).
-  · AUC dentro del dia: media por dia en el banco `eval_dia`, test 2020,
+  · AUC dentro del día: media por día en el banco `eval_dia`, test 2020,
     verdad EGIF (`2020_egif`).
 Uso:  python f4_metrica_ciega.py   [TFM_MALLA=<ruta a TFM_fuego_malla>]
 """

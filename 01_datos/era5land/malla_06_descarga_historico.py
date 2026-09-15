@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 6: ERA5-Land horario 2015-2020 para ENTRENAR.
+Pipeline de malla, módulo 6: ERA5-Land horario 2015-2020 para entrenar.
 
-NO TOCA PRODUCCIÓN. Escribe SOLO en el disco de expansión.
+No toca producción. Escribe solo en el disco de expansión.
 
-⚠️ APARCADO EL 21/08/2026 A LOS 2 MINUTOS DE ARRANCAR, SIN BAJAR NADA.
-Motivo: el cubo IberFire YA es ERA5-Land reprocesado (tmax/hr_min/viento con
+Aparcado el 21/08/2026 a los 2 minutos de arrancar, sin bajar nada.
+Motivo: el cubo IberFire ya es ERA5-Land reprocesado (tmax/hr_min/viento con
 corr 0,987-0,998 y sesgo 0 contra los nodos, `malla_02_vs_cubo.json`; el FWI
 del cubo se reproduce con las 13 UTC, `verificar_hora_fwi.py`). Entrenar con
 el cubo y servir ERA5-Land directo es la alternativa de `PROMPT_DOS_MODELOS.md`
@@ -14,9 +14,8 @@ la precipitación (cubo = ERA5-Land / 2,02), que se trata al servir; ver
 `ANALISIS_DATOS.md` §5. Este script queda por si algún día se reentrena con
 ERA5-Land nativo: funciona y es reanudable.
 
-=============================================================================
-POR QUÉ EXISTE
-=============================================================================
+Por qué existe
+--------------
 `PROMPT_DOS_MODELOS.md` §1 fija que toda la meteo, en entrenamiento y en
 producción, sale de ERA5-Land sobre su malla nativa. Pero ERA5-Land horario
 solo estaba descargado para jun-sep 2024 y may-ago 2026 (`malla_data/_cds`):
@@ -27,37 +26,35 @@ Se lanzó la noche del 21/08/2026 en paralelo con la fase 1 del encargo. Lo
 que haya bajado por la mañana es lo que hay: los scripts que consumen este
 producto tienen que funcionar con los meses que existan y decir cuáles faltan.
 
-=============================================================================
-QUÉ CAMBIA RESPECTO A `malla_04_climatologia.py`
-=============================================================================
-El módulo 4 bajaba cada mes, lo agregaba y BORRABA el horario, porque el disco
+Qué cambia respecto a `malla_04_climatologia.py`
+------------------------------------------------
+El módulo 4 bajaba cada mes, lo agregaba y borraba el horario, porque el disco
 principal iba al 97 %. Esa decisión costó cara: cuando `verificar_hora_fwi.py`
 demostró que el FWI del cubo son las 13 UTC y no el proxy tmax/hr_min, rehacer
 la climatología exigía bajar los 84 meses otra vez.
 
-Aquí el horario NO se borra: se guarda en el disco de expansión (1,5 TB
+Aquí el horario no se borra: se guarda en el disco de expansión (1,5 TB
 libres), ~60 MB/mes, ~4,3 GB los 72 meses. Instrucción explícita del 21/08:
 "nada de lo que descargues de ERA5 lo elimines, muévelo a expansion".
 
-Y el agregado diario incluye desde el principio las DOS recetas:
+Y el agregado diario incluye desde el principio las dos recetas:
   · extremos diarios (tmax, tmin, hr_min, viento_max, prec)   ← las features
   · instantáneas de las 13 UTC (t13, hr13, v13)               ← el FWI
 así no hay que volver a abrir el horario para calcular el FWI bien.
 
-=============================================================================
-ORDEN DE DESCARGA
-=============================================================================
+Orden de descarga
+-----------------
 Años completos de enero a diciembre, porque el FWI es recursivo y necesita el
 spin-up invernal; y del más reciente al más antiguo (2020 → 2015), para que si
 la noche no da para los 72, los años completos que queden sean los más
 cercanos a la distribución de producción. A ~25 min/mes de cola son ~30 h:
-NO termina en una noche. Es reanudable: se relanza y sigue por lo que falte.
+no termina en una noche. Es reanudable: se relanza y sigue por lo que falte.
 
 Respeta la cola de CDS igual que el módulo 4 (tope de 3 en cola, uno menos
 que allí porque `cron_malla.sh` también pide un mes a las 05:00; adopción de
 trabajos huérfanos; retroceso exponencial ante rechazos).
 
-Salidas (en EXPANSION, ver `config_expansion.py`):
+Salidas (en expansion, ver `config_expansion.py`):
     era5land_cds/era5land_AAAAMM.nc      horario crudo (zip de CDS)
     era5land_cds/diario_AAAAMM.npz       agregado en los 5.605 nodos
     logs/descarga_historico.log
@@ -143,7 +140,7 @@ def a_13utc(ds):
 
 
 def procesa(nc, a, m, la, lo):
-    """Horario → (diario + 13 UTC) → nodos → npz. El horario SE CONSERVA."""
+    """Horario → (diario + 13 UTC) → nodos → npz. El horario se conserva."""
     raw = abre(nc)
     ds = a_diario(raw)
     dim = [d for d in ds.dims if d not in ("latitude", "longitude")][0]
@@ -181,7 +178,7 @@ def adopta(c, pend):
             try:
                 r = c.get_remote(j["jobID"]).request
                 k = (int(r["year"]), int(r["month"]))
-                # solo los míos: meses completos (31 días pedidos)
+                # solo los de este script: meses completos (31 días pedidos)
                 if len(r.get("day", [])) != 31:
                     continue
             except Exception:

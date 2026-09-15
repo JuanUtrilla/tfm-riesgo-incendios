@@ -1,33 +1,32 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 25: barrido histórico 2015-2024 sobre el cubo, para poder
-calibrar el «si» (aviso de día) con días de CERO fuego.
+Dos modelos, paso 25: barrido histórico 2015-2024 sobre el cubo, para poder
+calibrar el «si» (aviso de día) con días de cero fuego.
 
-NO TOCA PRODUCCIÓN. Lee IberFire.nc, celdas.parquet, los modelos y FIRMS
+No toca producción. Lee IberFire.nc, celdas.parquet, los modelos y FIRMS
 2015-2024; escribe salida/dos_25_*.{npz,csv}.
 
-=============================================================================
-POR QUÉ ESTE SCRIPT Y NO EL REPLAY
-=============================================================================
-El «si» (¿hoy hay aviso?) necesita un umbral ABSOLUTO, y un umbral absoluto
-solo se puede estimar con días en los que NO arde nada. `replay_temporada.py`
+Por qué este script y no el replay
+----------------------------------
+El «si» (¿hoy hay aviso?) necesita un umbral absoluto, y un umbral absoluto
+solo se puede estimar con días en los que no arde nada. `replay_temporada.py`
 solo cubre 2025-2026 de mayo a noviembre, donde el 90 % de los días tienen
 fuego: ahí el umbral no se mide, se extrapola.
 
-El replay existe para reconstruir lo que la cadena HABRÍA PUBLICADO (descarga
+El replay existe para reconstruir lo que la cadena habría publicado (descarga
 ERA5-Land, IFS archivado, FWI, FIRMS). Para calibrar sobre el histórico nada
 de eso hace falta: el cubo IberFire ya trae la meteorología diaria a 1 km de
 2007-2024 y la etiqueta. Se puntúa directamente sobre él, que es lo que ya
-hacen `dos_05` y `dos_13` con el banco de evaluación, pero sobre TODOS los
+hacen `dos_05` y `dos_13` con el banco de evaluación, pero sobre todos los
 días y no solo sobre las muestras.
 
-Coste medido: el NetCDF está troceado (521, 77, 99) —eje temporal largo—, así
-que un bloque espacial con toda su serie se lee en 0,3 s y un día suelto de
-todo el mapa cuesta 2,8 s. Por eso el bucle va POR BLOQUE (144) y no por día.
+Coste medido: el NetCDF está troceado (521, 77, 99), con el eje temporal
+largo, así que un bloque espacial con toda su serie se lee en 0,3 s y un día
+suelto de todo el mapa cuesta 2,8 s. Por eso el bucle va por bloque (144) y
+no por día.
 
-=============================================================================
-QUÉ SE PUNTÚA
-=============================================================================
+Qué se puntúa
+-------------
   prod    xgb_v2_prototipo (46 features, etiqueta EGIF)
   unico   donde_dia_effis (46 features, negativos del mismo día 1:3)
   r10     donde_dia_effis_r10 (ídem, 1:10)
@@ -36,23 +35,22 @@ QUÉ SE PUNTÚA
 
 Features: réplica exacta de `extraer_features_cubo.procesar_bloque`, pero
 vectorizada sobre (días × celdas) en vez de fila a fila. Ventanas 7/15/30 que
-EXCLUYEN D; `dias_sin_lluvia` cuenta D incluido y corta en NaN; climatología
+excluyen D; `dias_sin_lluvia` cuenta D incluido y corta en NaN; climatología
 local del FWI 2008-2014 por celda y mes. `rayos_*` = 0, que es lo que sirve
 producción (`riesgo_hoy.py` L304). FIRMS de `firms_iberia_2015_2024.parquet`.
 
-=============================================================================
-QUÉ SE GUARDA (y por qué no los mapas)
-=============================================================================
+Qué se guarda (y por qué no los mapas)
+--------------------------------------
 3.653 días × 498.530 celdas × 5 modelos no cabe en disco y no hace falta. Lo
-que la calibración necesita es la DISTRIBUCIÓN del día, así que se acumula un
+que la calibración necesita es la distribución del día, así que se acumula un
 histograma por día y modelo (4.096 bins logarítmicos). De ahí salen exactos,
-a resolución de bin, cualquier cuantil y el nº de celdas sobre cualquier
-umbral candidato — sin fijar el umbral ahora.
+a resolución de bin, cualquier cuantil y el número de celdas sobre cualquier
+umbral candidato, sin fijar el umbral ahora.
 
   · histograma sobre una submuestra sistemática de 1 de cada 5 celdas
     (99.706), que estima el p98 del día con error despreciable (el p98 son
     ~2.000 celdas de la submuestra);
-  · la puntuación EXACTA en cada celda que arde ese día (todas, no la
+  · la puntuación exacta en cada celda que arde ese día (todas, no la
     submuestra), para el percentil del fuego;
   · la verdad del día: celdas quemadas, celdas de primer día, y el desglose
     noroeste/resto (los dos regímenes, ver dos_26).
@@ -107,7 +105,7 @@ def suma_caja(campo, radio):
 def celdas_y_region(ds):
     """Celdas de España con estáticas, submuestra y etiqueta de región.
 
-    Solo se PROCESAN las celdas `keep` = submuestra ∪ las que arden algún día
+    Solo se procesan las celdas `keep` = submuestra ∪ las que arden algún día
     de 2015-2024. El resto no aporta: el histograma del día sale de la
     submuestra (insesgada) y el percentil del fuego, de las que arden. Sin
     esto el bloque son 3.400 celdas en vez de 800 y la memoria se dispara.
@@ -160,7 +158,7 @@ def egif_mensual(ds):
 
 def firms_diario(ds, cel, dias):
     """frp_max_50km_7d y n_detec_50km_7d en las celdas, día a día [D-7, D-1]."""
-    f = f"{SAL}_firms_keep.npy"     # solo celdas `keep`: 3,4 GB, no 14,6
+    f = f"{SAL}_firms_keep.npy"     # solo celdas `keep`: 3,4 GB en vez de 14,6
     if os.path.exists(f):
         return np.load(f, mmap_mode="r")
     ny, nx = ds.sizes["y"], ds.sizes["x"]
@@ -208,7 +206,7 @@ def firms_diario(ds, cel, dias):
 # features del bloque, vectorizadas sobre (dias, celdas)
 # --------------------------------------------------------------------------
 def ventana_media(a, w):
-    """Media de los w días ANTERIORES a cada t (excluye t). NaN-aware."""
+    """Media de los w días anteriores a cada t (excluye t). Ignora los NaN."""
     n = a.shape[0]
     v = np.nan_to_num(a, nan=0.0)
     ok = (~np.isnan(a)).astype(np.float32)
@@ -354,7 +352,7 @@ def main():
         hist = d0["hist"]
         hechos = set(map(tuple, d0["hechos"]))
         # `list(array_2d)` lo parte en filas de 1-D y luego np.concatenate
-        # revienta contra los bloques nuevos, que son 2-D: va como UN elemento.
+        # falla contra los bloques nuevos, que son 2-D: va como un solo elemento.
         quem = [d0["quem"]] if len(d0["quem"]) else []
         print(f"  reanudando: {len(hechos)} bloques ya hechos", flush=True)
     else:
@@ -413,8 +411,8 @@ def main():
                   "clc_agricola", "clc_artificial", "clc_abierto",
                   "clc_agric_hetero", "ccaa"):
             F[c] = np.tile(sub[c].values.astype(np.float32), (nd, 1))
-        # OJO: `eg_mes[meses_t - 1]` materializaba (3.653, 920, 1188) = 16 GB.
-        # Indexado conjunto con difusión: (3.653, nc) y ya.
+        # Ojo: `eg_mes[meses_t - 1]` materializaba (3.653, 920, 1188) = 16 GB.
+        # Con indexado conjunto por difusión queda en (3.653, nc).
         F["n_fuegos_10km_mismomes_hist"] = eg_mes[(meses_t - 1)[:, None],
                                                   sub.iy.values[None, :],
                                                   sub.ix.values[None, :]]
@@ -428,7 +426,7 @@ def main():
                                 (1, nc))
         t_fea = time.time() - t_b - t_lee
 
-        # Predicción POR TRAMOS DE DÍAS: apilar las 46 columnas de golpe eran
+        # Predicción por tramos de días: apilar las 46 columnas de golpe eran
         # 3.653 × nc × 46 × 4 B y, con el diccionario `X` duplicando `F`,
         # el proceso se iba de memoria y lo mataba el núcleo.
         S = {n: np.empty((nd, nc), np.float32) for n in MODELOS}

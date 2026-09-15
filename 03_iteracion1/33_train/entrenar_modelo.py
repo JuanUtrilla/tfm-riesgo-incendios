@@ -11,7 +11,7 @@ Salidas:  modelos/xgb_v1.ubj              modelo final (UBJSON, conserva categó
 Protocolo (ESTADO_ARTE §7 + PROXIMOS_PASOS §3.1):
 - Split temporal congelado: train 2015-2018 / val 2019 (early stopping y
   calibración) / test 2020 (solo evaluación final).
-- ESCALERA DE BASELINES (la defensa exige que cada peldaño gane al anterior):
+- Escalera de baselines (cada peldaño tiene que ganar al anterior):
     A  FWI absoluto como score (sin ML)
     A2 percentil local de FWI como score (sin ML)
     B  XGBoost solo-FWI (sanity check del ensamblado)
@@ -20,7 +20,7 @@ Protocolo (ESTADO_ARTE §7 + PROXIMOS_PASOS §3.1):
 - Métricas: AUC-PR (principal, prevalencia del test fijada), AUC-ROC, Brier,
   TSS (umbral elegido en val, nunca en test).
 - CV espacial adicional del modelo D: GroupKFold(5) por bloque_100km sobre
-  train+val (el test 2020 no se toca) → mide generalización a ZONAS no vistas,
+  train+val (el test 2020 no se toca) → mide generalización a zonas no vistas,
   eje que la literatura señala como el más débil (Ploton 2020, Cheerala 2025).
 - Sin escalado/winsorización/imputación/SMOTE (§7.5). Sin scale_pos_weight:
   la salida se quiere como probabilidad → prevalencia real + calibración

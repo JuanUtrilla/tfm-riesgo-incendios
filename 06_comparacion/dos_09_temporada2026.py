@@ -1,38 +1,38 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 9: la temporada 2026, día a día, contra el área quemada
-de EFFIS. Producción vs dónde×cuándo vs único-dónde, MISMAS features.
+Dos modelos, paso 9: la temporada 2026, día a día, contra el área quemada
+de EFFIS. Producción, dónde x cuándo y único-dónde con las mismas features.
 
-NO TOCA PRODUCCIÓN. Lee salida/era5land_diario.nc (reanálisis may→ago 2026),
-el cubo, EFFIS y la caché FIRMS; escribe salida/dos_09_temporada2026.{json,csv,png}.
+No toca producción. Lee salida/era5land_diario.nc (reanálisis de mayo a agosto
+de 2026), el cubo, EFFIS y la caché FIRMS; escribe
+salida/dos_09_temporada2026.{json,csv,png}.
 
-=============================================================================
-DISEÑO
-=============================================================================
+Diseño
+------
 Lo de `dos_05` es retrospectivo (2019-2022). Esto es la temporada en curso.
-Para que la comparación sea DEL MODELO y no de la meteo, los tres se puntúan
+Para que la comparación sea del modelo y no de la meteo, los tres se puntúan
 sobre el mismo vector de 46 features por celda, construido como en
 `riesgo_hoy.py` pero solo con reanálisis (el IFS archivado no está; con
 reanálisis los tres tienen el mismo retrovisor, así que el cara a cara es
 justo entre ellos aunque sea una cota superior de lo que daría la operación).
 
-  prod          xgb_v2_prototipo (46 features)                  ← lo publicado
-  donde×cuando  P_donde_hist(celda) × P_cuando(29 dinámicas)    ← recomendado
-  donde_dia     modelo único, 46 features, muestreo dónde       ← el alternativo
+  prod          xgb_v2_prototipo (46 features)                  <- lo publicado
+  donde×cuando  P_donde_hist(celda) × P_cuando(29 dinámicas)    <- recomendado
+  donde_dia     modelo único, 46 features, muestreo dónde       <- el alternativo
   donde         el mapa estático solo (cota: sin meteo)
   fwi_pctl      percentil del FWI (línea base sin modelo)
 
-Juez: celdas con perímetro EFFIS cuya FIREDATE es ese día (función `quemadas`
-de `comparar_julio2026`, que ya usa el cron). Métricas por día: AUC de celdas
-quemadas contra TODAS las demás de España (es la métrica de
-`puntuar_effis.py`), percentil mediano del fuego y lift del 10 % superior.
-IC95 por bootstrap de DÍAS. Como referencia se añaden, los 4 días que existen,
-los mapas SELLADOS de producción (AEMET+IDW, previsión): eso sí es lo que se
-publicó, con su meteo y todo.
+Referencia: celdas con perímetro EFFIS cuya FIREDATE es ese día (función
+`quemadas` de `comparar_julio2026`, la misma que usaba el cron). Métricas por
+día: AUC de celdas quemadas contra todas las demás de España (la misma
+métrica que `puntuar_effis.py`), percentil mediano del fuego y lift del 10 %
+superior. IC95 por bootstrap de días. Como referencia se añaden, los 4 días
+que existen, los mapas sellados de producción (AEMET+IDW, previsión): eso sí
+es lo que se publicó, con su meteo y todo.
 
-FIRMS [D−5, D−1]: caché `salida/_firms/` (22-jul → 11-ago) y API para el
-resto; si el archivo NRT no llega a junio, esos días van a cero PARA LOS
-TRES modelos, y se deja contado en el JSON.
+FIRMS [D-5, D-1]: caché `salida/_firms/` (22-jul a 11-ago) y API para el
+resto; si el archivo NRT no llega a junio, esos días van a cero para los
+tres modelos, y se deja contado en el JSON.
 """
 
 import json
@@ -160,8 +160,8 @@ def main():
         mapas["donde×cuando"] = p_donde * pc
         mapas["donde_dia"] = ddia.predict_proba(X[FULL].values)[:, 1]
         mapas["donde"] = p_donde
-        # ablación: ¿cuánto de la ventaja es FIRMS [D-5,D-1] encendido alrededor
-        # de fuegos que siguen ardiendo? Se ponen a cero las dos features.
+        # ablación: cuánto de la ventaja es FIRMS [D-5,D-1] encendido alrededor
+        # de fuegos que siguen ardiendo. Se ponen a cero las dos features.
         X0 = X.copy(); X0["frp_max_50km_7d"] = 0.0; X0["n_detec_50km_7d"] = 0
         mapas["prod_sin_firms"] = prod.predict_proba(X0[FULL].values)[:, 1]
         mapas["donde_dia_sin_firms"] = ddia.predict_proba(X0[FULL].values)[:, 1]

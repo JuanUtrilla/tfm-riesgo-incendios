@@ -2,40 +2,39 @@
 """
 La verdad del día encima del mapa: perímetros EFFIS y focos FIRMS.
 
-NO TOCA PRODUCCIÓN. Solo dibuja; ninguna de estas capas entra en el modelo.
+No toca producción: solo dibuja, y ninguna de estas capas entra en el modelo.
 
-=============================================================================
-POR QUÉ
-=============================================================================
-El mapa diario se mira para saber si el sistema está acertando, y hasta hoy
+Por qué
+-------
+El mapa diario se mira para saber si el sistema va acertando, y hasta ahora
 había que abrir el mapa por un lado y `puntuacion_effis.csv` por otro. Con la
-verdad dibujada encima la pregunta se contesta de un vistazo: si el contorno
-del incendio cae sobre la mancha roja, el mapa acertó ese día.
+verdad dibujada encima se contesta de un vistazo: si el contorno del incendio
+cae sobre la mancha roja, el mapa acertó ese día.
 
-Dos capas, y hay que leerlas distinto:
+Son dos capas y se leen distinto:
 
-  · **Perímetros EFFIS** (contorno morado) de los últimos días. Es el JUEZ:
-    superficie quemada con FIREDATE conocida, la misma verdad-terreno que
-    puntúa `puntuar_effis.py`. Llega con retraso (de horas a días), así que
-    sobre el mapa de HOY casi siempre estará vacío y lo que se ve es el
-    pasado reciente: sirve para juzgar los mapas de ayer y anteayer, que son
-    los que ya se publicaron.
-  · **Incidentes de MITECO** (triángulos rojos) del último parte publicado.
-    Es el otro JUEZ, el rápido: el parte del día D sale el D+1 hacia las 14 h,
-    así que cierra el bucle en 24 h mientras EFFIS tarda 6-9 días. Solo trae
-    los incendios con medios del Estado (~4 al día) y la posición es el centro
+  · Perímetros EFFIS (contorno) de los últimos días: superficie quemada con
+    FIREDATE conocida, la misma verdad-terreno que puntuaba `puntuar_effis.py`
+    durante la temporada. Llega con retraso (de horas a días), así que sobre
+    el mapa de hoy casi siempre estará vacío y lo que se ve es el pasado
+    reciente: sirve para contrastar los mapas de ayer y anteayer, que son los
+    que ya se publicaron.
+  · Incidentes de MITECO (triángulos) del último parte publicado. Es la
+    referencia rápida: el parte del día D sale el D+1 hacia las 14 h, así que
+    cierra el bucle en 24 h mientras EFFIS tarda 6-9 días. Solo trae los
+    incendios con medios del Estado (unos 4 al día) y la posición es el centro
     del municipio, con 5-15 km de error: es un punto, no un perímetro, y así
     se dibuja.
 
-**FIRMS no se dibuja** (`FOCOS_FIRMS = False`). Se probó y se quitó a
-propósito: las detecciones VIIRS **entran como variable** del modelo
-(`frp_max_50km_7d`, `n_detec_50km_7d`), así que pintarlas encima invita a leer
-«foco sobre rojo = acierto» cuando el modelo ya las había visto al puntuar —
-la misma circularidad que se evita en las métricas, colada por el mapa. Y
-además tapan: ~1.000 cruces contra ~100 celdas de EFFIS. El código se queda
-por si alguna vez interesa un mapa de situación (fuego activo AHORA, que eso
-sí lo dice FIRMS y no lo dicen los jueces), pero para juzgar el mapa la regla
-es la de siempre: solo jueces independientes.
+FIRMS no se dibuja (`FOCOS_FIRMS = False`). Se probó y se quitó a propósito:
+las detecciones VIIRS entran como variable del modelo (`frp_max_50km_7d`,
+`n_detec_50km_7d`), así que pintarlas encima invita a leer «foco sobre rojo =
+acierto» cuando el modelo ya las había visto al puntuar; es la misma
+circularidad que se evita en las métricas, colada por el mapa. Y tapan: unas
+1.000 cruces contra unas 100 celdas de EFFIS. El código se queda por si alguna
+vez interesa un mapa de situación (fuego activo en este momento, que eso sí lo
+dice FIRMS y no lo dicen las otras dos fuentes), pero para contrastar el mapa
+solo valen fuentes independientes del modelo.
 
 Todas las capas son opcionales: si falta el GeoJSON de EFFIS o el CSV de
 incidentes, el mapa sale sin ellas y con un aviso. La cadena diaria no se cae
@@ -202,12 +201,12 @@ def preparar(ds, fecha):
 def dibujar(ax, capas, lw=1.0, focos_visibles=True, rotular=0, numerar=0):
     """Perímetros y focos sobre un `ax` con la malla ya pintada.
 
-    rotular: cuántos incendios EFFIS se identifican con su NOMBRE (los mayores
+    rotular: cuántos incendios EFFIS se identifican con su nombre (los mayores
     por superficie) y si se ponen los municipios de MITECO. En el mapa de un
     panel se usa 6.
     numerar: alternativa para la rejilla de 2×2, donde el nombre completo
     saldría cuatro veces y no cabe: al lado de cada marca va una clave corta
-    —número para EFFIS, letra para MITECO— y el nombre se resuelve en el pie
+    (número para EFFIS, letra para MITECO) y el nombre se resuelve en el pie
     de la figura con `resumen(capas, claves=True)`.
     """
     try:
@@ -266,7 +265,7 @@ def _dibujar(ax, capas, lw, focos_visibles, rotular=0, numerar=0):
 
 
 def handles(capas):
-    """Artistas de mentira para la leyenda, solo de lo que se ha dibujado."""
+    """Artistas ficticios para la leyenda, solo de lo que se ha dibujado."""
     from matplotlib.lines import Line2D
     h = []
     if capas["m7"].any():
@@ -316,7 +315,7 @@ def radio_pt(ha):
 
 
 def resumen(capas, n=6, claves=False):
-    """Texto de una o dos líneas que dice QUÉ es cada marca del mapa.
+    """Texto de una o dos líneas que dice qué es cada marca del mapa.
 
     En la rejilla de 2×2 rotular sobre el mapa saldría cuatro veces el mismo
     nombre, así que la identificación va aquí, en el pie de la figura.

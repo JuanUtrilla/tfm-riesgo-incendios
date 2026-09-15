@@ -1,48 +1,46 @@
 #!/usr/bin/env python3
 """
-Modelo B v3 — modelo de PRODUCCIÓN reajustado con 2015-2020 completo.
+Modelo B v3: modelo de producción reajustado con 2015-2020 completo.
 
-NO SOBRESCRIBE NADA. Escribe solo ficheros con sufijo _v3.
+No sobrescribe nada. Escribe solo ficheros con sufijo _v3.
 
-=============================================================================
-QUÉ CAMBIA RESPECTO A v1/v2 Y POR QUÉ  (justificación en EVALUACION_DETALLADA §10)
-=============================================================================
+Qué cambia respecto a v1/v2 y por qué (justificación en EVALUACION_DETALLADA §10)
 
-1. REAJUSTE CON TODOS LOS DATOS (§10.1)
+1. Reajuste con todos los datos (§10.1)
    v1/v2 se entrenaron solo con train 2015-2018 (53.563 filas). Val 2019 (14.489)
    y test 2020 (8.614) quedaban fuera: 23.103 filas = +43% de datos sin usar, y
-   además los DOS AÑOS MÁS RECIENTES. Para el protocolo de evaluación ese
-   sacrificio es obligatorio; para el modelo que sale a producción no aporta nada.
-   Práctica estándar: evaluar con el protocolo congelado, reportar ESE número,
+   los dos años más recientes. Para el protocolo de evaluación ese sacrificio
+   es obligatorio; para el modelo que sale a producción no aporta nada.
+   Práctica estándar: evaluar con el protocolo congelado, reportar ese número,
    y desplegar un modelo reajustado con todo.
 
-   ⚠️ REGLA QUE NO SE ROMPE: el modelo final (entrenado con 2015-2020) NO se
-   evalúa sobre 2020 — sería fraudulento. Las métricas que ampara son las de la
-   FASE 1 (protocolo congelado), calculadas con el mismo conjunto de features y
+   Regla que no se rompe: el modelo final (entrenado con 2015-2020) no se
+   evalúa sobre 2020; sería fraudulento. Las métricas que ampara son las de la
+   fase 1 (protocolo congelado), calculadas con el mismo conjunto de features y
    los mismos hiperparámetros, pero con el modelo que sí respetó el split.
 
-2. SUSTITUCIÓN DE LA AUTORREGRESIVA CADUCADA (§10.3.c)
+2. Sustitución de la autorregresiva caducada (§10.3.c)
    `n_fuegos_10km_mismomes_hist` (EGIF) es la nº1 en SHAP y en producción está
-   CONGELADA EN 2020: los incendios de 2021-2026 no existen para el modelo, y la
+   congelada en 2020: los incendios de 2021-2026 no existen para el modelo, y la
    degradación crece cada año. Se prueba sustituirla por su equivalente FIRMS
    (extraer_historia_firms_v3.py), que sí se puede actualizar indefinidamente.
-   El cambio de fuente EXIGE reentrenar con la misma definición: de lo contrario
+   El cambio de fuente exige reentrenar con la misma definición: de lo contrario
    el modelo aplicaría lo aprendido sobre una distribución a otra distinta y
    fallaría en silencio (bitácora §16).
-   Se decide con datos, comparando en VAL, no por preferencia a priori.
+   Se decide con datos, comparando en val, no por preferencia a priori.
 
-3. SELECCIÓN DE n_estimators SIN VAL (§10.1-a)
+3. Selección de n_estimators sin val (§10.1-a)
    Al entrar 2019 en entrenamiento ya no hay conjunto donde parar. Se usa
-   VALIDACIÓN CRUZADA TEMPORAL (rolling origin): 2015-16→17, 2015-17→18,
-   2015-18→19, 2015-19→20. Da la iteración óptima media Y una estimación de la
+   validación cruzada temporal (rolling origin): 2015-16→17, 2015-17→18,
+   2015-18→19, 2015-19→20. Da la iteración óptima media y una estimación de la
    varianza año a año (material para la memoria).
 
-4. CORTES DE ALERTA RECALCULADOS OUT-OF-FOLD (§10.1-b)
+4. Cortes de alerta recalculados out-of-fold (§10.1-b)
    Los cortes de v2 (0,25 / 0,55 / 0,80) salieron de los cuantiles de las
    predicciones en val 2019. Si 2019 pasa a entrenamiento esas predicciones son
    in-sample, están infladas, y los mismos cortes numéricos harían que el sistema
-   AVISASE DE MENOS. Los cortes de v3 se derivan de las predicciones OUT-OF-FOLD
-   de la CV temporal, fijando la misma COBERTURA operativa que v2
+   avisase de menos. Los cortes de v3 se derivan de las predicciones out-of-fold
+   de la CV temporal, fijando la misma cobertura operativa que v2
    (34,8% / 22,0% / 13,5% de días-celda) para no alterar el comportamiento del
    sistema de alertas, y se reportan precisión y recall resultantes.
 
@@ -80,7 +78,7 @@ FEATS_FIRMS_HIST = ["firms_diasfuego_mismomes_tasa", "firms_diasfuego_tasa",
                     "firms_frp_p95_hist", "firms_anios_previos"]
 
 # Hiperparámetros candidatos: los de v1 y los que encontró Optuna
-# (dataset/tuning_optuna_v1.json). Se elige mirando VAL 2019, nunca test.
+# (dataset/tuning_optuna_v1.json). Se elige mirando val 2019, nunca test.
 PARAMS_BASE = dict(learning_rate=0.05, max_depth=6, min_child_weight=5,
                    subsample=0.9, colsample_bytree=0.8, reg_lambda=1.0)
 PARAMS_TUNED = dict(learning_rate=0.01704120432383672, max_depth=10,
@@ -122,10 +120,10 @@ def ajustar(feats, params, tr, va, n_estimators=3000, early=100):
 def ap_norm(y, p) -> float:
     """AUC-PR normalizado: (AP − prevalencia) / (1 − prevalencia).
 
-    Imprescindible para comparar AÑOS entre sí. La prevalencia del dataset varía
+    Hace falta para comparar años entre sí. La prevalencia del dataset varía
     mucho por año (15,2% en 2018 … 37,0% en 2017) porque las pseudo-ausencias se
-    sortearon uniformemente dentro del SPLIT y no del año; como el suelo del
-    AUC-PR es exactamente la prevalencia, los AP crudos de años distintos NO son
+    sortearon uniformemente dentro del split y no del año; como el suelo del
+    AUC-PR es exactamente la prevalencia, los AP crudos de años distintos no son
     comparables. 0 = azar, 1 = perfecto.
     """
     prev = float(np.mean(y))
@@ -171,9 +169,7 @@ def main() -> None:
               "n_val": len(va), "n_test": len(te),
               "prevalencia_test": float(te["label"].mean())}
 
-    # ===================================================================== #
-    # FASE 1 — protocolo congelado: elegir features e hiperparámetros EN VAL
-    # ===================================================================== #
+    # ---- Fase 1: protocolo congelado, elegir features e hiperparámetros en val
     print("== FASE 1: protocolo congelado (elección en VAL 2019) ==", flush=True)
     candidatos = {
         "v2_egif__params_base":   (feats_v2,  PARAMS_BASE),
@@ -200,10 +196,10 @@ def main() -> None:
     salida["fase1_ganador"] = ganador
     salida["features"] = feats
 
-    # --- variante LIGERA -----------------------------------------------------
+    # --- variante ligera -----------------------------------------------------
     # Los hiperparámetros de Optuna (max_depth 10, lr 0,017) ganan +0,0014 de
-    # AUC-PR en val sobre los de base... y multiplican por ~13 el tamaño del
-    # fichero del modelo (11 MB vs 840 KB). Eso NO es gratis: el modelo viaja
+    # AUC-PR en val sobre los de base y multiplican por ~13 el tamaño del
+    # fichero del modelo (11 MB frente a 840 KB). Eso no es gratis: el modelo viaja
     # dentro del repo del colector para el job diario de GitHub Actions
     # (bitácora §22), donde cada MB se paga en clonado y en cuota.
     # Se produce también la variante con params base y se documenta el
@@ -215,11 +211,9 @@ def main() -> None:
         print(f"  (se producirá además la variante ligera: {hermano})\n", flush=True)
 
     # El test 2020 se toca una sola vez por variante, dentro de producir():
-    # cada variante debe ir acompañada de SUS métricas, no de las de otra.
+    # cada variante debe ir acompañada de sus métricas, no de las de otra.
 
-    # ===================================================================== #
-    # FASES 2-4, ejecutadas para cada variante que se quiera desplegar
-    # ===================================================================== #
+    # ---- Fases 2-4, ejecutadas para cada variante que se quiera desplegar
     for sufijo, (feats, params) in variantes_finales.items():
         etiqueta = "PRINCIPAL" if sufijo == "" else "LIGERA"
         print(f"\n{'='*72}\n=== VARIANTE {etiqueta}  (xgb_v3{sufijo}.ubj, "
@@ -241,8 +235,8 @@ def producir(sufijo, feats, params, df, tr, va, te) -> dict:
     """CV temporal → cortes de alerta → reajuste final, para una variante.
 
     Reajusta también el modelo gemelo bajo el protocolo congelado (train
-    2015-2018), porque las métricas que amparan a ESTA variante tienen que ser
-    las suyas, no las de otra: es el único número honesto que puede acompañarla.
+    2015-2018), porque las métricas que amparan a esta variante tienen que ser
+    las suyas, no las de otra.
     """
     salida = {"features": feats, "n_features": len(feats), "params": params}
     y_te = te["label"].values
@@ -281,7 +275,7 @@ def producir(sufijo, feats, params, df, tr, va, te) -> dict:
               f"(prev {f['prevalencia']*100:4.1f}% → norm {f['auc_pr_norm']:.4f}) "
               f"ROC={f['auc_roc']:.4f}  iter={f['mejor_iter']}", flush=True)
 
-    # Se resume con AUC-PR NORMALIZADO y AUC-ROC, no con el AP crudo: los años
+    # Se resume con AUC-PR normalizado y AUC-ROC, no con el AP crudo: los años
     # tienen prevalencias muy distintas y el AP crudo los haría incomparables
     # (2018 parece hundirse a 0,66 solo porque su prevalencia es del 15%).
     norm = [f["auc_pr_norm"] for f in salida["fase2_cv_temporal"]]
@@ -313,15 +307,13 @@ def producir(sufijo, feats, params, df, tr, va, te) -> dict:
     salida["n_estimators_final"] = n_final
     salida["escala_datos"] = float(escala)
 
-    # ===================================================================== #
-    # FASE 3 — cortes de alerta desde las predicciones OUT-OF-FOLD
-    # ===================================================================== #
+    # ---- Fase 3: cortes de alerta desde las predicciones out-of-fold
     print("\n== FASE 3: cortes de alerta (out-of-fold, cobertura de v2) ==",
           flush=True)
     oof = pd.concat(oof, ignore_index=True)
     oof.to_parquet(f"{DIR}/dataset/oof_v3{sufijo}.parquet", index=False)
 
-    # Los cortes se derivan SOLO de los años cuya prevalencia coincide con la de
+    # Los cortes se derivan solo de los años cuya prevalencia coincide con la de
     # diseño (~26%): 2019 y 2020. Incluir 2017 (37%) y 2018 (15%) desplazaría los
     # cortes por un artefacto del muestreo, no por el comportamiento del modelo.
     # Siguen siendo out-of-fold: en ambos folds ese año quedó fuera del ajuste.
@@ -347,9 +339,7 @@ def producir(sufijo, feats, params, df, tr, va, te) -> dict:
     salida["fase3_n_oof_base_cortes"] = len(base)
     salida["fase3_prevalencia_base"] = float(base["label"].mean())
 
-    # ===================================================================== #
-    # FASE 4 — modelo final: reajuste con 2015-2020 completo
-    # ===================================================================== #
+    # ---- Fase 4: modelo final, reajuste con 2015-2020 completo
     print("\n== FASE 4: reajuste final con 2015-2020 completo ==", flush=True)
     m_final = ajustar(feats, params, df, None, n_estimators=n_final, early=None)
     os.makedirs(f"{DIR}/modelos", exist_ok=True)
@@ -403,8 +393,8 @@ def producir(sufijo, feats, params, df, tr, va, te) -> dict:
 
     # comprobación de cordura: el modelo final debe rankear parecido al del
     # protocolo sobre 2020 (correlación alta) aunque sus valores estén sesgados
-    # al alza por ser in-sample. No es una métrica: es un control de que el
-    # reajuste no ha roto nada.
+    # al alza por ser in-sample. Sirve solo como control de que el reajuste no
+    # ha roto nada.
     p_te_final = m_final.predict_proba(te[feats])[:, 1]
     corr = float(np.corrcoef(p_te, p_te_final)[0, 1])
     print(f"  control (NO es una métrica): correlación del ranking en 2020 "
@@ -413,7 +403,7 @@ def producir(sufijo, feats, params, df, tr, va, te) -> dict:
     salida["tam_modelo_mb"] = round(
         os.path.getsize(f"{DIR}/modelos/xgb_v3{sufijo}.ubj") / 1e6, 2)
 
-    # ---- FASE 5: figuras (sobre el modelo del PROTOCOLO, el evaluable) ----- #
+    # ---- Fase 5: figuras (sobre el modelo del protocolo, el evaluable) ----- #
     try:
         import matplotlib
         matplotlib.use("Agg")

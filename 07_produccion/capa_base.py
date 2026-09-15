@@ -2,17 +2,16 @@
 """
 Capa base administrativa de los mapas: provincias, comunidades y ciudades.
 
-NO TOCA PRODUCCIÓN. Solo dibuja; no cambia ninguna probabilidad.
+No toca producción: solo dibuja, no cambia ninguna probabilidad.
 
-=============================================================================
-POR QUÉ
-=============================================================================
+Por qué
+-------
 Los mapas del repo se leían como una mancha de color sobre el contorno de
 España: sin referencias, «¿esto es Zamora o León?» no se contesta a ojo, y el
 mapa diario se mira precisamente para eso. Se añaden los límites de provincia
 y las ciudades para poder situar el riesgo sin abrir otro mapa al lado.
 
-Los polígonos son los MISMOS del proyecto hermano (`exportar_limites.py`,
+Los polígonos son los mismos del proyecto hermano (`exportar_limites.py`,
 Natural Earth 10 m admin-1, dominio público, simplificados a 800 m y ya
 proyectados a píxeles de la malla). Se comprobó que la rejilla es idéntica
 (1188 × 920, EPSG:3035, origen 2674734,3466 / 2492195,9911, paso 1 km), así
@@ -21,8 +20,8 @@ y sin shapely en la cadena diaria.
 
 Las etiquetas se limitan a las N ciudades más pobladas (población de
 `estado/municipios.json`, emparejada por cercanía a cada capital) porque las
-50 capitales rotuladas tapan el mapa: en un panel grande caben ~25, en una
-rejilla de 2×2 caben ~12. Los puntos sí se dibujan todos.
+50 capitales rotuladas tapan el mapa: en un panel grande caben unas 25, en
+una rejilla de 2×2 caben unas 12. Los puntos sí se dibujan todos.
 
 Si falta `limites.npz` el mapa sale como antes, con un aviso: la cadena diaria
 no se cae por la capa base.
@@ -104,7 +103,7 @@ def dibujar(ax, nx, ny, etiquetas=20, ciudades=True, lw=1.0):
 
 
 def handles():
-    """Artistas de mentira para la leyenda: qué es cada línea y cada punto."""
+    """Artistas ficticios para la leyenda: qué es cada línea y cada punto."""
     from matplotlib.lines import Line2D
     return [
         Line2D([], [], color="0.15", lw=1.4, label="límite de comunidad"),
@@ -115,7 +114,7 @@ def handles():
 
 
 def leyenda(fig, extra=(), ncol=5):
-    """UNA leyenda para toda la figura: capa base + lo que añada el llamante.
+    """Una sola leyenda para toda la figura: capa base + lo que añada el llamante.
 
     Va abajo y en horizontal para no comerse mapa; sin marco, porque el fondo
     de la figura ya es blanco.
@@ -140,7 +139,7 @@ def niveles_en_barra(cb, cortes=(30, 90, 98), nombres=("BAJO", "MODERADO",
     lim = [0] + [i for i, b in enumerate(tramos[1:-1], 1)
                  if b in cortes] + [n] if tramos is not None else [0, 2, 4, 5, 6]
     for nom, a, b in zip(nombres, lim[:-1], lim[1:]):
-        # a la IZQUIERDA de la barra: los números de los cortes van a la
+        # a la izquierda de la barra: los números de los cortes van a la
         # derecha y ahí se solapaban ("60MODERADO")
         cb.ax.text(-0.25, (a + b) / 2 / n, nom, transform=cb.ax.transAxes,
                    ha="right", va="center", fontsize=7.5, color="0.2")
@@ -150,9 +149,9 @@ def alerta_global(fig, pctl, valor=None, cortes=(30, 90, 98),
                   nombres=("BAJO", "MODERADO", "ALTO", "EXTREMO"),
                   colores=("#ffeda0", "#feb24c", "#fd8d3c", "#bd0026"),
                   rect=(0.055, 0.945, 0.20, 0.016)):
-    """Termómetro de la ALERTA GLOBAL del día en una esquina de la figura.
+    """Termómetro de la alerta global del día en una esquina de la figura.
 
-    El mapa va en percentil DEL DÍA, así que por construcción todos los días
+    El mapa va en percentil del día, así que por construcción todos los días
     pintan el mismo 2 % en EXTREMO: un 12 de agosto de récord y un martes de
     marzo salen idénticos. El mapa no puede decir si hoy es un día malo, y
     hasta ahora eso solo estaba como cifra en el subtítulo. Aquí es un

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""F6 - De donde saca cada modelo su ventaja, y la comprobacion de desfase.
+"""F6 - De dónde saca cada modelo su ventaja, y la comprobación de desfase.
 
-(a) Importancia por *gain* de los dos modelos, leida de los .ubj publicados en
-    `muestras/modelos/`. `donde_dia_effis` se guardo sin nombres de columna:
-    los indices f0..f45 se traducen con la lista canonica
+(a) Importancia por *gain* de los dos modelos, leída de los .ubj publicados en
+    `muestras/modelos/`. `donde_dia_effis` se guardó sin nombres de columna:
+    los índices f0..f45 se traducen con la lista canónica
     `muestras/modelos/xgb_v2_prototipo_features.json`, que es la que
     `dos_05_modelos.py:76` usa como FULL para entrenarlo.
-    Los porcentajes se escriben ademas en figs/f6_gain.json.
-(b) Fraccion de superficie quemada del dia que cae en el 2 % de celdas de mayor
-    riesgo, en funcion del desfase entre el mapa y el dia del fuego
+    Los porcentajes se escriben también en figs/f6_gain.json.
+(b) Fracción de superficie quemada del día que cae en el 2 % de celdas de mayor
+    riesgo, en función del desfase entre el mapa y el día del fuego
     (`salida/dos_23_vispera.json`, corrida limpia).
 Uso:  python f6_donde_mira.py   [TFM_MALLA=<ruta a TFM_fuego_malla>]
 """

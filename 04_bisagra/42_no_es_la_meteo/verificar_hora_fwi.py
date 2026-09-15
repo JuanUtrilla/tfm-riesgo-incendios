@@ -2,30 +2,29 @@
 """
 ¿De verdad el FWI del cubo son las 13 UTC? Verificación antes de tocar nada.
 
-NO TOCA PRODUCCIÓN. Escribe salida/verificar_hora_fwi.json.
+No toca producción. Escribe salida/verificar_hora_fwi.json.
 
-=============================================================================
-QUÉ SE VERIFICA Y POR QUÉ HACE FALTA
-=============================================================================
+Qué se verifica y por qué hace falta
+------------------------------------
 `diagnostico_fwi.py` encontró que el FWI del cubo (31,9 de media en julio
 2024) se reproduce calculándolo con los valores instantáneos de las 13 UTC
-(31,7), y NO con el proxy tmax/hrMin que se sirve (39,2) ni con el mediodía
+(31,7), y no con el proxy tmax/hrMin que se sirve (39,2) ni con el mediodía
 canónico de las 11 UTC (25,1).
 
-Pero eso era UN mes, 300 nodos y una comparación de MEDIAS. Dos medias pueden
+Pero eso era un mes, 300 nodos y una comparación de medias. Dos medias pueden
 coincidir con distribuciones distintas, y una hora puede acertar en julio por
 casualidad. Actuar sobre eso significaría rehacer los 84 meses de la
-climatología, así que primero se comprueba en serio:
+climatología, así que primero se comprueba con más cuidado:
 
  · varios meses (julio, agosto, septiembre de 2024)
- · no solo la media: mediana, sesgo, correlación y error absoluto
- · la hora que MINIMIZA el sesgo en cada mes, para ver si es estable o si
+ · media, mediana, sesgo, correlación y error absoluto
+ · la hora que minimiza el sesgo en cada mes, para ver si es estable o si
    cambia con la estación
 
 Si la hora buena se mueve de un mes a otro, no hay una "convención horaria"
 que copiar y la hipótesis se cae.
 
-SPIN-UP. La serie arranca el 1-jun-2024 y solo se evalúan julio, agosto y
+Spin-up. La serie arranca el 1-jun-2024 y solo se evalúan julio, agosto y
 septiembre, para que el FWI llegue con memoria a los meses medidos. Junio se
 usa de rodaje y no se puntúa.
 

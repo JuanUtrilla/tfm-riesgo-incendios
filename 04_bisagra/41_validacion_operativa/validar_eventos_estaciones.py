@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-Validación 2025-2026 vía ESTACIONES: incendios FIRMS recientes vs el riesgo que
-daba el prototipo (misma tubería estación→features que producción).
+Validación 2025-2026 vía estaciones: incendios FIRMS recientes frente al riesgo
+que daba el prototipo (misma tubería estación→features que producción).
 
 Diferencia con la validación 2021-2024 (cubo): aquí las features salen de las
 estaciones AEMET (FWI propio, vegetación climatológica, autorregresivas
-congeladas) — valida a la vez el modelo Y el puente estación→features del
-prototipo, sobre fuegos que el modelo no pudo ver ni en sueños (2025-2026).
+congeladas), así que se valida a la vez el modelo y el puente
+estación→features del prototipo, sobre fuegos posteriores al entrenamiento
+(2025-2026).
 
 1. Serie diaria por estación (aemet_diario_2025_2026.parquet, spin-up nov-2024)
-   → FWI propio → features de producción → PROBABILIDAD DIARIA por estación.
+   → FWI propio → features de producción → probabilidad diaria por estación.
 2. Eventos: DBSCAN FIRMS 2025-2026 (mismos parámetros que 2021-24, filtro
    industrial >8 días/píxel en el periodo).
 3. Cada evento se empareja con la estación válida más cercana (≤35 km) y se
-   calcula el percentil del día de inicio dentro del AÑO de esa estación
-   (2026: año parcial ene→hoy — caveat documentado).
+   calcula el percentil del día de inicio dentro del año de esa estación
+   (2026 es un año parcial, de enero a hoy; el caveat queda documentado).
 
 Salidas: dataset/eventos_firms_2025_2026.parquet
          viz_data/eventos_firms_series_2025.json
@@ -161,7 +162,7 @@ def main():
     arbol = cKDTree(np.column_stack([ex, ey]))
     Xe, Ye = tr.transform(ev["lon"].values, ev["lat"].values)
     # hasta 4 estaciones candidatas a ≤35 km: si a la más cercana le falta el
-    # día (huecos en su serie), se prueba la siguiente — sin esto se perdían
+    # día (huecos en su serie), se prueba la siguiente; sin esto se perdían
     # en silencio ~40 eventos, incluido el gran incendio de Almería (jul-2026)
     d4, j4 = arbol.query(np.column_stack([Xe, Ye]), k=4)
 

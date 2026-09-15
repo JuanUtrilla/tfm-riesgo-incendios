@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 23: el mapa de AYER contra el fuego de HOY.
+Dos modelos, paso 23: el mapa de ayer contra el fuego de hoy.
 
 Los pasos 20-22 puntúan el mapa del día D contra el fuego del día D, y ese
 mapa lleva dentro el resumen meteorológico del propio día D (tmax, hr_min,
-viento_max: la tarde). No es una previsión, es un diagnóstico concurrente.
-`meteo_dia` usa slice(0, k+1) — el día D incluido.
+viento_max: la tarde). Es un diagnóstico concurrente, no una previsión.
+`meteo_dia` usa slice(0, k+1), con el día D incluido.
 
 Aquí se hace lo único genuinamente anticipado que permiten los datos que ya
 están en disco: puntuar los incendios del día D con el mapa del día D−1
-(y D−2, D−3), que están construidos SOLO con información existente la noche
-anterior. Es una previsión por persistencia: no reentrena nada, asume que el
-riesgo de ayer sigue valiendo hoy. Cota INFERIOR de lo que daría un mapa con
-IFS, que sí anticipa el tiempo de mañana.
+(y D−2, D−3), construidos solo con información existente la noche anterior.
+Es una previsión por persistencia: no reentrena nada y asume que el riesgo
+de ayer sigue valiendo hoy. Cota inferior de lo que daría un mapa con IFS,
+que sí anticipa el tiempo de mañana.
 
-La caída de D+0 a D+1 es la medida honesta de cuánto del acierto venía de
-conocer la tarde.
+La caída de D+0 a D+1 mide cuánto del acierto venía de conocer la tarde.
 
-NO TOCA PRODUCCIÓN. Escribe salida/dos_23_vispera.{json,csv}.
+No toca producción. Escribe salida/dos_23_vispera.{json,csv}.
 """
 
 import glob

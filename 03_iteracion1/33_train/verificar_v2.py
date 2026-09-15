@@ -3,13 +3,13 @@
 
 No existe script que lo entrene: fue un reentrenamiento interactivo del
 15-jul-2026 (el .ubj es de las 08:51, horas antes del commit inicial de
-`TFM_fuego`) documentado en `../MODELO_B_BITACORA.md` §16 — v1 sin las cuatro
+`TFM_fuego`) documentado en `../MODELO_B_BITACORA.md` §16: v1 sin las cuatro
 autorregresivas intra-celda contaminadas por el artefacto del muestreo
 misma-celda (+0,92 log-odds por `n_fuegos_1km_hist=0` en pleno Madrid urbano;
 AUC-PR 0,828 frente a 0,843, «coste pequeño, modelo honesto para producción»).
 
 Este script convierte esa afirmación en comprobación: la lista canónica de 50
-features (`features.FULL`) menos las 46 del JSON servido debe ser EXACTAMENTE
+features (`features.FULL`) menos las 46 del JSON servido tiene que ser exactamente
 el conjunto de las cuatro contaminadas, y el orden del JSON debe coincidir con
 el que lleva dentro el .ubj. Corre con `muestras/` recién clonado el repo.
 """

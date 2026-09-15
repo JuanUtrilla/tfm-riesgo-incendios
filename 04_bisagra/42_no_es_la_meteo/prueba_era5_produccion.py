@@ -2,42 +2,40 @@
 """
 ¿Puede ERA5 (malla) sustituir a AEMET como entrada meteo de producción?
 
-NO SOBRESCRIBE NADA. Escribe solo dataset/prueba_era5_produccion.json
+No sobrescribe nada. Escribe solo dataset/prueba_era5_produccion.json
 y un resumen por pantalla.
 
-=============================================================================
-LA PREGUNTA
-=============================================================================
+La pregunta
+-----------
 `fwi_pctl_local` = percentil del FWI de hoy dentro de la climatología de esa
-celda. En ENTRENAMIENTO numerador y denominador salen los dos del cubo
-(ERA5-Land). En PRODUCCIÓN el numerador pasó a ser un FWI de estación AEMET y
-el denominador se quedó en el cubo → el percentil satura (8,1 % de estaciones
+celda. En entrenamiento numerador y denominador salen los dos del cubo
+(ERA5-Land). En producción el numerador pasó a ser un FWI de estación AEMET y
+el denominador se quedó en el cubo, y el percentil satura (8,1 % de estaciones
 en pctl ≥99,9 un día cualquiera, frente al 1,3 % de entrenamiento).
 
 Hay dos formas de arreglarlo:
-  (a) mover el DENOMINADOR a AEMET  → clim_fwi_aemet (ya construido; pierde
+  (a) mover el denominador a AEMET  → clim_fwi_aemet (ya construido; pierde
       217 de 683 estaciones por falta de años completos)
-  (b) mover el NUMERADOR de vuelta a la familia ERA5 → esta prueba
+  (b) mover el numerador de vuelta a la familia ERA5 → esta prueba
 
 Si (b) funciona, no hay que reentrenar ni reconstruir la climatología: la
 entrada vuelve a la distribución de entrenamiento por construcción.
 
-=============================================================================
-EL DISEÑO: aislar la FUENTE, congelar la IMPLEMENTACIÓN
-=============================================================================
+El diseño: aislar la fuente, congelar la implementación
+-------------------------------------------------------
 Hay tres sabores de FWI en el proyecto y confundirlos invalida la prueba:
 
-  1. `ds["FWI"]` del cubo         — implementación de IberFire sobre ERA5-Land
-                                    (es la que vio el ENTRENAMIENTO)
-  2. fwi_canadiense sobre el cubo — implementación propia sobre ERA5-Land
-                                    (es la de `clim_fwi/`, el DENOMINADOR)
-  3. fwi_canadiense sobre AEMET   — implementación propia sobre estación
-                                    (es el NUMERADOR de producción hoy)
+  1. `ds["FWI"]` del cubo         : implementación de IberFire sobre ERA5-Land
+                                    (la que vio el entrenamiento)
+  2. fwi_canadiense sobre el cubo : implementación propia sobre ERA5-Land
+                                    (la de `clim_fwi/`, el denominador)
+  3. fwi_canadiense sobre AEMET   : implementación propia sobre estación
+                                    (el numerador de producción hoy)
 
 El percentil de producción empareja 3 contra 2: misma implementación, distinta
-fuente. Luego el sesgo de implementación se cancela y **lo único que se está
-midiendo es la fuente**. Por eso las tres ramas de abajo usan SIEMPRE
-`calcular_fwi_serie`, y (1) se calcula solo como control.
+fuente. El sesgo de implementación se cancela y lo único que se mide es la
+fuente. Por eso las tres ramas de abajo usan siempre `calcular_fwi_serie`, y
+(1) se calcula solo como control.
 
 Tres numeradores, mismas estaciones y mismos días:
 
@@ -46,12 +44,12 @@ Tres numeradores, mismas estaciones y mismos días:
                                                     la que vive el denominador
   ERA5   fwi_canadiense sobre Open-Meteo          → el candidato
          (era5_seamless: T/HR de ERA5-Land 9 km,
-          viento/precip de ERA5 31 km — ERA5-Land
+          viento/precip de ERA5 31 km; ERA5-Land
           no sirve viento ni precipitación)
   AEMET  fwi_canadiense sobre la estación         → lo que hace producción hoy
 
-MÉTRICA QUE DECIDE: el percentil de cada numerador contra `clim_fwi/<idema>.npz`
-(el denominador REAL de producción). Gana quien reproduzca el comportamiento de
+Métrica que decide: el percentil de cada numerador contra `clim_fwi/<idema>.npz`
+(el denominador real de producción). Gana quien reproduzca el comportamiento de
 CUBO. Si ERA5 ≈ CUBO y AEMET satura, la arquitectura (b) queda validada.
 
 Periodo: spin-up desde 2023-01-01 (el DC tiene ~52 días de constante de tiempo),
@@ -157,7 +155,7 @@ def serie_openmeteo(est):
 
 
 def serie_aemet(est):
-    """Misma receta EXACTA que tiempo_real.serie_diaria_aemet (m/s, mm)."""
+    """Misma receta exacta que tiempo_real.serie_diaria_aemet (m/s, mm)."""
     con = sqlite3.connect(f"{DIR}/aemet_historico.db")
     q = ("SELECT idema, fecha, tmax, hrmin, velmedia, racha, prec "
          "FROM climatologia_diaria WHERE fecha BETWEEN ? AND ? "

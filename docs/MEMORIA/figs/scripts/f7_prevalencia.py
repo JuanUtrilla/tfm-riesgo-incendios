@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Figura 7: la prevalencia real del fuego y la persistencia de la etiqueta.
 
-Los dos números del análisis exploratorio del cubo que condicionan todo el
+Los dos números del análisis exploratorio del cubo de los que depende el
 diseño posterior:
 
-  (a) celdas-día con `is_fire` por cada 100.000, año a año, contra el 25 % de
+  (a) celdas-día con `is_fire` por cada 100.000, año a año, frente al 25 % de
       positivos que tenía por construcción el conjunto de la iteración 1.
-      Cinco órdenes de magnitud. Eje logarítmico, si no la barra del diseño
-      aplasta a las demás.
-  (b) P(arde en t+k | arde en t): 0,51 a un día. `is_fire` marca días
-      ARDIENDO, no igniciones, y por eso la evaluación usa `primer_dia`.
+      Hay cinco órdenes de magnitud de diferencia; el eje es logarítmico
+      porque si no la barra del diseño aplasta a las demás.
+  (b) P(arde en t+k | arde en t): 0,51 a un día. `is_fire` marca los días en
+      que la celda está ardiendo, no las igniciones, y por eso la evaluación
+      usa `primer_dia`.
 
 Fuente: 02_eda/ANALISIS_CUBO.md, tabla de prevalencia (`dos_00`) y sección de
 persistencia. Medido sobre las 498.530 celdas peninsulares × día.

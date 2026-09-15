@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cobertura con tolerancia (a posteriori): se dilata el TOP del modelo (top-2 %
+"""Cobertura con tolerancia (a posteriori): se dilata el top del modelo (top-2 %
 y top-0,5 %) a R km y se mide qué fracción de las celdas quemadas y de los
 incendios del día quedan a ≤R km de alguna celda del top. Se acompaña del % de
 España que cubre ese top dilatado (el azar cubriría esa misma fracción de las

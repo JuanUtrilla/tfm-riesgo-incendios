@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""F3 - Que separa un positivo de un negativo en el conjunto de la iteracion 1.
+"""F3 - Qué separa un positivo de un negativo en el conjunto de la iteración 1.
 
 Lee las medianas ya calculadas por `02_eda/eda_dataset.py` y guardadas en
 `02_eda/figuras/eda_resumen.log` (53.563 filas: 13.577 positivos y 39.986
@@ -43,7 +43,7 @@ def medianas():
 def main():
     med = medianas()
     nombres = [n for n in ETIQ if n in med]
-    # separacion relativa: |pos-neg| / max(|pos|,|neg|,eps), solo para ordenar
+    # separación relativa: |pos-neg| / max(|pos|,|neg|,eps), solo para ordenar
     def sep(n):
         p, q = med[n]
         return abs(p - q) / max(abs(p), abs(q), 1e-9)

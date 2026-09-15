@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 13: los modelos con ETIQUETA EFFIS, y su test en 2024.
+Dos modelos, paso 13: los modelos con etiqueta EFFIS, y su test en 2024.
 
-NO TOCA PRODUCCIÓN. Lee dataset_effis.parquet y celdas.parquet del disco
+No toca producción. Lee dataset_effis.parquet y celdas.parquet del disco
 externo; escribe modelos *_effis allí y salida/dos_13_metricas.json.
 
 Misma receta que `dos_05` (features, XGBoost, protocolo dentro del día),
@@ -13,7 +13,7 @@ cambiando solo la etiqueta: superficie quemada EFFIS en su primer día.
   donde_effis_c       por celda, estáticas+clima+geo+densidad EGIF 2008-14,
                       etiqueta «≥1 is_fire en 2008-2022», early stop en 2023.
                       (El `donde_effis` de dos_10 usaba 2008-2020 y paraba
-                      con 2021-24: contamina el test 2024; este no.)
+                      con 2021-24, lo que contamina el test 2024; este no.)
   donde_effis_c × cuando_effis     el producto
 Referencias: prod, y los modelos EGIF de dos_05 (cuando, donde_dia,
 donde_cel_hist×cuando) puntuados sobre el mismo banco.
@@ -84,7 +84,7 @@ def main():
                   va[FULL].values, va["label"].values, "donde_dia_effis")
     scores["donde_dia_effis"] = m_d.predict_proba(ev[FULL].values)[:, 1]
 
-    # --- DÓNDE por celda, etiqueta EFFIS 2008-2022, val 2023 ---------------
+    # --- dónde por celda, etiqueta EFFIS 2008-2022, val 2023 ---------------
     z = np.load(f"{ce.DATASET}/cubo_etiquetas.npz")
     an = list(z["anios"]); nfa = z["n_fuego_anio"]
     def per(a0, a1):

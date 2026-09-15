@@ -3,7 +3,7 @@ Descarga el censo ganadero armonizado de Europa (Zenodo 11058509) y filtra
 a España para los tres cortes disponibles (2000, 2010, 2020).
 
 Fuente: "Harmonized ruminant livestock dataset for Europe" (Nature Sci. Data, 2024).
-https://zenodo.org/records/11058509 — GeoPackage, sin registro, CC BY 4.0.
+https://zenodo.org/records/11058509 (GeoPackage, sin registro, CC BY 4.0).
 
 Uso:
     conda activate tfm_fuego

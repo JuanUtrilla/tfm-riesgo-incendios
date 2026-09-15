@@ -1,34 +1,32 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 1: nodos ERA5-Land y mapeo celda → nodo.
+Pipeline de malla, módulo 1: nodos ERA5-Land y mapeo celda → nodo.
 
-NO TOCA PRODUCCIÓN. Todo el pipeline nuevo lleva prefijo `malla_` y escribe en
+No toca producción. Todo el pipeline nuevo lleva prefijo `malla_` y escribe en
 `malla_data/`. El sistema que corre (`tiempo_real.py`, `mapa_riesgo_hoy.py`)
 queda intacto: la serie de previsiones selladas por commit no se parte.
 
-=============================================================================
-QUÉ HACE Y POR QUÉ
-=============================================================================
+Qué hace y por qué
+------------------
 Producción hoy calcula las 19 features meteo por estación AEMET (~690 puntos
 irregulares, 16 % sin viento) y las interpola a la malla de 1 km con IDW k=8.
 Ese paso nunca se validó y es el eslabón frágil.
 
 Aquí se sustituye por algo sin interpolación: la meteo se calcula en los nodos
 de la malla nativa de ERA5-Land (0,1° ≈ 9 km) y cada celda de 1 km toma el
-valor de SU nodo. No hay IDW, no hay huecos y no hay dependencia de que una
-estación concreta reporte.
+valor de su nodo. No hay IDW, no hay huecos y no depende de que una estación
+concreta reporte.
 
-Que esto no pierde nada está medido: la meteo del cubo NUNCA fue de 1 km
-—ERA5-Land es de ~9 km reescalado—, y lo genuinamente fino (terreno, usos del
+Que esto no pierde nada está medido: la meteo del cubo nunca fue de 1 km
+(ERA5-Land es de ~9 km reescalado), y lo que sí es fino (terreno, usos del
 suelo) no se toca. Ver ENFOQUE_TRAIN_SERVE.md §5 y §6.
 
-=============================================================================
-DECISIONES
-=============================================================================
-· Rejilla de 0,1° ALINEADA con la de ERA5-Land (múltiplos exactos de 0,1),
+Decisiones
+----------
+· Rejilla de 0,1° alineada con la de ERA5-Land (múltiplos exactos de 0,1),
   no una rejilla propia. Así el nodo que se pide a la API es el que existe y
   no hay una interpolación encubierta en el proveedor.
-· Asignación por REDONDEO al nodo más cercano en lat/lon, no por vecino más
+· Asignación por redondeo al nodo más cercano en lat/lon, no por vecino más
   cercano en metros. Es lo mismo a esta escala y es reproducible sin árboles.
 · Se conservan solo los nodos con al menos una celda peninsular (`is_spain`):
   no se descarga meteo de mar ni de Francia.

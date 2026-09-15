@@ -2,18 +2,17 @@
 """
 Módulo 5b: ¿discrimina la malla tan bien como el cubo? Varios días.
 
-NO TOCA PRODUCCIÓN. Escribe dataset/malla_05b_evaluacion.json.
+No toca producción. Escribe dataset/malla_05b_evaluacion.json.
 
-=============================================================================
-POR QUÉ HACE FALTA ESTO
-=============================================================================
+Por qué hace falta
+------------------
 El módulo 5 pinta un día y da una cifra de discriminación, pero ese día tenía
 39 celdas con detección FIRMS dentro de España. Con 39 celdas, la diferencia
-entre los dos mapas no se distingue del ruido, así que ese número NO decide
+entre los dos mapas no se distingue del ruido, así que ese número no decide
 nada. Aquí se repite sobre varios días y se agrupan las celdas.
 
-MÉTRICA. Para cada celda con detección FIRMS de ese día se calcula su
-PERCENTIL dentro de la distribución de riesgo de España ESE día. Un mapa
+Métrica. Para cada celda con detección FIRMS de ese día se calcula su
+percentil dentro de la distribución de riesgo de España ese día. Un mapa
 perfecto pondría todos los fuegos en el percentil 100; uno inútil, en el 50.
 Se agrupan todas las celdas de todos los días y se compara la mediana.
 
@@ -21,11 +20,11 @@ Es mejor que "el percentil de la mediana" del módulo 5 porque no colapsa el
 día a un único número antes de comparar, y porque normaliza por día: los días
 de peligro general alto no pesan más que los tranquilos.
 
-DÍAS. Los de más detecciones en España dentro del rango con ERA5-Land en
+Días. Los de más detecciones en España dentro del rango con ERA5-Land en
 disco (jun-sep 2024), evitando días consecutivos: 16, 17 y 18 de septiembre
-son el MISMO episodio y contarlos como tres muestras infla la confianza.
+son el mismo episodio y contarlos como tres muestras infla la confianza.
 
-SPIN-UP. La recursión del FWI arranca el 1-jun (§ módulo 5). Cuanto más
+Spin-up. La recursión del FWI arranca el 1-jun (§ módulo 5). Cuanto más
 temprano el día evaluado, menos spin-up. Por eso el más temprano aquí es de
 agosto (62 días) y el script mide e informa del sesgo real por día.
 
@@ -102,7 +101,7 @@ def main():
             p = P[nom]
             todas = p[es_esp]; todas = todas[np.isfinite(todas)]
             fuego = p[det]; fuego = fuego[np.isfinite(fuego)]
-            # percentil de CADA celda de fuego dentro del país ese día
+            # percentil de cada celda de fuego dentro del país ese día
             orden = np.sort(todas)
             pct = np.searchsorted(orden, fuego, side="right") / len(orden) * 100
             pool[nom].append(pct)
@@ -140,7 +139,7 @@ def main():
           f"{np.median(A['cubo']):>9.1f}{np.median(A['malla']):>9.1f}"
           f"{np.median(A['malla_qm']):>10.1f}")
 
-    # BOOTSTRAP POR DÍAS, no por celdas. Las celdas con fuego de un mismo día
+    # Bootstrap por días, no por celdas. Las celdas con fuego de un mismo día
     # pertenecen a los mismos incendios y no son independientes: remuestrearlas
     # da un intervalo demasiado estrecho. La unidad de muestreo real es el día.
     rng = np.random.default_rng(0)

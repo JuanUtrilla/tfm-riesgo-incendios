@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
 """
-v3 — Propensión local de fuego a partir de FIRMS (sustituto NO CADUCABLE de la
+v3: propensión local de fuego a partir de FIRMS (sustituto no caducable de la
 autorregresiva del EGIF).
 
-PROBLEMA QUE RESUELVE
+Problema que resuelve
 El modelo de producción (xgb_v2_prototipo) conserva una sola feature
 autorregresiva, `n_fuegos_10km_mismomes_hist`, que es la nº1 en importancia SHAP
 y se calcula sobre el EGIF. El EGIF está incompleto desde 2021 (bitácora §2), así
-que en producción esa feature está CONGELADA EN 2020: para el modelo, los
+que en producción esa feature está congelada en 2020: para el modelo, los
 incendios de 2021-2026 no han existido, y la degradación crece cada año.
 
 FIRMS (VIIRS, NASA) sí está disponible indefinidamente y en tiempo casi real, y
 de hecho ya alimenta dos features vivas del modelo (frp_max_50km_7d,
 n_detec_50km_7d). Este script construye el equivalente FIRMS de la propensión
-local, para poder reentrenar con la MISMA definición que se usará en producción
-—requisito imprescindible: cambiar la fuente de una feature sin reentrenar hace
-que el modelo la interprete con el significado viejo y falle en silencio
+local, para poder reentrenar con la misma definición que se usará en producción.
+Es un requisito imprescindible: cambiar la fuente de una feature sin reentrenar
+hace que el modelo la interprete con el significado viejo y falle en silencio
 (mismo tipo de bug que los NaN y la racha de viento, bitácora §16).
 
-DEFINICIONES (todas estrictamente anteriores al AÑO de la fila → sin fuga ni
+Definiciones (todas estrictamente anteriores al año de la fila → sin fuga ni
 artefacto de muestreo; positivos y negativos de la misma celda-año reciben el
 mismo valor, luego no pueden discriminar por orden temporal)
 
   firms_diasfuego_mismomes_tasa
-      días distintos con ≥1 detección FIRMS a <10 km, en el MISMO MES de años
+      días distintos con ≥1 detección FIRMS a <10 km, en el mismo mes de años
       anteriores, dividido por el nº de años anteriores disponibles.
       Análogo directo de n_fuegos_10km_mismomes_hist (estacionalidad local).
 
@@ -33,7 +33,7 @@ mismo valor, luego no pueden discriminar por orden temporal)
 
   firms_frp_p95_hist
       percentil 95 del FRP (Fire Radiative Power, MW) de las detecciones a <10 km
-      en años anteriores. Proxy de la INTENSIDAD típica del fuego en la zona,
+      en años anteriores. Proxy de la intensidad típica del fuego en la zona,
       no solo de su frecuencia. NaN si no hay detecciones previas.
 
   firms_anios_previos
@@ -41,7 +41,7 @@ mismo valor, luego no pueden discriminar por orden temporal)
       fila. Es la "confianza" de las tasas anteriores; se pasa al modelo para que
       pueda descontar el ruido de las estimaciones con poco histórico.
 
-POR QUÉ TASAS Y NO CONTEOS
+Por qué tasas y no conteos
 FIRMS empieza el 1-ene-2015 y el dataset entrena desde 2015. Un conteo acumulado
 crecería con el calendario (2015 → 0 años de historia, 2026 → 11), lo que
 introduciría una tendencia espuria y, peor, una diferencia sistemática entre
@@ -49,12 +49,12 @@ entrenamiento (historia corta) y producción (historia larga). Normalizando por
 años disponibles la magnitud es estacionaria en expectativa; la varianza sí
 depende del nº de años, y por eso se expone `firms_anios_previos`.
 Las filas de 2015 no tienen ningún año previo → NaN (XGBoost lo gestiona de
-forma nativa y aquí SÍ verá NaN al entrenar, que es la condición para que lo
+forma nativa y aquí sí verá NaN al entrenar, que es la condición para que lo
 maneje bien, bitácora §16).
 
-POR QUÉ DÍAS-FUEGO Y NO DETECCIONES
+Por qué días-fuego y no detecciones
 Un solo gran incendio produce miles de detecciones; el conteo crudo es de cola
-muy pesada y mide superficie, no recurrencia. Contar DÍAS DISTINTOS con fuego
+muy pesada y mide superficie, no recurrencia. Contar días distintos con fuego
 se aproxima a un recuento de episodios y es mucho más comparable con la
 semántica de "nº de incendios" del EGIF.
 
@@ -110,7 +110,7 @@ def main() -> None:
         if vec:
             v_anio, v_mes = f_anio[vec], f_mes[vec]
             v_dia, v_frp = f_dia[vec], f_frp[vec]
-            # tabla [año, mes] con nº de DÍAS DISTINTOS con detección
+            # tabla [año, mes] con nº de días distintos con detección
             tabla = np.zeros((len(anios), 13), dtype=np.int32)
             triples = np.unique(np.column_stack([v_anio, v_mes, v_dia]), axis=0)
             for a, m, _ in triples:

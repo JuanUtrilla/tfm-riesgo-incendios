@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replay de UN día en condiciones de servicio, con los datos de archivo.
+"""Replay de un día en condiciones de servicio, con los datos de archivo.
 
 Reproduce lo que la cadena diaria habría publicado la mañana del día D:
   producción (riesgo_hoy.py, xgb_v2_prototipo) + candidatos (dos_riesgo_hoy.py:
@@ -9,7 +9,7 @@ Dos condiciones:
   ifs         reanálisis ERA5-Land hasta D−7, IFS archivado de D−6 a D  (servicio)
   reanalisis  reanálisis hasta el propio D                                (cota superior)
 
-NO toca ningún .py de los repos: corre sobre una copia en sandbox_replay/
+No toca ningún .py de los repos: corre sobre una copia en sandbox_replay/
 (salida propia) y parchea desde fuera: reanálisis truncado, `descarga` del IFS
 sustituida por el archivo, `firms_nrt` por `comparar_rankings.firms_dia`
 (ventana 7, cacheada desde los parquets de focos) y la fecha «hoy» de

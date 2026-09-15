@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 4: las medidas de la fase 1 (`ANALISIS_DATOS.md`).
+Dos modelos, paso 4: las medidas de la fase 1 (`ANALISIS_DATOS.md`).
 
-NO TOCA PRODUCCIÓN. Lee las tablas de expansión; escribe salida/dos_04_analisis.json.
+No toca producción. Lee las tablas de expansión; escribe salida/dos_04_analisis.json.
 
-=============================================================================
-QUÉ SE MIDE Y POR QUÉ
-=============================================================================
+Qué se mide y por qué
+---------------------
 §3.3 Autocorrelación.
   · Moran's I de la densidad EGIF 2015-20 por celda (vecindad reina 3×3) y
-    agregada a 10 km. Dice cuánto se parecen celdas vecinas → si se parte al
-    azar, el test está en el vecindario del train.
-  · Persistencia del DÓNDE entre periodos: AUC de predecir «arde en 2019»
+    agregada a 10 km. Dice cuánto se parecen celdas vecinas: si se parte al
+    azar, el test queda en el vecindario del train.
+  · Persistencia del dónde entre periodos: AUC de predecir «arde en 2019»
     (y 2020, y EFFIS 2021-24) solo con la densidad de 2015-18 a 10 km. Es la
-    línea base más tonta posible del modelo DÓNDE, y hay que ganarla.
+    línea base más simple posible del modelo dónde, y hay que ganarla.
   · Autocorrelación temporal de la meteo (lag 1, 7, 30) sobre los nodos
     ERA5-Land 2008-2014: dice cuánto se parecen días consecutivos.
   · Fuga por partición: el mismo modelo de susceptibilidad con CV aleatorio y
     con CV por bloques de 100 km. La diferencia es la fuga.
 
-§3.4 Susceptibilidad (cota del DÓNDE).
-  XGBoost sobre CELDAS con estáticas + clima → P(≥1 EGIF en 2015-18). OOF por
-  bloques de 100 km, y evaluado en 2019, 2020 y EFFIS 2021-24. Con y sin
-  densidad histórica 2008-14 (la feature que «casi es la etiqueta»).
+§3.4 Susceptibilidad (cota del dónde).
+  XGBoost sobre celdas con estáticas + clima para estimar P(≥1 EGIF en
+  2015-18). OOF por bloques de 100 km, y evaluado en 2019, 2020 y EFFIS
+  2021-24. Con y sin densidad histórica 2008-14 (la feature que «casi es la
+  etiqueta»).
 
-Todo sobre las 498.530 celdas peninsulares. ~5 min.
+Todo sobre las 498.530 celdas peninsulares. Unos 5 min.
 """
 
 import json
@@ -150,7 +150,7 @@ def main():
     R["autocorr_temporal_meteo_2010_14"] = tmp
     print("temporal:", {k: round(v, 3) for k, v in tmp.items()})
 
-    # ---------------- susceptibilidad: cota del DÓNDE -----------------------
+    # ---------------- susceptibilidad: cota del dónde -----------------------
     y = y1518.astype(int)
     grupos = df["bloque_100km"].values
     params = dict(n_estimators=400, max_depth=6, learning_rate=0.05,

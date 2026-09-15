@@ -4,7 +4,7 @@ Descarga las últimas ~24h de todas las estaciones y las inserta en SQLite.
 Diseñado para ejecutarse cada 6h desde GitHub Actions.
 
 Variables de entorno requeridas:
-    AEMET_API_KEY  — clave de la API de AEMET OpenData
+    AEMET_API_KEY: clave de la API de AEMET OpenData
 """
 
 import os

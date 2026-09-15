@@ -2,27 +2,27 @@
 """
 ¿ERA5-Land puro cierra la diferencia de precipitación con el cubo?
 
-NO SOBRESCRIBE NADA. Escribe dataset/malla_02_vs_cubo.json.
+No sobrescribe nada. Escribe dataset/malla_02_vs_cubo.json.
 
-POR QUÉ. §6 atribuyó el sesgo frío de −2,0 del FWI a que `era5_seamless` toma
+Por qué: §6 atribuyó el sesgo frío de −2,0 del FWI a que `era5_seamless` toma
 la precipitación de ERA5 (31 km) y llueve el doble que el cubo (1,38 vs 0,69
-mm/día, jun-sep 2024). La conclusión fue: ir a ERA5-Land puro desde CDS lo
+mm/día, jun-sep 2024). La conclusión fue que ir a ERA5-Land puro desde CDS lo
 arreglaría.
 
 La verificación del módulo 2 pone eso en duda: sobre may-ago 2026, ERA5-Land
-(CDS) y ERA5 (Open-Meteo) dan la MISMA precipitación (0,88 vs 0,81 en jun-ago,
-r=0,969). Si es así, el factor 2 no está entre los dos productos de ERA5 sino
-entre el CUBO y ambos, y cambiar de producto no arreglaría nada.
+(CDS) y ERA5 (Open-Meteo) dan la misma precipitación (0,88 vs 0,81 en jun-ago,
+r=0,969). Si es así, el factor 2 está entre el cubo y los dos productos de
+ERA5, no entre estos dos, y cambiar de producto no arreglaría nada.
 
 Aquel contraste mezclaba años (CDS 2026 contra cubo 2024). Este script lo
-resuelve sin ambigüedad: baja ERA5-Land de CDS para EL MISMO periodo de §6
-(jun-sep 2024) y lo compara con el cubo en las MISMAS 120 estaciones, ya
+resuelve sin ambigüedad: baja ERA5-Land de CDS para el mismo periodo de §6
+(jun-sep 2024) y lo compara con el cubo en las mismas 120 estaciones, ya
 cacheadas.
 
 Desenlaces:
   · ERA5-Land ≈ 0,69 (el cubo)  → §6 acierta, el arreglo por fuente funciona.
   · ERA5-Land ≈ 1,38 (ERA5)     → §6 se equivoca: el cubo procesa la
-    precipitación de otra forma y NO hay arreglo por fuente. El camino sería
+    precipitación de otra forma y no hay arreglo por fuente. El camino sería
     entonces el mapeo de cuantiles del módulo 3, que es empírico y ya se midió
     que funciona (saturación 2,2 % → 0,5 %).
 

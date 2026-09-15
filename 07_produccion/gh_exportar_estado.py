@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
 """
-Exporta a `estado/` TODO lo que la cadena diaria necesita del repo original
+Exporta a `estado/` todo lo que la cadena diaria necesita del repo original
 y del disco externo, para que corra en GitHub Actions sin ellos.
 
-Se ejecuta EN LOCAL (con el cubo y el USB) cada vez que cambie algo de esto:
+Se ejecuta en local (con el cubo y el USB) cada vez que cambie algo de esto:
 un modelo nuevo, otra climatología, otra capa. Después: `gh_estado.py push --base`.
 
 Qué exporta y por qué:
   cubo_estaticas.nc     las 16 variables 2D del cubo que leen riesgo_hoy /
                         dos_riesgo_hoy / quemadas / firms_dia (+ x, y, is_spain).
-                        Comprimido: ~15 MB frente a los 29 GB del cubo.
+                        Comprimido: unos 15 MB frente a los 29 GB del cubo.
   nodos.npz, clim_fwi_nodos.npz, mapeo_ifs_a_era5land.npz   la malla y su clim
   malla_mensual_m{4..11}.npz   vegetación/LST/EGIF mismo-mes (caché de producción)
   modelos/              xgb_v2 (+features), donde_dia_effis, cuando, mapa dónde
   municipios.json       geocodificador de MITECO
   vendor/               parser de TFM-RAG y geocodificador de validar_miteco
                         (copias literales, con su origen en cabecera)
-  julio2026_effis.json, estaciones_prototipo.parquet  bases de los jueces
+  julio2026_effis.json, estaciones_prototipo.parquet  bases de los jueces en
+                        vivo que siguieron la temporada 2026 (dos_15, dos_16)
 """
 
 import glob
@@ -33,7 +34,7 @@ E = config.ESTADO
 os.makedirs(f"{E}/modelos", exist_ok=True)
 os.makedirs(f"{E}/vendor", exist_ok=True)
 
-# --- 1. cubo → NetCDF pequeño ----------------------------------------------
+# 1. cubo → NetCDF pequeño
 VARS = ["is_spain", "AutonomousCommunities", "elevation_mean", "slope_mean",
         "roughness_mean", "dist_to_roads_mean", "dist_to_waterways_mean",
         "popdens_2020"] + [f"CLC_2018_{s}" for s in (
@@ -51,7 +52,7 @@ if not os.path.exists(ruta):
     ds.close()
     print(f"  cubo_estaticas.nc: {os.path.getsize(ruta)/1e6:.1f} MB")
 
-# --- 2. malla, climatología, mapeo, cachés mensuales ------------------------
+# 2. malla, climatología, mapeo, cachés mensuales
 for n in ("nodos.npz", "clim_fwi_nodos.npz", "mapeo_ifs_a_era5land.npz"):
     shutil.copy(config.entrada(n), f"{E}/{n}")
 for m in range(4, 12):
@@ -63,14 +64,14 @@ for m in range(4, 12):
     else:
         print(f"  aviso: sin caché mensual m{m} (se precomputaría del cubo; en GH no se puede)")
 
-# --- 3. modelos ---------------------------------------------------------------
+# 3. modelos
 for f in ("xgb_v2_prototipo.ubj", "xgb_v2_prototipo_features.json"):
     shutil.copy(f"{config.FUENTE}/modelos/{f}", f"{E}/modelos/{f}")
 for f in ("donde_dia_effis.ubj", "cuando.ubj", "donde_effis_c.ubj"):
     shutil.copy(f"{ce.MODELOS}/{f}", f"{E}/modelos/{f}")
 shutil.copy(config.salida("dos_13_mapa_donde_effis_c.npz"), f"{E}/dos_13_mapa_donde_effis_c.npz")
 
-# --- 4. jueces ----------------------------------------------------------------
+# 4. jueces en vivo (seguimiento de la temporada 2026)
 shutil.copy(f"{config.FUENTE}/prototipo/cache/municipios.json", f"{E}/municipios.json")
 shutil.copy(f"{config.FUENTE}/prototipo/estaciones_prototipo.parquet",
             f"{E}/estaciones_prototipo.parquet")

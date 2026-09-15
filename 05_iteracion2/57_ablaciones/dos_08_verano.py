@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 8: ¿entrenar solo con VERANO mejora el producto de verano?
+Dos modelos, paso 8: ¿entrenar solo con verano mejora el producto de verano?
 
-NO TOCA PRODUCCIÓN. Lee expansión; escribe salida/dos_08_verano.json.
+No toca producción. Lee expansión; escribe salida/dos_08_verano.json.
 
-=============================================================================
-POR QUÉ
-=============================================================================
+Por qué
+-------
 `ANALISIS_DATOS.md` §1: el 38 % de las igniciones EGIF son de febrero-abril
 (Cantábrico), con otra geografía y otra meteo que las de julio-agosto. El
-DÓNDE de `dos_05` aprendió «dónde arde en todo el año» y el CUÁNDO «cuándo
+dónde de `dos_05` aprendió «dónde arde en todo el año» y el cuándo «cuándo
 arde, con negativos de todo el año». El mapa se sirve en verano. Aquí se
-reentrenan los dos con jun-sep (DÓNDE: etiqueta = ≥1 EGIF jun-sep 2015-18;
-CUÁNDO: filas del diseño `cuando` con mes 5-10, para que el negativo siga
+reentrenan los dos con jun-sep (dónde: etiqueta = ≥1 EGIF jun-sep 2015-18;
+cuándo: filas del diseño `cuando` con mes 5-10, para que el negativo siga
 siendo «otro día» pero de la misma estación) y se comparan, pareado por
 días, con los de todo el año sobre el mismo banco `eval_dia`.
 """

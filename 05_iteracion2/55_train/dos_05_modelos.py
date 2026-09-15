@@ -1,54 +1,53 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 5: entrenar DÓNDE y CUÁNDO, combinarlos, y medirlos
-DENTRO DEL DÍA contra el modelo de producción.
+Dos modelos, paso 5: entrenar dónde y cuándo, combinarlos, y medirlos
+dentro del día contra el modelo de producción.
 
-NO TOCA PRODUCCIÓN. Lee expansión y `modelos/xgb_v2_prototipo.ubj` (solo
+No toca producción. Lee expansión y `modelos/xgb_v2_prototipo.ubj` (solo
 lectura); escribe modelos en expansión y métricas en salida/.
 
-=============================================================================
-LOS MODELOS (todos XGBoost, mismos hiperparámetros base de `entrenar_modelo.py`)
-=============================================================================
-  prod        `xgb_v2_prototipo` tal cual, 46 features. LÍNEA BASE OBLIGATORIA.
-  cuando      diseño `cuando` (misma celda, otro día), features SOLO dinámicas
+Los modelos (todos XGBoost, mismos hiperparámetros base de `entrenar_modelo.py`)
+--------------------------------------------------------------------------------
+  prod        `xgb_v2_prototipo` tal cual, 46 features. Línea base obligatoria.
+  cuando      diseño `cuando` (misma celda, otro día), solo features dinámicas
               y servibles: meteo del día y ventanas, FWI y derivados, vegetación,
               FIRMS [D-7,D-1], rayos, calendario. Sin estáticas, sin historia
-              EGIF. Es «dado este sitio, ¿es hoy?».
-  donde_cel   modelo por CELDA (498.530 filas): estáticas + clima + lat/lon
-              → P(≥1 EGIF en 2015-18). Sin meteo del día. Sin densidad
-              histórica de fuego como feature (variante _hist la lleva).
+              EGIF. Responde a «dado este sitio, ¿es hoy?».
+  donde_cel   modelo por celda (498.530 filas): estáticas + clima + lat/lon
+              para estimar P(≥1 EGIF en 2015-18). Sin meteo del día. Sin
+              densidad histórica de fuego como feature (la variante _hist la
+              lleva).
   donde_cel_hist  ídem + densidad EGIF 2008-14 (previa al dataset, servible
               congelada). Es la variante «mapa de dónde hubo incendios antes»
               de la que avisa `CUANDO_Y_DONDE.md`: se mide qué añade.
-  donde_dia   modelo ÚNICO con features completas entrenado sobre el diseño
+  donde_dia   modelo único con features completas entrenado sobre el diseño
               `donde` (mismo día, otra celda). Lo que pasa si solo se cambia
               el muestreo y nada más.
-  mixto       modelo ÚNICO con features completas, negativos mitad `cuando` y
+  mixto       modelo único con features completas, negativos mitad `cuando` y
               mitad `donde`. El contraste obligatorio del encargo (§5).
   donde_cel×cuando, donde_cel_hist×cuando   producto de probabilidades.
   donde_cel+cuando (logit)   suma de logits = producto de odds. Se reporta
               para ver si la forma de combinar importa.
   Líneas base sin modelo: fwi, fwi_pctl_local, densidad EGIF 2015-18 a 10 km
-              (el «mapa tonto» del DÓNDE), y su producto con fwi_pctl_local.
+              (el «mapa tonto» del dónde), y su producto con fwi_pctl_local.
 
-Las features «completas» son las 46 de producción MENOS nada: se dejan las
-46 para que `mixto`/`donde_dia` sean comparables con `prod` feature a feature.
-Las 4 autorregresivas que producción no lleva siguen fuera.
+Las features «completas» son las 46 de producción, sin quitar ninguna, para
+que `mixto`/`donde_dia` sean comparables con `prod` feature a feature. Las 4
+autorregresivas que producción no lleva siguen fuera.
 
-=============================================================================
-EL PROTOCOLO (§6 del encargo)
-=============================================================================
+El protocolo (§6 del encargo)
+-----------------------------
 Banco: `eval_dia`, verano de 2019 (val) y 2020 (test): cada día 1.000 celdas
 al azar + los incendios EGIF del día + celdas EFFIS ardiendo. Ningún modelo
 lo ha visto (train 2015-18; val 2019 solo para early stopping del cuándo).
 
-  · AUC DENTRO DEL DÍA: por cada día con ≥1 positivo, AUC de positivos contra
-    las 1.000 celdas al azar de ESE día. Se reporta la media sobre días.
+  · AUC dentro del día: por cada día con ≥1 positivo, AUC de positivos contra
+    las 1.000 celdas al azar de ese mismo día. Se reporta la media sobre días.
   · Lift del decil superior: fracción de positivos del día que caen en el 10 %
     de celdas mejor puntuadas, dividida por 0,1.
-  · Dos verdades-terreno: EGIF (ignición en la celda) y EFFIS (`is_fire` con
+  · Dos verdades terreno: EGIF (ignición en la celda) y EFFIS (`is_fire` con
     `primer_dia`=1, lo más parecido a una ignición que tiene EFFIS).
-  · Bootstrap de 2.000 remuestreos POR DÍAS para el IC95 de la diferencia
+  · Bootstrap de 2.000 remuestreos por días para el IC95 de la diferencia
     contra `prod`. Nunca por celdas (`README.md` §6bis).
   · 2022 (verano récord, fuera del EGIF): solo EFFIS, y solo como prueba
     externa: las features EGIF de 2022 arrastran el EGIF incompleto de 2021.

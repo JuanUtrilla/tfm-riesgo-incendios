@@ -1,40 +1,34 @@
 #!/usr/bin/env python3
 """
-EXPERIMENTO B, fase 2 — puntuar el modelo con tres fuentes de meteo distintas.
+Experimento B, fase 2: puntuar el modelo con tres fuentes de meteo distintas.
 
-NO SOBRESCRIBE NADA. Escribe solo dataset/experimento_b_fase2_*.{parquet,json}.
+No sobrescribe nada. Escribe solo dataset/experimento_b_fase2_*.{parquet,json}.
 
-=============================================================================
-EL DISEÑO
-=============================================================================
-Mismos días, mismas estaciones, misma etiqueta, mismo modelo (xgb_v2), MISMO
+El diseño
+Mismos días, mismas estaciones, misma etiqueta, mismo modelo (xgb_v2), mismo
 código de construcción de features. Lo único que cambia es de dónde sale la
 meteo:
 
-  BRAZO A · ERA5-Land   → la fuente que vio el modelo AL ENTRENAR (dentro del
+  Brazo A · ERA5-Land   → la fuente que vio el modelo al entrenar (dentro del
                           cubo IberFire, aquí cruda a 0,1°)
-  BRAZO B · AEMET obs   → serie diaria observada, reconstruida con este mismo
+  Brazo B · AEMET obs   → serie diaria observada, reconstruida con este mismo
                           script desde la API de climatológicos
-  BRAZO C · AEMET fcst  → las probabilidades SELLADAS por commit (prevision_D0),
+  Brazo C · AEMET fcst  → las probabilidades selladas por commit (prevision_D0),
                           que no se pueden recalcular a posteriori: un forecast
                           emitido el día D-1 ya no se puede volver a pedir
 
-La diferencia A−B es el desplazamiento de FUENTE con el mismo horizonte
-(observado contra observado). La diferencia B−C es el coste de PREDECIR en vez
+La diferencia A−B es el desplazamiento de fuente con el mismo horizonte
+(observado contra observado). La diferencia B−C es el coste de predecir en vez
 de observar. Juntas descomponen el hueco que VALIDACION.md §4b dejó abierto.
 
-=============================================================================
-EL CONTROL QUE HACE CREÍBLE TODO LO DEMÁS
-=============================================================================
+El control que hace creíble todo lo demás
 El brazo B se compara contra los `ranking_<fecha>.csv` que producción commiteó
-en su día. Si mi pipeline reproduce esas probabilidades, el montaje es fiel y
-las diferencias entre brazos son atribuibles a los datos. Si NO las reproduce,
-hay un bug en mi copia y el resto del experimento no vale nada — igual que el
-CONTROL validó `ablacion_proxies_operativos.py`.
+en su día. Si esta tubería reproduce esas probabilidades, el montaje es fiel y
+las diferencias entre brazos son atribuibles a los datos. Si no las reproduce,
+hay un bug en la copia y el resto del experimento no vale nada, igual que el
+control validó `ablacion_proxies_operativos.py`.
 
-=============================================================================
 FIRMS
-=============================================================================
 `frp_max_50km_7d` y `n_detec_50km_7d` no dependen de la fuente meteo: se
 calculan una vez y se usan idénticas en A y B, para que no contaminen la
 comparación. Se replica exactamente lo que hace ranking_diario.firms_frp:
@@ -88,15 +82,15 @@ def env(nombre, alias=()):
 
 
 # --------------------------------------------------------------------------- #
-# BRAZO B — serie diaria observada de AEMET, rango explícito
+# Brazo B: serie diaria observada de AEMET, rango explícito
 # --------------------------------------------------------------------------- #
 def serie_aemet(f0, f1):
     """Climatológicos diarios de todas las estaciones entre f0 y f1.
 
     Es `ranking_diario.serie_diaria_todas` con el rango como parámetro en vez
     de 'los últimos 80 días': para comparar con ERA5-Land los dos brazos deben
-    tener EXACTAMENTE el mismo spinup de FWI, y el de producción se mide desde
-    'hoy', que no es el día que estamos evaluando."""
+    tener exactamente el mismo spinup de FWI, y el de producción se mide desde
+    'hoy', que no es el día que se evalúa."""
     key = env("AEMET_API_KEY", ("TOKEN_AEMET",))
     filas, ini = [], f0
     while ini <= f1:
@@ -138,7 +132,7 @@ def serie_aemet(f0, f1):
 
 
 # --------------------------------------------------------------------------- #
-# FIRMS — idénticas en los dos brazos
+# FIRMS: idénticas en los dos brazos
 # --------------------------------------------------------------------------- #
 def firms_por_dia(est, dias):
     """frp_max / n_detec a <50 km en [D-5, D-1]. Replica ranking_diario.firms_frp
@@ -269,7 +263,7 @@ def main():
         tablas[nombre] = f
         print(f"{nombre}: {len(f):,} estación-día puntuadas")
 
-    # --- CONTROL: ¿reproduce el brazo AEMET obs lo que commiteó producción?
+    # --- control: ¿reproduce el brazo AEMET obs lo que commiteó producción?
     rk = prod[prod["tipo"] == "ranking (día cerrado)"][["idema", "fecha", "prob"]]
     ctrl = tablas["AEMET obs"].merge(rk, on=["idema", "fecha"],
                                      suffixes=("_mio", "_prod"))
@@ -296,7 +290,7 @@ def main():
     for nombre, g in largo.groupby("brazo"):
         g = g.reset_index(drop=True)
         o, lo, hi, n_m = auc_boot(g, "prob", rng)
-        # baseline FWI percentil calculado con la MISMA fuente
+        # baseline FWI percentil calculado con la misma fuente
         of, lof, hif, n_f = auc_boot(g, "fwi_pctl_local", rng)
         res[nombre] = {"n": int(len(g)), "dias": int(g["fecha"].nunique()),
                        "auc_modelo": round(o, 4), "ic95_modelo": [round(lo, 4), round(hi, 4)],

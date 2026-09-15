@@ -1,41 +1,39 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 34: auditoría de GEOMETRÍA entre entrenamiento y servicio.
+Dos modelos, paso 34: auditoría de geometría entre entrenamiento y servicio.
 
-NO TOCA PRODUCCIÓN NI NINGÚN REPO, y NO modifica `auditoria_train_serve.py`,
+No toca producción ni ningún repo, y no modifica `auditoria_train_serve.py`,
 que está sellado. Escribe salida/dos_34_*.csv.
 
-=============================================================================
-QUÉ HUECO CUBRE
-=============================================================================
-`auditoria_train_serve.py` compara VALORES de features entre las dos ramas, y
+Qué hueco cubre
+---------------
+`auditoria_train_serve.py` compara valores de features entre las dos ramas, y
 por eso no vio dos desajustes reales:
 
   · la ventana temporal de FIRMS (entrenó con [D-7, D-1], se servían 5 días);
-  · la GEOMETRÍA del vecindario.
+  · la geometría del vecindario.
 
 El segundo es el que mide este script. El extractor de entrenamiento
 (`extraer_features_historia.py`) cuenta vecinos con `cKDTree` dentro de un
-RADIO circular —«a <10 km», «a <50 km»—, mientras que la cadena
+radio circular («a <10 km», «a <50 km»), mientras que la cadena
 (`riesgo_hoy.py:230,270`) usa `maximum_filter(size=101)` y `suma_caja(gn, 50)`,
-es decir una CAJA cuadrada. Una caja de lado 2r+1 cubre más superficie que el
+es decir una caja cuadrada. Una caja de lado 2r+1 cubre más superficie que el
 círculo de radio r, así que la cadena sirve valores sistemáticamente mayores
 que los que el modelo aprendió.
 
-=============================================================================
-CÓMO SE MIDE, SIN DEPENDER DE LA CADENA
-=============================================================================
-En vez de ejecutar las dos ramas y comparar salidas —que exige la cadena viva—
-se aplican LAS DOS GEOMETRÍAS a la MISMA rejilla de entrada y se compara. La
-rejilla es `dos_25_egif_mes.npz`, los incendios EGIF del mismo mes acumulados
-por celda, que es la entrada de `n_fuegos_10km_mismomes_hist` — la variable de
-mayor ganancia del modelo (29 %).
+Cómo se mide, sin depender de la cadena
+---------------------------------------
+En vez de ejecutar las dos ramas y comparar salidas (lo que exige la cadena
+viva), se aplican las dos geometrías a la misma rejilla de entrada y se
+compara. La rejilla es `dos_25_egif_mes.npz`, los incendios EGIF del mismo mes
+acumulados por celda, que es la entrada de `n_fuegos_10km_mismomes_hist`, la
+variable de mayor ganancia del modelo (29 %).
 
 Se reporta:
   · el cociente de superficies, que es la predicción teórica;
   · el cociente medido de los valores servidos contra los de entrenamiento;
-  · la correlación de Spearman, para ver si el desajuste es de ESCALA (el orden
-    se conserva) o también de ORDEN.
+  · la correlación de Spearman, para ver si el desajuste es de escala (el orden
+    se conserva) o también de orden.
 
 Uso:
     python dos_34_auditoria_geometria.py
@@ -53,10 +51,10 @@ RADIOS = (10, 50)              # los dos vecindarios que usan las features
 
 
 def circular(g, r):
-    """Suma en un vecindario CIRCULAR de radio r (lo que hace el entrenamiento).
+    """Suma en un vecindario circular de radio r (lo que hace el entrenamiento).
 
     Convolución por FFT con una máscara de disco: exacta y rápida sobre la
-    malla completa, frente al cKDTree del extractor, que da lo mismo.
+    malla completa; da lo mismo que el cKDTree del extractor.
     """
     n = int(np.ceil(r / KM))
     yy, xx = np.mgrid[-n:n + 1, -n:n + 1]
@@ -66,7 +64,7 @@ def circular(g, r):
 
 
 def caja(g, r):
-    """Suma en una CAJA de lado 2r+1 (lo que hace la cadena)."""
+    """Suma en una caja de lado 2r+1 (lo que hace la cadena)."""
     lado = int(2 * np.ceil(r / KM) + 1)
     return uniform_filter(g.astype(np.float32), size=lado,
                           mode="constant") * lado ** 2

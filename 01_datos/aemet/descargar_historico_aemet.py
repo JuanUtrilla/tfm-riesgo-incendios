@@ -1,28 +1,26 @@
 #!/usr/bin/env python3
 """
-Histórico diario de AEMET 2015-2025 — base para la climatología de FWI propia.
+Histórico diario de AEMET 2015-2025, base para la climatología de FWI propia.
 
-NO SOBRESCRIBE NADA. Escribe solo dataset/aemet_historico_2015_2025.parquet.
+No sobrescribe nada. Escribe solo dataset/aemet_historico_2015_2025.parquet.
 
-=============================================================================
-PARA QUÉ
-=============================================================================
-`modelo/clim_fwi/<idema>.npz` se construyó con la meteo DEL CUBO (ERA5-Land,
-2008-2014) — ver preparar_prototipo.py:105-108. En producción el numerador del
-percentil es un FWI calculado desde ESTACIÓN AEMET. Numerador y referencia son
+Para qué
+--------
+`modelo/clim_fwi/<idema>.npz` se construyó con la meteo del cubo (ERA5-Land,
+2008-2014), ver preparar_prototipo.py:105-108. En producción el numerador del
+percentil es un FWI calculado desde estación AEMET. Numerador y referencia son
 fuentes distintas, y la feature satura: en entrenamiento julio-agosto el 1,0 %
 de las filas cae en el percentil ≥99,9; en producción, el 12,6 %, con la
 mediana nacional en el percentil 87 frente a 54 en entrenamiento.
 
-El arreglo es rehacer la climatología con la MISMA fuente que el numerador.
+El arreglo es rehacer la climatología con la misma fuente que el numerador.
 Este script baja la materia prima.
 
-=============================================================================
-POR QUÉ 2015-2025 Y NO 2008-2014 (la ventana del cubo)
-=============================================================================
-Replicar la ventana original sería lo ideal — cambiaría solo la fuente y nada
-más. No se puede: comprobado el 18/08/2026, en julio de 2008 AEMET solo servía
-**446 estaciones** (hoy 858) y a un tercio de las filas les faltaba `hrMin`,
+Por qué 2015-2025 y no 2008-2014 (la ventana del cubo)
+------------------------------------------------------
+Replicar la ventana original sería lo ideal, porque cambiaría solo la fuente.
+No se puede: comprobado el 18/08/2026, en julio de 2008 AEMET solo servía
+446 estaciones (hoy 858) y a un tercio de las filas les faltaba `hrMin`,
 `velmedia` o `racha`, que son justo los campos que el FWI necesita. Media red
 se quedaría sin climatología.
 
@@ -34,13 +32,12 @@ fuentes, y queda declarado.
 
 2026 se excluye a propósito: es el año que se está prediciendo.
 
-=============================================================================
-DETALLE
-=============================================================================
+Detalle
+-------
 El endpoint `todasestaciones` admite rangos de ~15 días y devuelve todas las
 estaciones de una vez, así que 11 años son ~270 peticiones, no 270×858.
 Idempotente por tramos: los parquet parciales van a dataset/_hist_aemet/ y si
-un tramo ya está, se salta. Relanzable sin miedo.
+un tramo ya está, se salta. Se puede relanzar las veces que haga falta.
 
 Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python descargar_historico_aemet.py
 """

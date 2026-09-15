@@ -2,9 +2,10 @@
 """
 Tuning bayesiano acotado del Modelo B (Optuna, 40 trials).
 
-Objetivo: AUC-PR en val 2019 (el test 2020 NO se toca hasta el final).
-Presupuesto deliberadamente corto: la literatura y nuestra escalera muestran
-que el ROI está en las features, no en el tuning (§3.1 PROXIMOS_PASOS).
+Objetivo: AUC-PR en val 2019 (el test 2020 no se toca hasta el final).
+Presupuesto deliberadamente corto: la literatura y la escalera de features del
+propio trabajo muestran que la ganancia está en las features más que en el
+tuning (§3.1 PROXIMOS_PASOS).
 
 Salida: dataset/tuning_optuna_v1.json (mejores params + métrica final en test)
         modelos/xgb_v1_tuned.ubj (solo si mejora al modelo base en val)

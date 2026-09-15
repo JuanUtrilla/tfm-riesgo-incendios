@@ -1,45 +1,42 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 3: corrección de la precipitación por cuantiles.
+Pipeline de malla, módulo 3: corrección de la precipitación por cuantiles.
 
-NO TOCA PRODUCCIÓN. Escribe malla_data/mapeo_precip.npz y
+No toca producción. Escribe malla_data/mapeo_precip.npz y
 dataset/malla_03_cuantiles.json.
 
-=============================================================================
-POR QUÉ SOLO LA PRECIPITACIÓN
-=============================================================================
+Por qué solo la precipitación
+-----------------------------
 Medido en `malla_02_vs_cubo.py` (jun-sep 2024, 120 estaciones, contra el cubo):
 
-    tmax        sesgo −0,01 °C   r 0,998   → ERA5-Land YA coincide
-    hr_min      sesgo +0,05 %    r 0,997   → ERA5-Land YA coincide
-    viento_max  sesgo +0,00 m/s  r 0,987   → ERA5-Land YA coincide
+    tmax        sesgo −0,01 °C   r 0,998   → ERA5-Land ya coincide
+    hr_min      sesgo +0,05 %    r 0,997   → ERA5-Land ya coincide
+    viento_max  sesgo +0,00 m/s  r 0,987   → ERA5-Land ya coincide
     prec        sesgo +0,71 mm   r 0,904   → única que hay que corregir
 
 Ir a ERA5-Land puro arregló el viento (era +0,79 con `era5_seamless`) pero no
 la lluvia: ERA5-Land llueve 1,40 mm/día, igual que ERA5 (1,38) y el doble que
-el cubo (0,69). No es de unidades — el ratio tiene mediana 1,84 con cuartiles
-1,25 y 2,80, y dividir por 2 EMPEORA la correlación (0,875 vs 0,904).
+el cubo (0,69). No es un problema de unidades: el ratio tiene mediana 1,84 con
+cuartiles 1,25 y 2,80, y dividir por 2 empeora la correlación (0,875 vs 0,904).
 
-Por eso el mapeo de cuantiles es lo correcto y no una regla de tres: es
-monótono (conserva el orden, y con r=0,904 el orden es bueno) y ajusta la
-distribución sin suponer que la relación sea lineal ni constante.
+Por eso se usa un mapeo de cuantiles y no una regla de tres: es monótono
+(conserva el orden, y con r=0,904 el orden es bueno) y ajusta la distribución
+sin suponer que la relación sea lineal ni constante.
 
-=============================================================================
-DECISIÓN: MAPEO GLOBAL, NO POR NODO
-=============================================================================
+Decisión: mapeo global, no por nodo
+-----------------------------------
 La discrepancia parece de procesado del cubo (`total_precipitation_mean`), no
 un fenómeno local, así que debería ser espacialmente homogénea. Un mapeo global
 se ajusta con ~14.000 muestras en vez de ~122 por nodo, y por tanto estima bien
-la cola — que es donde se juega el FWI. El script COMPRUEBA esa hipótesis
+la cola, que es donde se juega el FWI. El script comprueba esa hipótesis
 midiendo si el mapeo global deja sesgo residual por estación.
 
 La lluvia es cero la mayor parte de los días, así que el mapeo se ajusta solo
 sobre los días húmedos y los ceros se preservan: mapear ceros contra cuantiles
 metería lluvia donde no la hubo.
 
-=============================================================================
-PRUEBA DE ACEPTACIÓN
-=============================================================================
+Prueba de aceptación
+--------------------
 No basta con que cuadren las medias de precipitación: lo que importa es el FWI.
 El script recalcula el FWI con ERA5-Land corregido y lo compara con el del
 cubo. Criterio: |sesgo| < 1,0 y corr > 0,97 (con `era5_seamless` era −2,01 y
@@ -91,9 +88,9 @@ def main():
          "viento_max": cubo["wind_speed_max"],
          "prec": cubo["total_precipitation_mean"]}
 
-    # ---- ajuste: adaptación de FRECUENCIA + mapeo de cuantiles -------------
+    # ---- ajuste: adaptación de frecuencia + mapeo de cuantiles -------------
     # Corregir solo la magnitud dejaba la mitad del sesgo (−7,08 → −3,56): el
-    # reanálisis grueso tiene "drizzle bias", llueve MÁS DÍAS de los que llueve
+    # reanálisis grueso tiene "drizzle bias", llueve más días de los que llueve
     # en el cubo, y esos días de más mojan el combustible aunque su magnitud
     # esté bien escalada. Primero se iguala la frecuencia de días húmedos
     # (umbral sobre ERA5-Land tal que P(ERA5>t) = P(cubo>UMBRAL)) y solo

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""¿Qué señal diaria separa mejor los días con incendio grande? (14/09/2026)
+"""Compara qué señal diaria separa mejor los días con incendio grande (14/09/2026).
 
-Solo lectura. Compara, en 2022-2024 (años que ninguna calibración vio):
+Solo lectura. Señales, evaluadas en 2022-2024 (años que ninguna calibración vio):
   calendario      frecuencia de día grande por día del año (±15 d), 2015-2021
-  p98             p98 de la puntuación del r10 en España (lo que usa el semáforo)
+  p98             p98 de la puntuación del r10 en España (la señal que usaba el semáforo)
   % EXTREMO       % de celdas en EXTREMO con la escala absoluta
   termómetro mes  percentil del % EXTREMO dentro de su mes (distribución 2015-2021)
 Métrica: AUC por época con IC95 por bootstrap de días (1,000, semilla 42), y % de
-días grandes perdidos si se apagan tantos días como apaga el semáforo actual.
+días grandes perdidos si se apagan tantos días como apagaba el semáforo V0.
 Día grande: al menos 5 celdas nuevas quemadas.
 
 Entradas: calibracion_si/sandbox/salida/dos_27_dias.csv y dos_26_dias.csv

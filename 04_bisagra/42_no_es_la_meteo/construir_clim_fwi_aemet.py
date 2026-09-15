@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 """
-Climatología de FWI calculada desde AEMET — arregla el cruce de fuentes.
+Climatología de FWI calculada desde AEMET, para arreglar el cruce de fuentes.
 
-NO SOBRESCRIBE NADA. Escribe en un directorio NUEVO,
-`aemet_horario_verano2026/modelo/clim_fwi_aemet/`, dejando intacto el
-`clim_fwi/` original. El cambio en producción es una línea de ruta y es
-decisión del usuario, no de este script.
+No sobrescribe nada. Escribe en un directorio nuevo,
+`aemet_horario_verano2026/modelo/clim_fwi_aemet/`, y deja intacto el
+`clim_fwi/` original. El cambio en producción es una línea de ruta y lo
+decide el usuario, no este script.
 
-=============================================================================
-EL FALLO QUE ARREGLA
-=============================================================================
-`fwi_pctl_local` = percentil del FWI de hoy dentro de la climatología de esa
-estación. En ENTRENAMIENTO los dos términos salen del cubo (ERA5-Land):
-coherente. En PRODUCCIÓN el numerador es un FWI de estación AEMET y la
+El fallo que arregla
+`fwi_pctl_local` es el percentil del FWI de hoy dentro de la climatología de
+esa estación. En entrenamiento los dos términos salen del cubo (ERA5-Land) y
+son coherentes. En producción el numerador es un FWI de estación AEMET y la
 referencia sigue siendo la del cubo. Como el FWI de AEMET corre muy por encima
 del del cubo, el percentil se desplaza y satura:
 
@@ -20,27 +18,25 @@ del del cubo, el percentil se desplaza y satura:
     producción              : mediana 87,1 · 12,6 % de filas en pctl ≥99,9
 
 La feature deja de discriminar en el techo del ranking, que es justo donde
-vive el AUC operativo con 1 % de prevalencia.
+se juega el AUC operativo con 1 % de prevalencia.
 
-=============================================================================
-CÓMO SE CONSTRUYE
-=============================================================================
+Cómo se construye
 Mismo procedimiento que `preparar_prototipo.py` pero con meteo de AEMET:
 
 1. Serie diaria por estación, 2015-2025 (`descargar_historico_aemet.py`).
-2. FWI con `calcular_fwi_serie`, EL MISMO código que usa producción — si se
-   usara otra implementación el arreglo introduciría un desajuste nuevo.
-3. Se guarda, por mes, el vector ORDENADO de valores de FWI, que es lo que
+2. FWI con `calcular_fwi_serie`, el mismo código que usa producción; con otra
+   implementación el arreglo metería un desajuste nuevo.
+3. Se guarda, por mes, el vector ordenado de valores de FWI, que es lo que
    `ranking_diario.py` espera encontrar en el .npz.
 
-Reglas de calidad, para no emitir climatologías basura:
+Reglas de calidad, para no emitir climatologías inservibles:
 
-· El FWI es un integrador recursivo: necesita series continuas. Se procesa
-  **año a año**, con spin-up desde el 1 de enero, y se descarta el año
-  completo de una estación si le falta más del 20 % de los días.
+· El FWI es un integrador recursivo y necesita series continuas. Se procesa
+  año a año, con spin-up desde el 1 de enero, y se descarta el año completo
+  de una estación si le falta más del 20 % de los días.
 · Se exigen ≥5 años válidos y ≥60 valores por mes para emitir ese mes. Un mes
   con pocos datos daría percentiles a saltos.
-· Si una estación no llega al mínimo, NO se le escribe .npz: `ranking_diario`
+· Si una estación no llega al mínimo, no se le escribe .npz: `ranking_diario`
   ya devuelve NaN en ese caso y XGBoost gestiona el NaN de forma nativa.
   Mejor sin feature que con una feature mal calibrada.
 · Los huecos cortos (≤3 días) se interpolan linealmente en T/HR/viento y se

@@ -1,8 +1,8 @@
 # 4 · El diagnóstico: por qué el 0.89 no medía lo que hacía falta
 
-El modelo daba 0.89 en test y entre 0.57 y 0.64 en operación. Probamos tres
-explicaciones en este orden y descartamos las dos primeras con números. Por
-eso la tercera es creíble.
+El modelo daba 0.89 en el conjunto de prueba y entre 0.57 y 0.64 en operación.
+Se probaron tres explicaciones, en este orden, y las dos primeras se
+descartaron con medidas. La tercera es la que queda en pie.
 
 ```
 41  ¿Está mal medido?      no: tres verdades independientes dicen lo mismo
@@ -15,10 +15,15 @@ eso la tercera es creíble.
 
 *(a) Negativos en la misma celda otros días. (b) Negativos en otras celdas del mismo día. (c) Lo que se pide en operación.*
 
-## 41 · La validación en operación
+## 41 · La medida en operación
 
-Cinco puntuaciones comparadas contra tres verdades independientes: focos
-FIRMS, perímetros EFFIS y los partes del MITECO.
+Se compararon cinco puntuaciones contra tres verdades independientes: los
+focos FIRMS (*Fire Information for Resource Management System*), los
+perímetros de EFFIS (*European Forest Fire Information System*) y los partes
+del MITECO (Ministerio para la Transición Ecológica y el Reto Demográfico). La
+tabla recoge el AUC (*Area Under the Curve*) del modelo y del percentil local
+del FWI (*Fire Weather Index*), con su diferencia y su intervalo de
+confianza (IC).
 
 | Serie (20 días) | Modelo | FWI percentil local | Diferencia (IC95) |
 |---|---|---|---|
@@ -26,7 +31,9 @@ FIRMS, perímetros EFFIS y los partes del MITECO.
 | Ranking a día cerrado | 0.707 | 0.668 | +0.039 [−0.047, +0.116] |
 
 Ninguna diferencia es significativa. El modelo en operación no se distinguía
-de un índice sin modelo, el percentil local del FWI.
+de un índice sin modelo, el percentil local del FWI. Esta medida sirvió para
+detectar el problema; la validación del trabajo es el replay de las dos
+temporadas siguientes, descrito en el capítulo de comparación.
 
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
@@ -38,27 +45,26 @@ de un índice sin modelo, el percentil local del FWI.
 | `validar_eventos_estaciones.py` | Lo mismo en 2025-2026 con la tubería de estaciones de producción | Validación en la geometría de servicio |
 | `extraer_evento.py` | Extracción evento a evento (punto y ventana temporal) para incendios conocidos | Comprobaciones tempranas |
 
-## 42 · No es la meteorología
+## 42 · Primera hipótesis: la meteorología
 
 Es el bloque más grande del repositorio porque esta hipótesis era la más
-plausible y había que agotarla. Medimos la diferencia entre ERA5-Land y AEMET
-variable a variable, probamos el IFS, un híbrido y correcciones por cuantiles,
-y de paso construimos el pipeline de malla que después fue la base de la
+plausible y había que agotarla. Se midió la diferencia entre ERA5-Land y AEMET
+(Agencia Estatal de Meteorología) variable a variable. Se probaron el IFS
+(*Integrated Forecasting System*), un híbrido y correcciones por cuantiles. En
+el camino se construyó la cadena de malla que después fue la base de la
 iteración 2.
 
-Lo que quedó firme:
-
-- La precipitación no coincide: +8.00 mm en 30 días, y de ahí sale un FWI 10
-  puntos más bajo.
-- La climatología del percentil no debe cruzar fuentes. Con numerador de AEMET
-  y referencia del cubo, la variable satura: el 12.6 % de las filas en
-  percentil 99.9 o más en producción, frente al 1.0 % en entrenamiento. La
-  malla calcula numerador y denominador con la misma fuente.
-- El cubo es ERA5-Land reprocesado: temperatura, humedad y viento coinciden con
-  correlación 0.987-0.998 y sesgo cero. Solo difiere la precipitación.
+Tres resultados quedaron firmes. La precipitación no coincide entre fuentes:
++8.00 mm en 30 días, y de ahí sale un FWI 10 puntos más bajo. La climatología
+del percentil no debe cruzar fuentes: con numerador de AEMET y referencia del
+cubo, la variable satura, con el 12.6 % de las filas en percentil 99.9 o más en
+producción frente al 1.0 % en entrenamiento; por eso la malla calcula
+numerador y denominador con la misma fuente. Y el cubo es ERA5-Land
+reprocesado: temperatura, humedad y viento coinciden con correlación
+0.987-0.998 y sesgo cero, y solo difiere la precipitación.
 
 La comparación directa de AUC entre fuentes meteorológicas no se reporta
-porque su control no cerró (`docs/LIMITACIONES.md` §2). Lo de arriba basta
+porque su control no cerró (`docs/LIMITACIONES.md` §2). Lo anterior basta
 para descartar la hipótesis.
 
 | Script | Qué hace | Para qué se usa |
@@ -77,10 +83,11 @@ para descartar la hipótesis.
 | `prueba_era5_atribucion.py`, `prueba_era5_produccion.py`, `prueba_ifs_produccion.py`, `prueba_hibrido_produccion.py`, `prueba_hibrido_corregido.py` | Cinco pruebas acotadas: de dónde viene el sesgo de ERA5, y si ERA5, el IFS o el híbrido sirven como entrada de producción | El camino hasta la configuración de servicio |
 | `prototipo_TFM_fuego/` | La primera versión de los módulos de malla (`malla_01`, `02`, `04`, `05`, `05b`), la que produjo los números de este capítulo | La versión definitiva de `01_datos/` y `07_produccion/` divergió después, y se conservan las dos |
 
-## 43 · No es el train/serve
+## 43 · Segunda hipótesis: el desfase entre entrenar y servir
 
-Auditoría de las 46 variables una por una, y ablación de las aproximaciones
-que usa producción para las variables que no tiene en tiempo real:
+Se auditaron las 46 variables una por una y se midió por ablación lo que
+cuestan las aproximaciones que usa producción para las variables que no tiene
+en tiempo real. La tabla recoge la pérdida de AUC en el conjunto de prueba.
 
 | Aproximación operativa | Δ AUC en test 2020 |
 |---|---|
@@ -88,25 +95,23 @@ que usa producción para las variables que no tiene en tiempo real:
 | Rayos a cero | −0.000 |
 | Las dos, como en producción | −0.0045 |
 
-No explica la diferencia. De paso: las cinco variables de satélite aportan lo
-mismo reales que congeladas.
+Esa pérdida no explica la diferencia. Como resultado secundario, las cinco
+variables de satélite aportan lo mismo reales que congeladas.
 
 | Script | Qué hace | Para qué se usa |
 |---|---|---|
 | `auditoria_train_serve.py` | Para cada variable, qué le llega al modelo en producción frente a lo que vio al entrenar, y cuánto cuesta cada desviación | La auditoría |
 | `ablacion_proxies_operativos.py` | Reentrena y evalúa con las variables de satélite congeladas y los rayos a cero, con bootstrap por bloques | El −0.0045 |
-| `dos_06_deriva.py` | Deriva de distribución (PSI) entre el cubo y ERA5-Land en los nodos | Comprobar la malla antes de servirla |
+| `dos_06_deriva.py` | Deriva de distribución (PSI, *Population Stability Index*) entre el cubo y ERA5-Land en los nodos | Comprobar la malla antes de servirla |
 
-## 44 · Es la especificación
+## 44 · Tercera hipótesis: la especificación
 
-Dos medidas, y con ellas el trabajo cambió de dirección:
-
-- En la muestra caso-control, el 98.8 % de las celdas tenía exactamente un
-  25 % de positivos. El modelo no podía aprender qué celda es más peligrosa que
-  otra, solo qué día lo es.
-- El AUC caso-control de los dos diseños es el mismo (0.92), y el AUC dentro
-  del día los separa (0.744 frente a 0.828). La métrica de desarrollo no veía la
-  diferencia.
+Dos medidas cambiaron la dirección del trabajo. En la muestra caso-control,
+el 98.8 % de las celdas tenía exactamente un 25 % de positivos. El modelo no
+podía aprender qué celda es más peligrosa que otra, solo qué día lo es. Y el
+AUC caso-control de los dos diseños es el mismo (0.92) mientras que
+el AUC dentro del día los separa (0.744 frente a 0.828): la métrica de
+desarrollo no veía la diferencia.
 
 ![La misma pareja de modelos bajo dos métricas](../docs/MEMORIA/figs/f4_metrica_ciega.png)
 
@@ -117,6 +122,6 @@ Dos medidas, y con ellas el trabajo cambió de dirección:
 | `dos_00_cubo_etiquetas.py` | Una pasada por el cubo para medir la etiqueta real: prevalencia por año, persistencia, EGIF frente a EFFIS | Los números de prevalencia del capítulo 2 |
 | `dos_02_muestrear.py` | La tabla maestra con los tres diseños de muestreo (misma celda otro día, otra celda mismo día, y evaluación dentro del día) | La comparación de diseños de `05_iteracion2/55_train/dos_05_modelos.py` |
 
-No era un problema de ajuste. La pregunta con la que se entrenó, «¿es hoy
-peligroso en esta celda?», no es la que se hace en operación, «¿cuál de las
+El ajuste no era el problema. El modelo se entrenó para responder «¿es hoy
+peligroso en esta celda?», y en operación la pregunta es «¿cuál de las
 498,530 celdas arde hoy?».

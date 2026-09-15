@@ -1,19 +1,17 @@
 # Procedencia de cada fichero
 
-Este repositorio **no reescribe código**: cada script es una copia literal del
-repositorio donde se ejecutó y produjo los números de la memoria. Lo único que
-se ha adaptado son las rutas, y solo en los cuatro módulos compartidos de
-`01_datos/comun/` (ver [`ESTRUCTURA.md`](ESTRUCTURA.md)).
-
-La razón es de evidencia, no de pereza: si se reescribiera `dos_18_ratio.py`,
-el 87.6 de percentil ponderado que aparece en la memoria ya no lo habría
-producido el código que se enseña. Se conserva el original y se documenta de
-dónde viene.
+Este repositorio reúne el código de tres repositorios de trabajo y es, desde el
+14/09/2026, el único de referencia: el que reproduce el trabajo y el que se
+mantiene. Cada script se copió tal cual del repositorio donde se ejecutó y
+produjo los números de la memoria, y solo se adaptaron las rutas de los cuatro
+módulos compartidos de `01_datos/comun/` (ver [`ESTRUCTURA.md`](ESTRUCTURA.md)).
+Después de la copia se han revisado los comentarios y las cadenas de
+documentación de los scripts, sin cambiar el código; el hash que sigue
+documenta de qué fichero procede cada copia, no si sigue siendo idéntica.
 
 Origen: **T** = `TFM_fuego` · **M** = `TFM_fuego_malla` · **P** =
 `aemet-horario-verano2026`. El hash es el `md5` (8 primeros dígitos) del
-fichero en su repo de origen el 25/08/2026, para poder comprobar que la copia
-es literal.
+fichero en su repo de origen el 25/08/2026.
 
 ## Homónimos que divergen
 

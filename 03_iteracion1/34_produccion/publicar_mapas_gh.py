@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Publica los mapas nacionales HOY/D+1 en el repo GitHub del colector para
-verlos desde el móvil (README los embebe con nombre fijo).
+Publica los mapas nacionales de hoy y D+1 en el repo GitHub del colector para
+verlos desde el móvil (el README los embebe con nombre fijo).
 
 Flujo (se lanza tras mapa_riesgo_hoy.py en el cron diario):
 1. Toma eda/mapa_riesgo_rt_<hoy>.png y _<mañana>.png.
 2. Los convierte a JPG (~200 KB) en <repo>/mapas/mapa_D0.jpg y mapa_D1.jpg
-   (nombre fijo → el README siempre muestra el último; el histórico queda en git).
+   (con nombre fijo el README siempre muestra el último; el histórico queda en git).
 3. git add/commit/push (solo si hay cambios).
 
 Uso: python3 publicar_mapas_gh.py
@@ -46,7 +46,7 @@ def main():
         return
     subprocess.run(["git", "commit", "-m", f"Mapas de riesgo {fechas}"],
                    cwd=REPO, check=True)
-    # el bot de GitHub Actions pushea cada 6 h → integrar remoto antes del push
+    # el bot de GitHub Actions pushea cada 6 h, así que se integra el remoto antes del push
     subprocess.run(["git", "pull", "--rebase"], cwd=REPO, check=True)
     subprocess.run(["git", "push"], cwd=REPO, check=True)
     print(f"publicado: {fechas}")

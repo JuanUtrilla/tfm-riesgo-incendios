@@ -1,58 +1,51 @@
 #!/usr/bin/env python3
 """
-EXPERIMENTO B — ¿se va el AUC en la reconstrucción meteorológica?
+Experimento B: ¿se va el AUC en la reconstrucción meteorológica?
 
-NO SOBRESCRIBE NADA. Escribe solo dataset/experimento_b_*.{parquet,json}.
+No sobrescribe nada. Escribe solo dataset/experimento_b_*.{parquet,json}.
 
-=============================================================================
-LA PREGUNTA, Y POR QUÉ ES LA ÚLTIMA QUE QUEDA
-=============================================================================
-Test 2020: AUC-ROC 0,923. Validación operativa 2026: 0,64. El experimento A
+La pregunta, y por qué es la última que queda
+Test 2020: AUC-ROC 0,923. Comprobación operativa 2026: 0,64. El experimento A
 (`ablacion_proxies_operativos.py`) midió que congelar el satélite y anular los
-rayos cuesta 0,0045 — no es eso. Del hueco quedan dos causas posibles:
+rayos cuesta 0,0045, así que la causa no está ahí. Del hueco quedan dos causas
+posibles:
 
-  (a) DEFINICIONAL — prevalencia 25 % de diseño frente a 1,1 % real, negativos
+  (a) Definicional: prevalencia 25 % de diseño frente a 1,1 % real, negativos
       con buffer, etiqueta EGIF ≥1 ha frente a EFFIS ≥30 ha, unidad celda de
-      1 km frente a estación ±25 km. No se puede "arreglar": es que son dos
+      1 km frente a estación ±25 km. No se puede "arreglar": son dos
       preguntas distintas.
-  (b) METEOROLÓGICA — en entrenamiento las 20 features meteo salen de
+  (b) Meteorológica: en entrenamiento las 20 features meteo salen de
       ERA5-Land (reescalado a 1 km dentro del cubo IberFire); en producción
       salen de estación AEMET (serie observada) o de forecast municipal.
 
 Este script ataca (b) sirviéndole al modelo, para los mismos días y estaciones
-de 2026, la meteo de ERA5-Land: la MISMA fuente que vio al entrenar.
+de 2026, la meteo de ERA5-Land: la misma fuente que vio al entrenar.
 
-=============================================================================
-LO QUE SE PUEDE RESPONDER SIN NINGUNA CLAVE (fase 1)
-=============================================================================
+Lo que se puede responder sin ninguna clave (fase 1)
 Los CSV sellados de producción guardan 7 columnas meteo ya calculadas:
 `fwi`, `fwi_pctl_local`, `fwi_anom_sigma`, `t2m_max`, `rh_min`, `viento_max`,
 `dias_sin_lluvia`, `precip_30d`. Comparar esas mismas features calculadas
 desde ERA5-Land contra las de producción, estación a estación y día a día,
-**cuantifica el desplazamiento de fuente feature por feature** sin tocar el
+cuantifica el desplazamiento de fuente feature por feature sin tocar el
 modelo. Es el pendiente nº1 de VALIDACION.md §7.
 
-=============================================================================
-LO QUE EXIGE CLAVES (fase 2)
-=============================================================================
+Lo que exige claves (fase 2)
 Puntuar con el modelo pide las 46 features. 44 salen de aquí o del parquet de
 estaciones congelado; faltan las dos de FIRMS. `n_detec_50km_7d` está en el
-CSV de producción y se reutiliza; `frp_max_50km_7d` NO está guardada y exige
+CSV de producción y se reutiliza; `frp_max_50km_7d` no está guardada y exige
 FIRMS_MAP_KEY. Sin clave se pone a 0 y queda declarado: por el experimento A
-sabemos que las features FIRMS pesan ~0, así que el sesgo es pequeño, pero es
+se sabe que las features FIRMS pesan ~0, así que el sesgo es pequeño, pero es
 un sesgo y no se esconde.
 
-=============================================================================
-CAVEATS QUE HAY QUE DECLARAR EN LA MEMORIA
-=============================================================================
+Caveats que hay que declarar en la memoria
 · ERA5-Land es 0,1° (~9 km) y aquí se toma la celda de tierra más cercana a la
-  estación. El cubo usa ERA5-Land REESCALADO a 1 km. No es lo mismo: esta
+  estación. El cubo usa ERA5-Land reescalado a 1 km. No es lo mismo: esta
   comparación mide "ERA5-Land crudo vs AEMET", no "el cubo vs AEMET".
 · No se corrige por altitud. La orografía de ERA5-Land es suave y en montaña
   la temperatura tendrá sesgo frío/cálido frente a la estación. Corregirlo
   metería una diferencia más y dejaría de medirse la fuente tal cual es.
 · `viento_max` en producción es min(velmedia×1,5, racha) de AEMET; aquí es el
-  máximo horario del viento a 10 m. La definición TAMBIÉN cambia entre fuentes,
+  máximo horario del viento a 10 m. La definición también cambia entre fuentes,
   y eso forma parte de lo que se está midiendo, no es un error.
 
 Uso:  /home/charredgem/miniconda3/envs/tfm_fuego/bin/python experimento_b_era5.py
@@ -156,7 +149,7 @@ def serie_estaciones(est):
 
 
 # --------------------------------------------------------------------------- #
-# 2. serie diaria → las 46 features, para CADA día objetivo
+# 2. serie diaria → las 46 features, para cada día objetivo
 # --------------------------------------------------------------------------- #
 def features_dia(s, i, e, idema, fecha, festivos, clim_dir):
     """Copia fiel del bloque de ranking_diario.main(), parametrizada por día."""
@@ -229,12 +222,12 @@ def construir(diaria, est, dias_objetivo):
             i = pos.get(dia)
             if i is None or i < DIAS_SPINUP or pd.isna(s.loc[i, "tmax"]):
                 continue
-            # VENTANA RODANTE de exactamente DIAS_SPINUP días antes del día
+            # Ventana rodante de exactamente DIAS_SPINUP días antes del día
             # objetivo, no la serie entera. Producción arranca el FWI 80 días
             # antes de "hoy" (ranking_diario.serie_diaria_todas), y el DC del
             # FWI tiene memoria de meses: alimentarlo con 124 días en vez de 80
             # da un DC distinto y el brazo deja de ser comparable con lo que
-            # producción publicó. Medido: sin esto, mi reconstrucción del brazo
+            # producción publicó. Medido: sin esto, la reconstrucción del brazo
             # AEMET se desvía −0,097 de AUC respecto a los ranking_*.csv
             # commiteados, casi 3× el efecto que el experimento quiere medir.
             sl = (s.iloc[i - DIAS_SPINUP:i + 1]

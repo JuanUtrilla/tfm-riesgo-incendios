@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 2b: previsión IFS en los nodos.
+Pipeline de malla, módulo 2b: previsión IFS en los nodos.
 
-NO TOCA PRODUCCIÓN. Escribe salida/ifs_malla_<fecha>.parquet.
+No toca producción. Escribe salida/ifs_malla_<fecha>.parquet.
 
-=============================================================================
-QUÉ RAMA CUBRE
-=============================================================================
-ERA5-Land es reanálisis y llega con ~6 días de retraso, así que el mapa de HOY
-y MAÑANA necesita otra fuente para el tramo final:
+Qué rama cubre
+--------------
+ERA5-Land es reanálisis y llega con ~6 días de retraso, así que el mapa de hoy
+y mañana necesita otra fuente para el tramo final:
 
     ... D-30 ... D-7 │ D-6 ... D, D+1
         ERA5-Land    │      IFS
@@ -17,25 +16,23 @@ y MAÑANA necesita otra fuente para el tramo final:
 El IFS se pide a Open-Meteo (`ecmwf_ifs025`), no a CDS: CDS encola y no es de
 baja latencia. Y no en GRIB del ECMWF, que exigiría `eccodes`.
 
-=============================================================================
-LA RAMA DE PREVISIÓN NO SE SIRVE CRUDA
-=============================================================================
+La rama de previsión no se sirve cruda
+--------------------------------------
 Medido en `malla_02b_hibrido.py`: el híbrido crudo satura `fwi_pctl_local` al
-2,05 %, contra 0,23 % del reanálisis. No lo salva la memoria del FWI — con
+2,05 %, contra 0,23 % del reanálisis. No lo salva la memoria del FWI: con
 tres días de IFS ya está el 83 % del daño, porque el valor diario lo manda el
 FFMC y su constante de tiempo son horas.
 
 La corrección va en `riesgo_hoy.py`, no aquí: este módulo baja la previsión
 cruda y la deja tal cual. El mapeo (`mapeo_ifs_a_era5land.npz`) se aplica al
-FWI ya calculado, que es donde se midió que funciona — 2,46 % → 0,41 % fuera
-de muestra.
+FWI ya calculado, que es donde se midió que funciona (2,46 % → 0,41 % fuera
+de muestra).
 
-=============================================================================
-CUOTA DE OPEN-METEO
-=============================================================================
+Cuota de Open-Meteo
+-------------------
 Cobra nodos × tramos de 14 días: 5.605 nodos × 1 tramo = 5.605 unidades,
-contra 10.000 al día. Cabe, pero el límite es TAMBIÉN por minuto (~600) y
-mandarlas seguidas devuelve 429 — comprobado. De ahí los lotes de 200 puntos
+contra 10.000 al día. Cabe, pero el límite es también por minuto (~600) y
+mandarlas seguidas devuelve 429 (comprobado). De ahí los lotes de 200 puntos
 (medido: 200 coordenadas por petición responden en 0,4 s) con PAUSA segundos
 entre lotes: 29 peticiones, unos 10 minutos.
 
@@ -86,7 +83,7 @@ def descarga(past_dias=7, fecha=None, forzar=False):
         print(f"  IFS: reanudando, {len(hechos)} nodos ya bajados", flush=True)
 
     n_lotes = int(np.ceil(len(la) / LOTE))
-    # 21/08/2026: Open-Meteo limita también POR HORA (~5.000 unidades): el cron
+    # 21/08/2026: Open-Meteo limita también por hora (~5.000 unidades): el cron
     # del 21 cayó en el lote 25/29 con 429 tras 6 reintentos de hasta 300 s.
     # Se llevan los envíos de la última hora y, si ya van LOTES_HORA, se
     # espera a que el más antiguo cumpla 61 min. Y el retroceso ante 429 llega

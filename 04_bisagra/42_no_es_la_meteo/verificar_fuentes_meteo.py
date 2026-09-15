@@ -1,56 +1,53 @@
 #!/usr/bin/env python3
 """
-VERIFICACIÓN METEOROLÓGICA — ¿qué fuente predice mejor el tiempo?
+Verificación meteorológica: ¿qué fuente predice mejor el tiempo?
 
-NO MODIFICA NADA. Crea solo dataset/verificacion_fuentes_meteo.{parquet,json}.
+No modifica nada. Crea solo dataset/verificacion_fuentes_meteo.{parquet,json}.
 
-=============================================================================
-POR QUÉ ESTA COMPARACIÓN ES LA BUENA
-=============================================================================
-Toda la discusión sobre si el modelo acierta se estrella contra el mismo muro:
-la temporada 2026 tiene **184 incendios** en la serie sellada, y con eso el IC95
-del AUC mide ±0,08. No hay forma de decidir nada.
+Por qué esta comparación sí se puede medir
+------------------------------------------
+Cualquier comparación de aciertos del modelo sobre la temporada 2026 choca con
+la muestra: hay 184 incendios en la serie sellada, y con eso el IC95 del AUC
+mide ±0,08. No da para decidir nada.
 
-Pero la pregunta "¿esta fuente predice bien el tiempo?" **no necesita ningún
-dato de incendios**: se compara la predicción contra lo que realmente pasó. Y
-ahí la muestra son ~13.600 estaciones-día, ochenta veces más. Es la única capa
-del sistema que hoy se puede medir con precisión.
+La pregunta "¿esta fuente predice bien el tiempo?" no necesita datos de
+incendios: se compara la predicción contra lo que realmente pasó. Ahí la
+muestra son ~13.600 estaciones-día, ochenta veces más. Es la única capa del
+sistema que hoy se puede medir con precisión.
 
 La motivación es concreta: la red de AEMET tiene huecos (16,3 % de
 estaciones-día sin viento; 128 de 858 estaciones sin viento en toda la serie) y
 no está distribuida uniformemente (`popdens` media 840 en las estaciones frente
 a 100 en las celdas del cubo). Una malla global no tiene ninguno de los dos
-problemas. La pregunta es si además predice igual o mejor.
+problemas. Queda por ver si predice igual o mejor.
 
-=============================================================================
-QUÉ SE COMPARA
-=============================================================================
-Verdad-terreno: **observación de AEMET** (climatológicos diarios consolidados).
-Es lo que realmente ocurrió en el punto de la estación.
+Qué se compara
+--------------
+Verdad-terreno: observación de AEMET (climatológicos diarios consolidados).
+Es lo que ocurrió en el punto de la estación.
 
 Candidatos, sobre las mismas estaciones y los mismos días:
 
-  · **Previsión municipal de AEMET** — la que usa producción hoy. Sus valores
+  · Previsión municipal de AEMET, la que usa producción hoy. Sus valores
     están guardados en los CSV sellados por commit, así que son la previsión
-    real que se emitió, no una reconstrucción.
-  · **ECMWF IFS** (Open-Meteo, archivo de pasadas históricas) — malla completa,
+    real que se emitió y no una reconstrucción.
+  · ECMWF IFS (Open-Meteo, archivo de pasadas históricas): malla completa,
     misma casa que produce ERA5. Se piden varias familias más para tener
     contexto: AIFS (el modelo de IA de ECMWF), GFS de NOAA e ICON de DWD.
 
-Métricas: sesgo, MAE, RMSE y correlación por variable. El **viento** es el foco:
+Métricas: sesgo, MAE, RMSE y correlación por variable. El viento es el foco:
 es el eslabón roto del sistema (previsión de AEMET r=0,45 frente a 0,93 de la
 temperatura) y entra al FWI por el ISI, que es multiplicativo.
 
-=============================================================================
-LO QUE ESTA COMPARACIÓN NO DICE
-=============================================================================
+Lo que esta comparación no dice
+-------------------------------
 Que una fuente prediga mejor la meteorología no implica que el modelo de
 incendios rinda mejor con ella: eso hay que medirlo aparte y choca otra vez con
 los 184 positivos. Aquí se responde solo la primera mitad, que es la que tiene
 respuesta.
 
-Y hay una asimetría a declarar: la previsión de AEMET es **municipal**
-(predicción para el municipio de la estación) y el IFS es una **celda de malla**
+Hay una asimetría que declarar: la previsión de AEMET es municipal
+(predicción para el municipio de la estación) y el IFS es una celda de malla
 interpolada al punto. No es exactamente el mismo objeto.
 
 Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python verificar_fuentes_meteo.py

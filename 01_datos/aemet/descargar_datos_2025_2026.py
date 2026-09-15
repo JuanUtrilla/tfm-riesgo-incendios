@@ -2,10 +2,10 @@
 """
 Descarga de datos 2025-2026 para la validación por estaciones:
 
-1. AEMET climatologías diarias de TODAS las estaciones, 2024-11-01 → hoy
+1. AEMET climatologías diarias de todas las estaciones, 2024-11-01 → hoy
    (el arranque en nov-2024 da ~60 días de spin-up al FWI antes del 1-ene-2025).
    Endpoint `todasestaciones` en trozos de 14 días (~45 peticiones), con la
-   caché permanente de tiempo_real._todas_chunk → re-lanzar es gratis.
+   caché permanente de tiempo_real._todas_chunk, así que relanzar no cuesta peticiones.
    Salida: dataset/aemet_diario_2025_2026.parquet
 
 2. Detecciones FIRMS 2025-01-01 → hoy (el parquet histórico termina en ene-2025):

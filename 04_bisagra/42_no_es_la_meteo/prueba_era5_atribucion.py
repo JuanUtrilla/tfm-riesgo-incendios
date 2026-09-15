@@ -2,27 +2,27 @@
 """
 ¿De qué variable viene el sesgo frío de ERA5? (−2,0 de FWI, ver §6)
 
-NO SOBRESCRIBE NADA. Escribe dataset/prueba_era5_atribucion.json.
+No sobrescribe nada. Escribe dataset/prueba_era5_atribucion.json.
 
 La sospecha: `era5_seamless` toma T y HR de ERA5-Land (9 km) pero viento y
 precipitación de ERA5 (31 km), más suavizados. El FWI es muy sensible al
-viento vía ISI = 0,208·exp(0,05039·v)·f(FFMC), que es EXPONENCIAL en el
+viento vía ISI = 0,208·exp(0,05039·v)·f(FFMC), que es exponencial en el
 viento: suavizar el viento hunde el FWI de forma no lineal.
 
 Comprobarlo yendo a CDS costaría días. Aquí se hace en una tarde y sin
-descargar nada nuevo: se corre el FWI con entradas HÍBRIDAS, sustituyendo de
+descargar nada nuevo: se corre el FWI con entradas híbridas, sustituyendo de
 una en una la variable de ERA5 por la del cubo. La variable que al sustituirla
 cierra el sesgo es la culpable.
 
     ERA5 puro                        → sesgo de referencia (−2,0)
-    ERA5 pero con el VIENTO del cubo → si el sesgo se va, es el viento
-    ERA5 pero con la PRECIP del cubo → idem
+    ERA5 pero con el viento del cubo → si el sesgo se va, es el viento
+    ERA5 pero con la precip del cubo → ídem
     ERA5 pero con T del cubo         → control (deberían coincidir: ambas
     ERA5 pero con HR del cubo        →          salen de ERA5-Land)
 
-Los dos controles son importantes: si T y HR NO coinciden entre cubo y
-Open-Meteo, entonces el problema no es el viento sino el regrillado del cubo a
-1 km, y la conclusión cambia por completo.
+Los dos controles importan: si T y HR no coinciden entre cubo y Open-Meteo,
+el problema no está en el viento sino en el regrillado del cubo a 1 km, y la
+conclusión cambia por completo.
 
 Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python prueba_era5_atribucion.py
 """

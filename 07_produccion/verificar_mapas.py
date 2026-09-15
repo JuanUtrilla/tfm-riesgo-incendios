@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """
-Mapas de VERIFICACIÓN: el mapa que se publicó, con lo que pasó ese día encima.
-=============================================================================
-POR QUÉ
-=============================================================================
+Mapas de verificación: el mapa que se publicó, con lo que pasó ese día encima.
+
 `mapas_hoy_manana.py` publica cada madrugada el mapa limpio de hoy y el de
 mañana. La verdad llega después: el parte del MITECO del día D sale el D+1
 hacia las 14 h, y los perímetros de EFFIS tardan entre seis y nueve días. Este
@@ -20,7 +18,7 @@ Lo que se dibuja encima:
     del municipio, con un error de 5 a 15 km. Por eso la tabla de verificación
     mira el mejor nivel dentro de un radio de 10 km alrededor del incidente,
     el mismo radio con el que puntuaba `dos_15_veredicto_miteco.py`.
-FIRMS no se dibuja: es variable del modelo, no juez (ver `capa_verdad.py`).
+FIRMS no se dibuja: es una variable de entrada del modelo (ver `capa_verdad.py`).
 
 Con `--refrescar` descarga antes los perímetros de la temporada (WFS de EFFIS,
 `puntuar_effis.refrescar`) y el parte del MITECO del día (`dos_15.descargar`),
@@ -54,9 +52,10 @@ COLS_CSV = ["fecha", "lat", "lon", "localizacion", "provincia", "n_medios"]
 def refrescar():
     """EFFIS de la temporada + parte MITECO de hoy + CSV de incidentes.
 
-    `puntuar_effis` y `dos_15` importan `historico`, el acumulado de los jueces
-    de la temporada 2026, que no viaja en este repositorio. Aquí solo se usan
-    sus funciones de descarga, así que se les da un módulo vacío."""
+    `puntuar_effis` y `dos_15` importan `historico`, el acumulado de las
+    puntuaciones diarias de la temporada 2026, que no viaja en este repositorio.
+    Aquí solo se usan sus funciones de descarga, así que se les da un módulo
+    vacío."""
     sys.modules.setdefault("historico", types.SimpleNamespace(anotar=lambda *a, **k: None))
     try:
         import puntuar_effis

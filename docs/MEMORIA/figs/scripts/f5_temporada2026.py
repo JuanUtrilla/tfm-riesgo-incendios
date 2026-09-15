@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""F5 - La temporada 2026 dia a dia: AUC dentro del dia y ventaja acumulada.
+"""F5 - La temporada 2026 día a día: AUC dentro del día y ventaja acumulada.
 
-Reproduce la logica de `06_comparacion/dos_19_veredicto.py` (bootstrap DE DIAS,
-N=2000, SEED=42) sobre `salida/dos_09_temporada2026.csv` (74 dias, ventana
-FIRMS de 7 dias, corrida limpia del 31/08/2026). Sin recomputo de modelos.
+Reproduce la lógica de `06_comparacion/dos_19_veredicto.py` (bootstrap de días,
+no de celdas; N=2000, SEED=42) sobre `salida/dos_09_temporada2026.csv` (74 días,
+ventana FIRMS de 7 días, corrida limpia del 31/08/2026). No reentrena ningún
+modelo.
 Uso:  python f5_temporada2026.py   [TFM_MALLA=<ruta a TFM_fuego_malla>]
 """
 import os

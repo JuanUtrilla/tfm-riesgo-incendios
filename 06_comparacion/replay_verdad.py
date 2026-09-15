@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verdad EFFIS por día y por incendio, para el replay.
 
-Para cada día de la temporada rasteriza CADA perímetro con FIREDATE ese día
+Para cada día de la temporada rasteriza cada perímetro con FIREDATE ese día
 (misma rejilla y regla que `comparar_julio2026.quemadas`: EPSG:3035, celdas de
 1 km, all_touched) y guarda:
   replay/verdad_<año>/<fecha>.npz   celda (índice plano), fuego (id), y por

@@ -3,7 +3,7 @@ Descarga datos climatológicos diarios de todas las estaciones AEMET.
 Guarda en SQLite local. Resumible en cualquier momento.
 
 Orden de descarga:
-  1. Estaciones peninsulares (idema numérico, 0-9) — las que tienen más datos
+  1. Estaciones peninsulares (idema numérico, 0-9), las que tienen más datos
   2. Baleares (prefijo B)
   3. Canarias (prefijo C)
 
@@ -38,7 +38,7 @@ FECHA_FIN  = date(2024, 12, 31)
 CHUNK_DAYS = 150              # 5 meses por petición (límite API AEMET: 6 meses)
 
 PAUSA_MIN  = 1.5              # segundos mínimos entre peticiones (~40 req/min, bajo el límite de 50)
-PAUSA_MAX  = 3.0              # techo reducido — no hace falta frenar tanto
+PAUSA_MAX  = 3.0              # techo reducido; no hace falta frenar tanto
 BACKOFF_BASE = 30             # espera mucho menor al primer 429
 MAX_REINTENTOS = 5
 
@@ -174,7 +174,7 @@ def aemet_get(url):
             log.error("HTTP %d en %s", r.status_code, url)
             return None
 
-        # Si llegamos aquí sin 429, reducimos la pausa poco a poco
+        # Sin 429 en esta petición, la pausa se reduce poco a poco
         _pausa_actual = max(_pausa_actual * 0.97, PAUSA_MIN)
         return r.json()
 
@@ -214,7 +214,7 @@ def get_climatologia_diaria(idema, fi, ff):
     if estado == 404:
         desc = meta.get("descripcion", "")
         if "rango" in desc.lower() or "superior" in desc.lower():
-            # Rango de fechas demasiado grande — error de configuración, no sin datos
+            # Rango de fechas demasiado grande: error de configuración, no estación sin datos
             log.error("Rango inválido para %s %s-%s: %s", idema, fi, ff, desc)
             return None
         # Estación sin datos para ese período

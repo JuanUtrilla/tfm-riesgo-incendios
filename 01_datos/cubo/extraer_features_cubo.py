@@ -6,20 +6,21 @@ Entrada:  dataset/muestra_maestra_v1.parquet  (de muestrear_dataset.py)
 Salida:   dataset/features_cubo_v1.parquet    (id_muestra + ~40 features)
           dataset/_features_parts/*.parquet   (partes por bloque, resumible)
 
-Estrategia de acceso (clave de rendimiento): el NetCDF está chunked [521,77,99]
-(tiempo, y, x) → se recorre la malla por bloques espaciales de 77×99 celdas,
-cargando en RAM la serie temporal COMPLETA de las variables dinámicas del bloque
+Estrategia de acceso, que es lo que decide el tiempo de ejecución: el NetCDF
+está chunked [521,77,99] (tiempo, y, x), así que se recorre la malla por bloques
+espaciales de 77×99 celdas, cargando en RAM la serie temporal completa de las
+variables dinámicas del bloque
 (~2 GB transitorios), y se calculan las features de todas las muestras del bloque
 con numpy. Evita 14k×10 lecturas aleatorias por celda.
 
-Features (definición exacta — documentada también en MODELO_B_BITACORA.md):
+Features (definición exacta, documentada también en MODELO_B_BITACORA.md):
 
 Del día D (el FWI/meteo del día es información de "predicción a día vista",
 disponible operacionalmente vía forecast):
   fwi, t2m_max, t2m_min, rh_min, viento_max, precip_dia, lst, ndvi, lai, swi010,
   es_festivo; vpd_max derivado: es(t2m_max)·(1−rh_min/100), es en kPa (Magnus).
 
-Ventanas hacia atrás EXCLUYENDO el día D (t-w .. t-1), anti-leakage N6/V4:
+Ventanas hacia atrás excluyendo el día D (t-w .. t-1), anti-leakage N6/V4:
   precip_7d/15d/30d (suma), fwi_med_7d, fwi_max_7d, fwi_med_15d, fwi_med_30d,
   rh_min_med_7d, t2m_max_med_7d, viento_max_med_7d, ndvi_med_30d,
   dias_sin_lluvia (días consecutivos con precip<1 mm contando hacia atrás desde
@@ -27,16 +28,16 @@ Ventanas hacia atrás EXCLUYENDO el día D (t-w .. t-1), anti-leakage N6/V4:
 
 Normalización local (ESTADO_ARTE §7.1-N5, contribución del TFM):
   fwi_pctl_local  = percentil del FWI del día vs la climatología 2008-2014 del
-                    MISMO MES en la MISMA celda (años previos al dataset → sin fuga).
+                    mismo mes en la misma celda (años previos al dataset, sin fuga).
   fwi_anom_sigma  = (fwi − media_clim) / std_clim (misma climatología).
 
 Estáticas por celda (una lectura global vectorizada):
-  elevacion, pendiente, rugosidad, dist_carreteras, dist_rios, popdens (del AÑO
+  elevacion, pendiente, rugosidad, dist_carreteras, dist_rios, popdens (del año
   de la fila), proporciones CLC (bosque, matorral, agrícola, artificial, espacios
-  abiertos, agric. heterogénea) del corte CLC más cercano SIN mirar al futuro:
+  abiertos, agric. heterogénea) del corte CLC más cercano sin mirar al futuro:
   CLC_2012 para filas ≤2017, CLC_2018 para ≥2018.
 
-Flags informativos (NO features): is_near_fire_dia (para filtrar negativos
+Flags informativos (no son features): is_near_fire_dia (para filtrar negativos
 ambiguos en el ensamblado), is_fire_dia.
 """
 

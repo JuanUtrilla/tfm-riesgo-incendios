@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 Cachés mensuales (vegetación/LST 2020-24 + EGIF mismo-mes) para los meses que
-producción no tenía (abril, mayo, octubre, noviembre), con lecturas CONTIGUAS
+producción no tenía (abril, mayo, octubre, noviembre), con lecturas contiguas
 del cubo.
 
 `riesgo_hoy.mensual` las calcula con `isel(time=idx)` sobre índices no
 contiguos, lo que obliga a netCDF a descomprimir cada chunk de 521 días una
 vez por día pedido: más de una hora por mes (medido el 21/08). Por año y mes
-el rango es contiguo y tarda ~1 min. Mismas claves y mismo resultado (media
+el rango es contiguo y tarda un minuto. Mismas claves y mismo resultado (media
 sobre los mismos días, NaN ignorados).
 
 Uso: python gh_mensual_rapido.py 10 5 11 4

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
 Consulta puntual del Modelo B: riesgo de incendio en (lat, lon, fecha) con
-explicación SHAP local — germen del prototipo de defensa.
+explicación SHAP local. Es el germen del prototipo.
 
 Uso: python3 predecir_punto.py <lat> <lon> <AAAA-MM-DD>
 Ej.:  python3 predecir_punto.py 40.545 -4.786 2021-08-14   (incendio de Sotalvo,
       año fuera del entrenamiento 2015-2018)
 
 Reconstruye las features desde el cubo IberFire + EGIF + FIRMS + WGLC con las
-mismas definiciones del pipeline (ver dataset/DATASET_CARD.md) para UNA celda,
-predice con el modelo afinado y muestra las 10 contribuciones SHAP locales.
-Rango de fechas servible: 2011 (ventanas) → 2024-12-31 (fin del cubo).
+mismas definiciones del pipeline (ver dataset/DATASET_CARD.md) para una sola
+celda, predice con el modelo afinado y muestra las 10 contribuciones SHAP locales.
+Rango de fechas servible: de 2011 (ventanas) a 2024-12-31 (fin del cubo).
 """
 
 import sys

@@ -6,7 +6,7 @@ Features de historial de fuego (EGIF), entorno de fuego activo (FIRMS) y rayos
 Entrada:  dataset/muestra_maestra_v1.parquet
 Salida:   dataset/features_historia_v1.parquet (id_muestra + features)
 
-Todas las features miran ESTRICTAMENTE hacia atrás (≤ D-1, salvo rayos del
+Todas las features miran estrictamente hacia atrás (≤ D-1, salvo rayos del
 propio día D, que son observables antes de la ignición típica de tarde):
 
 Historial de fuego (EGIF 2008-2020, coords proyectadas a EPSG:3035):
@@ -16,19 +16,19 @@ Historial de fuego (EGIF 2008-2020, coords proyectadas a EPSG:3035):
   n_fuegos_1km_hist   incendios a <1,5 km desde 2008-01-01 hasta D-1
                       (susceptibilidad estructural de la celda; los papers de
                       ocurrencia agregada sitúan el término autorregresivo como
-                      driver nº1 — arXiv:2508.09896)
-  n_fuegos_10km_mismomes_hist  incendios a <10 km en el MISMO MES de años
-                      ANTERIORES (estacionalidad local de ignición)
+                      driver nº1, arXiv:2508.09896)
+  n_fuegos_10km_mismomes_hist  incendios a <10 km en el mismo mes de años
+                      anteriores (estacionalidad local de ignición)
 
-Entorno de fuego activo (FIRMS VIIRS 2015+, nunca la detección del día D —
-sería circular con la propia ignición):
+Entorno de fuego activo (FIRMS VIIRS 2015+, nunca la detección del día D,
+que sería circular con la propia ignición):
   frp_max_50km_7d     FRP máximo a <50 km en [D-7, D-1] (0 si no hay detección:
                       es un cero real, no un missing)
   n_detec_50km_7d     nº de detecciones a <50 km en [D-7, D-1]
   Caveat: para fechas de ene-2015 la ventana está truncada (FIRMS empieza
-  2015-01-01) — afecta a <1% de filas, se deja tal cual.
+  2015-01-01); afecta a <1% de filas y se deja tal cual.
 
-Rayos (WGLC/WWLLN, rejilla 0,5° diaria 2010-2023 — celda ~50x40 km, se asigna
+Rayos (WGLC/WWLLN, rejilla 0,5° diaria 2010-2023; celda ~50x40 km, se asigna
 por vecino más cercano en lat/lon):
   rayos_dia           densidad de strokes (km-2 d-1) en el día D
   rayos_7d            suma [D-7, D-1] (tormentas secas recientes)

@@ -1,31 +1,30 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 6: deriva de features entre ENTRENAR (cubo) y SERVIR
+Dos modelos, paso 6: deriva de features entre entrenar (cubo) y servir
 (ERA5-Land en los nodos). §3.5 del encargo.
 
-NO TOCA PRODUCCIÓN. Lee cubo y `_cds` 2024 (solo lectura); escribe
+No toca producción. Lee cubo y `_cds` 2024 (solo lectura); escribe
 salida/dos_06_deriva.json.
 
-=============================================================================
-POR QUÉ
-=============================================================================
+Por qué
+
 La decisión de entrenar con el cubo y servir ERA5-Land directo se apoya en
-que el cubo ES ERA5-Land reprocesado. `malla_02_vs_cubo.json` lo midió con
-correlaciones y sesgos de MEDIAS. Pero un árbol no ve medias: ve la
+que el cubo es ERA5-Land reprocesado. `malla_02_vs_cubo.json` lo midió con
+correlaciones y sesgos de medias. Pero un árbol no ve medias: ve la
 distribución entera, y la métrica que el proyecto usa para «¿es la misma
 distribución?» es el PSI (`auditoria_train_serve.json`; >0,25 = sospechosa).
-Aquí se calcula el PSI feature a feature, con la receta de servicio REAL:
+Aquí se calcula el PSI feature a feature, con la receta de servicio real:
 
   · extremos diarios (tmax, hr_min, viento_max, prec) de `a_diario`
   · FWI con las 13 UTC (la receta buena) y con el proxy tmax/hr_min (la mala)
   · ventanas (precip_30d, fwi_med_7d, dias_sin_lluvia) sobre cada serie
-  · fwi_pctl_local con numerador y denominador de la MISMA fuente en cada
+  · fwi_pctl_local con numerador y denominador de la misma fuente en cada
     rama (cubo/cubo, malla-proxy/clim-proxy), y la combinación cruzada
     (FWI 13 UTC / clim-proxy) que es la que habría si se cambia el numerador
     sin rehacer la climatología.
 
 300 nodos al azar, jun-sep 2024 (junio es rodaje del FWI; se puntúa jul-sep).
-Los bins del PSI se definen sobre la distribución del CUBO (entrenamiento).
+Los bins del PSI se definen sobre la distribución del cubo (entrenamiento).
 """
 
 import json

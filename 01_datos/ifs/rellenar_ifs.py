@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Rellena el hueco del archivo IFS (15-ago -> hoy) FUERA del repo.
+"""Rellena el hueco del archivo IFS (15-ago -> hoy) fuera del repo.
 
-Baja de historical-forecast-api.open-meteo.com la previsión ARCHIVADA tal y
+Baja de historical-forecast-api.open-meteo.com la previsión archivada tal y
 como se emitió, misma forma que salida/ifs_malla_<fecha>.parquet:
 columnas nodo, fecha, tmax, hr_min, viento_max, prec.
 
-CUOTA: 5.605 nodos x 1 unidad por tramo de 14 dias, contra 10.000 al dia. El
-rango 08-ago -> 02-sep son 2 tramos = 11.210 unidades: NO cabe en un dia. Por
+Cuota: 5.605 nodos x 1 unidad por tramo de 14 días, contra 10.000 al día. El
+rango 08-ago -> 02-sep son 2 tramos = 11.210 unidades: no cabe en un día. Por
 eso es reanudable por nodo y espera ante el 429 hasta que la cuota se renueve
 a medianoche UTC.
 
-NO PISAR LA CADENA VIVA: la corrida diaria necesita sus 5.605 unidades. Este
-script espera a que la corrida del dia haya terminado antes de pedir nada, y
+No pisar la cadena viva: la corrida diaria necesita sus 5.605 unidades. Este
+script espera a que la corrida del día haya terminado antes de pedir nada, y
 vuelve a esperar cada vez que cruza la medianoche UTC.
 """
 import os, subprocess, sys, time
@@ -28,7 +28,7 @@ LOTE, PAUSA, ESPERA_MAX = 50, 20, 5400
 
 
 def cadena_del_dia_hecha():
-    """True si ya hay una corrida COMPLETA y terminada del dia UTC en curso."""
+    """True si ya hay una corrida completa y terminada del día UTC en curso."""
     try:
         out = subprocess.run(
             ["gh", "run", "list", "-R", REPO, "--workflow", "malla_diaria.yml",
@@ -67,7 +67,7 @@ def main():
 
     dia = None
     for b in range(0, len(pend), LOTE):
-        # al arrancar y en cada cambio de dia UTC, ceder el paso a la cadena
+        # al arrancar y en cada cambio de día UTC, ceder el paso a la cadena
         hoy = pd.Timestamp.utcnow().tz_localize(None).date()
         if hoy != dia:
             dia = hoy

@@ -3,15 +3,15 @@ Consulta datos de observación horaria (tiempo casi real) de una estación
 meteorológica de AEMET OpenData.
 
 Uso:
-    1. Define tu API Key como variable de entorno antes de ejecutar:
+    1. Definir la API Key como variable de entorno antes de ejecutar:
          export AEMET_API_KEY="tu_api_key_aqui"      (Linux/Mac/WSL)
          $env:AEMET_API_KEY="tu_api_key_aqui"         (PowerShell)
-    2. Ejecuta:
+    2. Ejecutar:
          python observacion_horaria.py CLE
 
-NOTA DE SEGURIDAD:
-    No escribas la API Key directamente en este archivo si vas a compartirlo
-    o subirlo a un repositorio. Usa siempre una variable de entorno o un
+Nota de seguridad:
+    No conviene escribir la API Key directamente en este archivo si se va a
+    compartir o subir a un repositorio. Mejor una variable de entorno o un
     archivo .env excluido de git.
 """
 
@@ -52,7 +52,7 @@ def consultar_estacion(idema: str, api_key: str) -> list[dict]:
 
     datos_url = meta["datos"]
 
-    # Paso 2: descargamos los datos reales desde la URL temporal
+    # Paso 2: se descargan los datos reales desde la URL temporal
     datos_resp = requests.get(datos_url, timeout=15)
     datos_resp.raise_for_status()
     # AEMET a veces devuelve el JSON con encoding latin-1
@@ -72,7 +72,7 @@ def main():
         return
 
     print(f"\nSe han recibido {len(datos)} registros.\n")
-    for registro in datos[-5:]:  # mostramos los 5 más recientes
+    for registro in datos[-5:]:  # se muestran los 5 más recientes
         fecha = registro.get("fint", "¿?")
         temp = registro.get("ta", "¿?")
         hum = registro.get("hr", "¿?")
@@ -83,7 +83,7 @@ def main():
             f"Viento: {viento} m/s | Precip: {precip} mm"
         )
 
-    # Guardamos el JSON completo por si lo quieres procesar luego
+    # Se guarda el JSON completo por si hace falta procesarlo luego
     out_path = f"observacion_{idema}.json"
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(datos, f, ensure_ascii=False, indent=2)

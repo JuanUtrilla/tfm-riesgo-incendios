@@ -3,18 +3,18 @@
 Hindcast de julio 2026: mapas diarios retrospectivos + verificación contra
 los focos FIRMS reales de cada día.
 
-⚠️ HONESTIDAD METODOLÓGICA: estos mapas se evalúan con meteo OBSERVADA del
-propio día (nowcast retrospectivo) y se generan a posteriori — NO son
-predicciones selladas. Las selladas por commit empiezan el 15/07 (ranking
-D-1) y el 22/07 (mapas D0/D+1 con forecast). Por eso los archivos llevan el
-sufijo `_retro` y la columna `prevision='retro'` en la verificación.
+Ojo: estos mapas se evalúan con meteo observada del propio día (nowcast
+retrospectivo) y se generan a posteriori, así que no son predicciones
+selladas. Las selladas por commit empiezan el 15/07 (ranking D-1) y el 22/07
+(mapas D0/D+1 con forecast). Por eso los archivos llevan el sufijo `_retro` y
+la columna `prevision='retro'` en la verificación.
 
 Salidas:
 - mapas/historico/<fecha>_D0_retro.jpg      (mapa + focos FIRMS de ese día)
 - rankings/retro_<fecha>.csv                (probabilidad por estación)
 - rankings/verificacion_retro_julio.csv     (métrica diaria retro)
 - mapas/seguimiento_julio_2026.png          (resumen del mes)
-La verificación del 22/07 (previsión D0 SÍ sellada) se añade a
+La verificación del 22/07 (previsión D0, esa sí sellada) se añade a
 rankings/verificacion_diaria.csv, la misma serie que alimenta el cron.
 
 Uso (local, una vez): AEMET_API_KEY=... FIRMS_MAP_KEY=... python3 retro_julio.py
@@ -38,7 +38,7 @@ DIAS = pd.date_range("2026-07-01", "2026-07-21", freq="D")
 
 
 def firms_julio():
-    """Detecciones FIRMS 26-jun → 25-jul (6 peticiones de 5 días)."""
+    """Detecciones FIRMS del 26-jun al 25-jul (6 peticiones de 5 días)."""
     key = os.environ["FIRMS_MAP_KEY"]
     trozos = []
     for d0 in ["2026-06-26", "2026-07-01", "2026-07-06", "2026-07-11",
@@ -66,8 +66,8 @@ def main():
             .set_index("idema")
     det = firms_julio()
 
-    # todas las fechas de una vez: la serie y el FWI se calculan UNA vez por
-    # estación y las features salen por índice de fecha
+    # todas las fechas de una vez: la serie y el FWI se calculan una sola vez
+    # por estación y las features salen por índice de fecha
     rks = md.evaluar_estaciones(list(DIAS), est)
     estat = dict(np.load(md.MALLA / "estaticas.npz"))
     estat["is_spain"] = estat["is_spain"].astype(bool)
@@ -83,7 +83,7 @@ def main():
         if len(rk) < 100:
             print(f"{dia.date()}: solo {len(rk)} estaciones — omitido")
             continue
-        # features FIRMS con la ventana [D-5, D-1] de ESE día (sin el propio
+        # features FIRMS con la ventana [D-5, D-1] de ese día (sin el propio
         # día: misma regla anti-circularidad que en producción)
         ventana = det[(det["d"] >= dia - pd.Timedelta(days=5)) & (det["d"] < dia)]
         rk["frp_max_50km_7d"], rk["n_detec_50km_7d"] = frp_estaciones(ventana, rk)
@@ -111,8 +111,8 @@ def main():
     pd.DataFrame(vers).to_csv(RAIZ / "rankings" / "verificacion_retro_julio.csv",
                               index=False)
 
-    # el 22/07 SÍ está sellado (prevision_D0 commiteada esa mañana) → va a la
-    # serie oficial que alimenta la tabla del README
+    # el 22/07 sí está sellado (prevision_D0 commiteada esa mañana), así que
+    # va a la serie oficial que alimenta la tabla del README
     v22 = verificar_prevision(det, pd.Timestamp("2026-07-22"),
                               RAIZ / "rankings" / "prevision_D0_2026-07-22.csv")
     if v22 is not None:

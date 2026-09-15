@@ -1,8 +1,8 @@
-"""Reconstruye xgb_v2_prototipo: receta de entrenar_modelo.py (v1) sin las 4
+"""Reconstruye xgb_v2_prototipo: la receta de entrenar_modelo.py (v1) sin las 4
+autorregresivas intra-celda contaminadas (MODELO_B_BITACORA §16).
 
-Ejecutado el 02/09/2026: 240/240 arboles identicos al .ubj servido, best_iteration
-139, val AUC-PR 0,8528395, test 2020 AUC-PR 0,8278 (140 arboles) / 0,8292 (240).
-autorregresivas intra-celda contaminadas (MODELO_B_BITACORA §16)."""
+Ejecutado el 02/09/2026: 240/240 árboles idénticos al .ubj servido, best_iteration
+139, val AUC-PR 0,8528395, test 2020 AUC-PR 0,8278 (140 árboles) / 0,8292 (240)."""
 import json, os
 import numpy as np, pandas as pd, xgboost as xgb
 from sklearn.metrics import average_precision_score, roc_auc_score

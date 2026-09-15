@@ -1,39 +1,37 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 29: calibración por celda ESTACIONAL.
+Dos modelos, paso 29: calibración por celda estacional.
 
-NO TOCA PRODUCCIÓN NI NINGÚN REPO. Lee salida/dos_25_*; escribe
+No toca producción ni ningún repo. Lee salida/dos_25_*; escribe
 salida/dos_29_*.{csv,json}.
 
-=============================================================================
-POR QUÉ HACE FALTA
-=============================================================================
-`dos_28` ajusta UNA curva isotónica puntuación→probabilidad para todo el año.
-Medido el 05/09/2026 sobre el top 0,02 % de cada mes (r10):
+Por qué hace falta
+------------------
+`dos_28` ajusta una sola curva isotónica puntuación→probabilidad para todo el
+año. Medido el 05/09/2026 sobre el top 0,02 % de cada mes (r10):
 
     mes         puntuación   curva global   real del mes
     febrero        1,0000        2,68 %         3,74 %
     octubre        0,9900        0,88 %         3,16 %
-    diciembre      1,0000        2,68 %         0,28 %     (9,6x DE MÁS)
-    julio          0,9440        0,24 %        10,36 %     (43x DE MENOS)
+    diciembre      1,0000        2,68 %         0,28 %     (9,6x de más)
+    julio          0,9440        0,24 %        10,36 %     (43x de menos)
 
-La puntuación NO es comparable entre estaciones: las peores celdas de julio
-puntúan 0,944 —menos que las de diciembre, que puntúan 1,0000— y sin embargo
-arden 37 veces más. Servir la curva global diría 2,7 % en diciembre (pánico
-donde no lo hay) y 0,24 % en julio (falsa calma en temporada alta, que es el
-error que de verdad importa: jun-sep concentra el 66 % de las celdas quemadas).
+La puntuación no es comparable entre estaciones: las peores celdas de julio
+puntúan 0,944 (menos que las de diciembre, que puntúan 1,0000) y sin embargo
+arden 37 veces más. Servir la curva global diría 2,7 % en diciembre (alarma
+donde no la hay) y 0,24 % en julio (falsa calma en temporada alta, que es el
+error que más pesa: jun-sep concentra el 66 % de las celdas quemadas).
 
-=============================================================================
-QUÉ HACE
-=============================================================================
-Ajusta la isotónica por ESTRATO y compara tres opciones:
+Qué hace
+--------
+Ajusta la isotónica por estrato y compara tres opciones:
     global   una curva            (lo de dos_28)
     regimen  tres curvas          (verano / invierno-primavera / transición)
     mes      doce curvas
-La estratificación se ELIGE EN VALIDACIÓN (2022-2023) y se reporta en TEST
+La estratificación se elige en validación (2022-2023) y se reporta en test
 2024. Partición idéntica a dos_26 y dos_28; el test no se toca para elegir.
 
-Criterio: error de calibración en la PUNTA, que es lo que se publica. Para
+Criterio: error de calibración en la punta, que es lo que se publica. Para
 cada mes se toma el top 0,02 % de celdas-día de ese mes, se compara la
 probabilidad predicha media con la observada, y se resume con la mediana del
 |log10(predicha/observada)|. 0 = perfecto, 1 = fallo de un factor 10.
@@ -56,8 +54,8 @@ SAL = config.salida("dos_29")
 CALIB = (2015, 2021)
 VAL = (2022, 2023)
 TEST = (2024, 2024)
-# Punta de EVALUACIÓN. El 0,02 % (el del entregable, §9) deja ~600 celdas-día
-# por mes-año: la mayoría de meses de 2024 salen con CERO quemadas y el error
+# Punta de evaluación. El 0,02 % (el del entregable, §9) deja ~600 celdas-día
+# por mes-año: la mayoría de meses de 2024 salen con cero quemadas y el error
 # no es calculable. Al 0,2 % son ~6.000 y ya se puede medir. El entregable
 # sigue reportándose al 0,02 % sobre el clima de los diez años.
 FRAC_PUNTA = 0.002

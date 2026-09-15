@@ -1,38 +1,36 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 18: ¿cuántos negativos del MISMO DÍA hace falta ver?
+Dos modelos, paso 18: ¿cuántos negativos del mismo día hace falta ver?
 
-NO TOCA PRODUCCIÓN. Lee el cubo y el disco externo; escribe
+No toca producción. Lee el cubo y el disco externo; escribe
 <externo>/dataset/{maestra,dataset}_ratio.parquet, los modelos
 donde_dia_effis_r<k>.ubj y salida/dos_18_ratio.json.
 
-=============================================================================
-POR QUÉ
-=============================================================================
+Por qué
+-------
 El salto del trabajo (0,744 → 0,828 de AUC dentro del día) vino de cambiar
-DE DÓNDE salen los negativos: del mismo día en otra celda, en vez de la misma
-celda en otro día. Lo que nunca se ha ablacionado es CUÁNTOS. `RATIO_NEG = 3`
+de dónde salen los negativos: del mismo día en otra celda, en vez de la misma
+celda en otro día. Lo que nunca se ha ablacionado es cuántos. `RATIO_NEG = 3`
 (dos_02) y `RATIO = 4` (dos_12) son constantes heredadas del muestreador
 original y nadie las ha movido.
 
 Importa porque el modelo se evalúa por cómo ordena las ~498.530 celdas de un
 día y en entrenamiento solo ve 3 negativos por positivo: en un día con 9
 igniciones son 27 celdas de medio millón. El AUC no depende de la prevalencia
-—por eso el desbalanceo no invalida nada—, pero sí depende de cuántos
-negativos DIFÍCILES entran en la comparación. A 1:100 el día de entrenamiento
+(por eso el desbalanceo no invalida nada), pero sí depende de cuántos
+negativos difíciles entran en la comparación. A 1:100 el día de entrenamiento
 se parece al día del banco de evaluación (1.000 celdas al azar), que es la
 pregunta operativa.
 
-=============================================================================
-DISEÑO: UNA SOLA EXTRACCIÓN, ESCALERA ANIDADA
-=============================================================================
-Los MISMOS positivos de `dos_12` (celdas EFFIS de primer día 2015-2024, tope
+Diseño: una sola extracción, escalera anidada
+---------------------------------------------
+Los mismos positivos de `dos_12` (celdas EFFIS de primer día 2015-2024, tope
 de 30 por día y bloque de 100 km, SEED 7: el código es idéntico, así que el
 conjunto es el mismo). Se sortean KMAX=110 negativos por positivo (mismo día,
-celda al azar de España) y se extraen las features UNA vez; cada peldaño de
-la escalera es un PREFIJO de esa lista (`k_neg` 0..k-1). Así:
+celda al azar de España) y se extraen las features una vez; cada peldaño de
+la escalera es un prefijo de esa lista (`k_neg` 0..k-1). Así:
 
-  · 1:3, 1:10, 1:30, 1:100 comparten positivos Y negativos (los de k menor
+  · 1:3, 1:10, 1:30, 1:100 comparten positivos y negativos (los de k menor
     son un subconjunto de los de k mayor): la diferencia es solo cuántos, no
     cuáles, y el ruido de muestreo no contamina la comparación;
   · se paga una sola extracción de features (2,1 M filas ≈ 8 min con los 8
@@ -42,18 +40,18 @@ la escalera es un PREFIJO de esa lista (`k_neg` 0..k-1). Así:
 `dos_03`, y por eso se sortean 110 y no 100: a ratios altos el filtro muerde
 más filas y hay que tener colchón para que todos los positivos lleguen a 100.
 
-ÁRBOLES FIJOS: 441 para todos, que es donde paró `donde_dia_effis` (1:3) con
+Árboles fijos: 441 para todos, que es donde paró `donde_dia_effis` (1:3) con
 early stopping en `dos_13`. Con más negativos la val cambia de prevalencia y
 el early stopping pararía en otro sitio: si se dejara libre, la comparación
-sería del ratio Y del número de árboles a la vez. Se reporta también la val
+sería del ratio y del número de árboles a la vez. Se reporta también la val
 aucpr, que no es comparable entre peldaños (prevalencias distintas) y solo
 sirve para ver que ninguno diverge.
 
 Banco: el `eval_dia` de `dataset_effis.parquet` (verano 2023 y 2024, 1.000
 celdas al azar por día + celdas EFFIS de primer día), sin tocar. Métrica: AUC
-dentro del día, IC95 por bootstrap de DÍAS, pareado contra el peldaño 1:3.
-La prueba externa de verdad es la temporada 2026 (`dos_09`, que recoge solos
-los modelos `donde_dia_effis_r*`).
+dentro del día, IC95 por bootstrap de días, pareado contra el peldaño 1:3.
+La prueba externa es la temporada 2026 (`dos_09`, que recoge solo los
+modelos `donde_dia_effis_r*`).
 
 Uso:
     python dos_18_ratio.py muestrear      # maestra_ratio.parquet
@@ -81,9 +79,9 @@ ESCALERA = (3, 10, 30, 60, 100)  # peldaños medidos (60 es el último
                                  # completo: el filtro is_near_fire se lleva
                                  # el 8,7 % y el positivo con menos negativos
                                  # vivos se queda en 62. El peldaño 100 es
-                                 # «hasta 100» y su reparto por positivo NO es
-                                 # uniforme —los positivos de zona con mucho
-                                 # fuego pierden más negativos—, así que la
+                                 # «hasta 100» y su reparto por positivo no es
+                                 # uniforme (los positivos de zona con mucho
+                                 # fuego pierden más negativos), así que la
                                  # escalera limpia es 3→60 y 100 es un extra.
 N_ARBOLES = 441                  # donde_dia_effis (1:3) en dos_13
 N_BOOT = 2000

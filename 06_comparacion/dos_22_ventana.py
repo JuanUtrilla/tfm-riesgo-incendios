@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 22: la alerta con VENTANA. ¿Vale marcar la zona con
-antelación?
+Dos modelos, paso 22: la alerta con ventana. Mide si sirve marcar la zona
+con antelación.
 
-dos_20 y dos_21 puntúan el mapa del día D contra el fuego del día D. Pero un
-mapa de riesgo no se usa así: si Guadalajara sale arriba hoy y mañana y arde
-al tercer día, el aviso SIRVIÓ. Aquí la alerta del día D es la UNIÓN del
-top-k de los últimos W+1 días, y un incendio cuenta como pillado si alguna de
-sus celdas estaba bajo alerta el día en que ardió.
+dos_20 y dos_21 puntúan el mapa del día D contra el fuego del día D. Un mapa
+de riesgo no se usa así: si Guadalajara sale arriba hoy y mañana y arde al
+tercer día, el aviso sirvió. Aquí la alerta del día D es la unión del top-k
+de los últimos W+1 días, y un incendio cuenta como pillado si alguna de sus
+celdas estaba bajo alerta el día en que ardió.
 
 Ojo con el truco: ampliar la ventana siempre sube la captura, porque hay más
-territorio bajo alerta. Por eso NO se compara captura contra captura, sino
-captura contra COSTE: la fracción media de España bajo alerta ese día. Una
-ventana de 3 días con top-1 % que pone el 2,5 % del país en alerta hay que
-compararla con el top-2,5 % de un solo día, no con el top-1 %. Si la curva
-(coste, captura) de las ventanas se pega a la de un día, la persistencia no
-aporta nada: solo estaba ensanchando la mancha.
+territorio bajo alerta. Por eso se compara captura contra coste, y no captura
+contra captura: el coste es la fracción media de España bajo alerta ese día.
+Una ventana de 3 días con top-1 % que pone el 2,5 % del país en alerta hay
+que compararla con el top-2,5 % de un solo día, no con el top-1 %. Si la
+curva (coste, captura) de las ventanas se pega a la de un día, la
+persistencia no aporta nada: solo estaba ensanchando la mancha.
 
-Se mide además la ANTELACIÓN: cuántos días antes entró la celda en el top-k.
+Se mide también la antelación: cuántos días antes entró la celda en el top-k.
 
 Sigue siendo reanálisis (cota superior, cf. dos_09), no previsión.
-NO TOCA PRODUCCIÓN. Escribe salida/dos_22_ventana.{json,csv,png}.
+No toca producción. Escribe salida/dos_22_ventana.{json,csv,png}.
 """
 
 import glob

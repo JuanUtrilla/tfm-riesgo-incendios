@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 11: los mismos mapas diarios de 2026, juzgados con los
-PARTES DE MITECO en vez de con EFFIS.
+Dos modelos, paso 11: los mismos mapas diarios de 2026, evaluados con los
+partes de MITECO en vez de con EFFIS.
 
-NO TOCA PRODUCCIÓN. Lee los mapas que guarda `dos_09` (expansión) y los 52
+No toca producción. Lee los mapas que guarda `dos_09` (expansión) y los 52
 incidentes geocodificados de `TFM_fuego/dataset/dashboard_miteco.json` (solo
 lectura; geocodificación al centro del municipio, hecha por `validar_miteco.py`
 del repo original). Escribe salida/dos_11_miteco.{json,csv}.
 
-Por qué: EFFIS es MODIS (perímetros, ≥5 ha, latencia) y favorece a quien
+Por qué: EFFIS es MODIS (perímetros, >=5 ha, latencia) y favorece a quien
 acierta los megaincendios. MITECO registra los incendios en los que el Estado
-desplegó medios, sin depender de satélite: otro sesgo, otro juez. Etiqueta:
-celdas a ≤ RADIO km del centro del municipio, el día de PRIMERA aparición del
-incidente (proxy de ignición). El radio absorbe el error de geocodificar al
-centro del municipio. Se reportan 10 y 25 km.
+desplegó medios, sin depender de satélite: otro sesgo, otra referencia.
+Etiqueta: celdas a <= RADIO km del centro del municipio, el día de primera
+aparición del incidente (proxy de ignición). El radio absorbe el error de
+geocodificar al centro del municipio. Se reportan 10 y 25 km.
 """
 import glob, json, os
 import numpy as np, pandas as pd, xarray as xr

@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Mapa de riesgo de incendio de España para un día dado — demo/validación visual.
+Mapa de riesgo de incendio de España para un día dado (demo y comprobación visual).
 
 Uso: python3 mapa_riesgo_dia.py [AAAA-MM-DD]   (default: 2022-07-17, pico de la
-     ola de incendios de 2022, AÑO NUNCA VISTO por el modelo: entrenado 2015-2018)
+     ola de incendios de 2022, año nunca visto por el modelo: entrenado 2015-2018)
 
-Reconstruye las MISMAS features del pipeline de entrenamiento para TODAS las
+Reconstruye las mismas features del pipeline de entrenamiento para todas las
 celdas peninsulares (~500k) y pinta la probabilidad del modelo junto a las
 detecciones FIRMS reales del día (verdad-terreno independiente del EGIF, que
 está incompleto en 2021+).
 
 Adaptaciones documentadas respecto al extractor de entrenamiento:
-- Autorregresivas EGIF: el registro llega a 2020 → para fechas posteriores los
-  conteos usan lo disponible (caveat de demo, sesga esas features a la baja).
-- n_fuegos por radio se calculan con convolución sobre la malla (box 3×3 para
-  1,5 km, 21×21 para 10 km) — equivalente a los radios KDTree del extractor.
+- Autorregresivas EGIF: el registro llega a 2020, así que para fechas posteriores
+  los conteos usan lo disponible (limitación de demo; sesga esas features a la baja).
+- n_fuegos por radio se calculan con convolución sobre la malla (caja 3×3 para
+  1,5 km, 21×21 para 10 km), equivalente a los radios KDTree del extractor.
 - frp_max_50km: maximum_filter 101×101 sobre la malla de FRP [D-7, D-1].
 - popdens: años >2020 usan popdens_2020; CLC: corte 2018.
 Salida: eda/mapa_riesgo_<fecha>.png + parquet con las probabilidades.
@@ -218,7 +218,7 @@ def main():
     im = ax.imshow(prob, origin="lower" if ys[1] > ys[0] else "upper",
                    cmap="YlOrRd", vmin=0, vmax=np.nanpercentile(prob, 99.5))
     fig.colorbar(im, label="probabilidad del modelo (prevalencia de diseño 25%)")
-    # FIRMS del PROPIO día D como verdad-terreno
+    # FIRMS del propio día D como verdad-terreno
     mD = fd == d
     fx2, fy2 = tr.transform(firms.loc[mD, "longitude"].values,
                             firms.loc[mD, "latitude"].values)
@@ -234,7 +234,7 @@ def main():
     fig.tight_layout()
     fig.savefig(f"{DIR}/eda/mapa_riesgo_{FECHA}.png", dpi=150)
 
-    # métrica del día: percentil de riesgo en celdas con detección vs resto
+    # métrica del día: percentil de riesgo en celdas con detección frente al resto
     pr_flat = prob.ravel()
     det = np.zeros((ny, nx), bool)
     det[fiy2.astype(int).clip(0, ny - 1), fix2.astype(int).clip(0, nx - 1)] = True

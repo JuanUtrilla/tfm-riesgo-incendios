@@ -1,59 +1,56 @@
 #!/usr/bin/env python3
 """
-AUDITORÍA TRAIN/SERVE — las 46 features, una por una: ¿le llega al modelo en
+Auditoría train/serve de las 46 features, una por una: ¿le llega al modelo en
 producción lo mismo que vio al entrenar, y cuánto cuesta cada desviación?
 
-NO MODIFICA NADA. Crea solo dataset/auditoria_train_serve.json.
+No modifica nada. Crea solo dataset/auditoria_train_serve.json.
 
-=============================================================================
-LA PREGUNTA Y SU LÍMITE
-=============================================================================
+La pregunta y su límite
+
 "Que el modelo en producción sea equivalente al de entrenamiento" es el
-objetivo correcto **para una parte** del problema y es imposible para la otra.
+objetivo correcto para una parte del problema y es imposible para la otra.
 Hay que separarlas o se persigue un fantasma:
 
-  PARTE ARREGLABLE — *train/serve skew*. El modelo aprendió a leer una
+  Parte arreglable: el train/serve skew. El modelo aprendió a leer una
   distribución de cada feature y en producción le llega otra: satélite
   congelado, rayos a 0, percentil de FWI cruzando fuentes, viento NaN leído
-  como cero. Esto SÍ se puede cerrar, y es lo que audita este script.
+  como cero. Esto sí se puede cerrar, y es lo que audita este script.
 
-  PARTE NO ARREGLABLE — la pregunta es otra. El 0,923 de test se midió sobre
+  Parte no arreglable: la pregunta es otra. El 0,923 de test se midió sobre
   celdas de 1 km, etiqueta EGIF ≥1 ha, prevalencia de diseño 25 % con
   negativos sorteados lejos de cualquier fuego. El 0,64 operativo se mide
-  sobre estación ±25 km, etiqueta EFFIS ≥30 ha, prevalencia 1,1 % y TODAS las
-  estaciones-día como candidatas. Igualar eso no es "arreglar producción": es
-  volver a evaluar en el laboratorio, que es justo lo que no queremos.
+  sobre estación ±25 km, etiqueta EFFIS ≥30 ha, prevalencia 1,1 % y todas las
+  estaciones-día como candidatas. Igualar eso no arregla producción: es
+  volver a evaluar en el laboratorio, que es justo lo que se quiere evitar.
 
 Este script sirve para no confundirlas: mide lo que se puede cerrar, lo
 ordena por lo que cuesta, y deja fuera lo que no depende de los datos.
 
-=============================================================================
-QUÉ HACE, EN TRES PASOS
-=============================================================================
-1. DESVIACIÓN. Para cada feature, compara su distribución en entrenamiento
+Qué hace, en tres pasos
+
+1. Desviación. Para cada feature, compara su distribución en entrenamiento
    (julio-agosto, para no confundir estacionalidad con desajuste) contra la de
-   producción 2026. Métrica: PSI (*Population Stability Index*) sobre los
-   deciles del entrenamiento — el estándar en monitorización de modelos.
+   producción 2026. Métrica: PSI (Population Stability Index) sobre los
+   deciles del entrenamiento, el estándar en monitorización de modelos.
    Convención habitual: <0,1 estable · 0,1-0,25 moderado · >0,25 grave.
 
-2. IMPORTANCIA. Ganancia del propio XGBoost. Una feature muy desviada que el
+2. Importancia. Ganancia del propio XGBoost. Una feature muy desviada que el
    modelo no mira no importa; una poco desviada de la que depende, sí.
 
-3. COSTE. Lo que convierte el diagnóstico en números: se toma el test 2020,
-   se **remapea por cuantiles** cada feature de su distribución de
-   entrenamiento a la de producción, y se vuelve a puntuar con el modelo SIN
-   reentrenar. La caída de AUC es lo que cuesta esa desviación.
+3. Coste. Lo que convierte el diagnóstico en números: se toma el test 2020,
+   se remapea por cuantiles cada feature de su distribución de entrenamiento
+   a la de producción, y se vuelve a puntuar con el modelo sin reentrenar. La
+   caída de AUC es lo que cuesta esa desviación.
 
    Por qué el remapeo por cuantiles es el simulador correcto: es monótono, así
-   que conserva el orden de la feature y por tanto su contenido informativo —
-   lo único que rompe son los **umbrales absolutos** que los árboles
-   aprendieron. Y eso es exactamente el mecanismo del train/serve skew, no una
-   analogía de él.
+   que conserva el orden de la feature y por tanto su contenido informativo;
+   lo único que rompe son los umbrales absolutos que los árboles aprendieron.
+   Y ese es exactamente el mecanismo del train/serve skew.
 
    Se mide una a una (coste aislado) y acumulando por orden de coste (coste
    conjunto, que no es la suma: los árboles compensan unas features con otras).
 
-CONTROL: la variante sin remapear nada debe reproducir el 0,9234 del gemelo de
+Control: la variante sin remapear nada debe reproducir el 0,9234 del gemelo de
 protocolo guardado en xgb_v3_metadata.json. Si no lo hace, nada de lo demás
 vale.
 
@@ -72,7 +69,7 @@ DIR = Path(__file__).parent
 REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
 SALIDA = DIR / "dataset" / "auditoria_train_serve.json"
 
-# features que en producción NO se observan; se listan para poder separarlas
+# features que en producción no se observan; se listan para poder separarlas
 # en el informe de las que sí y aun así se desvían.
 CONGELADAS = {"ndvi", "ndvi_med_30d", "lai", "swi010", "lst"}
 SINTETICAS = {"rayos_dia", "rayos_7d"}

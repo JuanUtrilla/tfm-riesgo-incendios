@@ -2,33 +2,34 @@
 """
 Módulo 3b: corregir el FWI de salida en vez de las entradas.
 
-NO SOBRESCRIBE NADA. Escribe malla_data/mapeo_fwi.npz y
+No sobrescribe nada. Escribe malla_data/mapeo_fwi.npz y
 dataset/malla_03b_fwi_qm.json.
 
-POR QUÉ SE LLEGA AQUÍ. Tres intentos de arreglar el sesgo por el lado de las
-entradas, y los tres diagnósticos mecanicistas fallaron:
+Por qué se llega aquí: hubo tres intentos de arreglar el sesgo por el lado de
+las entradas, y los tres diagnósticos mecanicistas fallaron:
 
   1. "es el viento suavizado"        → era la precipitación (§6)
   2. "ERA5-Land puro arregla la lluvia" → arregló el viento, no la lluvia
   3. "es drizzle bias (frecuencia)"  → las frecuencias ya coinciden
                                         (cubo 37,8 % · ERA5-Land 39,2 %)
 
-Lo que queda es un error de SECUENCIA, no de distribución: con r=0,904 en
-precipitación, ERA5-Land llueve en días parcialmente distintos. Y el FWI es
-asimétrico —la lluvia lo hunde en un día y recuperarse cuesta varios—, así que
-un error de CUÁNDO llueve sesga el índice a la baja aunque el CUÁNTO total sea
-correcto. Ninguna corrección de la distribución de entrada puede arreglar eso.
+Lo que queda es un error de secuencia, no de distribución: con r=0,904 en
+precipitación, ERA5-Land llueve en días parcialmente distintos. Como el FWI es
+asimétrico (la lluvia lo hunde en un día y recuperarse cuesta varios), un error
+en cuándo llueve sesga el índice a la baja aunque el total sea correcto.
+Ninguna corrección de la distribución de entrada puede arreglar eso.
 
-LA ALTERNATIVA. Corregir el FWI ya calculado. Es monótona, luego conserva el
-orden del ranking, que es lo único que usa el producto operativo; arregla de
-una vez la feature `fwi` y las ventanas que se derivan de ella; y no exige
-entender el mecanismo, que hoy ha demostrado ser lo más fiable.
+La alternativa es corregir el FWI ya calculado. La corrección es monótona,
+luego conserva el orden del ranking, que es lo único que usa el producto
+operativo; arregla de una vez la feature `fwi` y las ventanas que se derivan de
+ella; y no exige entender el mecanismo, cosa que los tres intentos anteriores
+no consiguieron.
 
-SIN FUGA: se ajusta con jun-sep 2024 y se comprueba también sobre may 2026
+Sin fuga: se ajusta con jun-sep 2024 y se comprueba también sobre may 2026
 (fuera del periodo de ajuste y de otro año) para ver si el mapeo aguanta.
 
-TAMBIÉN SE MIDE LA ALTERNATIVA DE DISEÑO: si en vez de corregir se reconstruye
-`clim_fwi` desde ERA5-Land, el sesgo se cancela POR CONSTRUCCIÓN en
+También se mide la alternativa de diseño: si en vez de corregir se reconstruye
+`clim_fwi` desde ERA5-Land, el sesgo se cancela por construcción en
 `fwi_pctl_local` y no hay nada que mapear. Aquí se cuantifica cuánto queda sin
 resolver por esa vía (la feature `fwi` cruda seguiría desplazada).
 

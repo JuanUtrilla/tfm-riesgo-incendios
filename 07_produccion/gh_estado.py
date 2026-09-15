@@ -2,22 +2,21 @@
 """
 Estado de la cadena diaria en un Release de GitHub: bajar y subir.
 
-=============================================================================
-POR QUÉ UN RELEASE Y NO GIT
-=============================================================================
+Por qué un Release y no git
+---------------------------
 El portátil se apaga a diario; la cadena corre en GitHub Actions. Allí no hay
 disco persistente: lo que cada corrida necesita de la anterior (el reanálisis
 diario acumulado desde el 1-may, los mapas de los últimos 45 días para
-puntuarlos cuando llegue EFFIS, los CSV de veredictos, el geojson de EFFIS,
+contrastarlos cuando llegue EFFIS, los CSV de veredictos, el geojson de EFFIS,
 los partes de MITECO) tiene que vivir fuera. Commitearlo inflaría el repo
-~50 MB/día; un Release admite assets grandes y se reescriben con --clobber.
+unos 50 MB/día; un Release admite assets grandes y se reescriben con --clobber.
 Mismo patrón que el colector del proyecto hermano (`mapa_diario.yml`).
 
 Dos assets en el release `estado`:
-  estado_base.tar.gz    lo que NO cambia: capas estáticas 2D del cubo, clim
+  estado_base.tar.gz    lo que no cambia: capas estáticas 2D del cubo, clim
                         FWI por nodo, nodos, mapeo IFS, cachés mensuales,
-                        modelos, municipios, ficheros del juez de julio.
-                        Lo genera `gh_exportar_estado.py` en local.
+                        modelos, municipios, ficheros de la comparación de
+                        julio. Lo genera `gh_exportar_estado.py` en local.
   estado_diario.tar.gz  lo que cambia cada día. Lo sube la corrida.
 
 Uso:
@@ -86,11 +85,11 @@ def pull():
 def diario_remoto_mas_nuevo():
     """Fecha del asset diario del Release, o None si no se puede leer.
 
-    31/08/2026: `push --base` sube TAMBIÉN el diario. Lanzado desde un portátil
+    31/08/2026: `push --base` sube también el diario. Lanzado desde un portátil
     con `salida/` congelada, eso pisó el estado acumulado que la cadena llevaba
-    hasta ese día — se perdieron los mapas diarios del 27-ago al 1-sep, y con
-    ellos la posibilidad de que el juez EFFIS puntuara esos días cuando llegaran
-    sus perímetros. Los veredictos ya calculados se recuperaron de `publicado/`
+    hasta ese día: se perdieron los mapas diarios del 27-ago al 1-sep, y con
+    ellos la posibilidad de contrastarlos con EFFIS cuando llegaran sus
+    perímetros. Los veredictos ya calculados se recuperaron de `publicado/`
     en git; los mapas no estaban en ningún sitio más. De ahí esta guarda.
     """
     r = gh("release", "view", RELEASE, "--json", "assets", intentos=1)
@@ -119,7 +118,7 @@ def push(base=False, forzar=False):
                  f"({rem:%F %H:%M} > {loc:%F %H:%M} UTC): subirlo pisaría el "
                  f"estado acumulado de la cadena, y los mapas diarios NO están "
                  f"en ningún otro sitio")
-        # Abortar SOLO en el camino manual (`--base`), que es el que provocó la
+        # Abortar solo en el camino manual (`--base`), que es el que provocó la
         # pérdida. El `push` a secas lo ejecuta la cadena con `if: always()`
         # para salvar el progreso aunque un paso haya fallado: convertirlo en
         # error rompería runs que hoy terminan bien. Ahí basta con avisar.

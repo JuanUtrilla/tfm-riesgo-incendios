@@ -1,6 +1,6 @@
 """ERA5-Land horario de mayo a noviembre de 2025 desde el CDS, misma petición
 que malla_02_descarga.pide_mes (área, variables, 24 horas, netcdf), pero con
-salida FUERA de los repos: archivo_ifs/era5land_cds/era5land_YYYYMM.nc.
+salida fuera de los repos: archivo_ifs/era5land_cds/era5land_YYYYMM.nc.
 Reanudable: salta los meses ya bajados. Tres peticiones en paralelo (el CDS
 las encola)."""
 import os, sys, calendar, time

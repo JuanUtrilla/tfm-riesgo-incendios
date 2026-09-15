@@ -38,12 +38,12 @@
 
 ## Dos decisiones de redacción
 
-La memoria sigue el orden lógico, no el cronológico: lo que importa es en qué
-orden hay que leer las cosas para entender la conclusión. Los intentos que no
-llevaron a ninguna parte están en `docs/BITACORA.md`, no en la memoria.
+La memoria sigue el orden lógico y no el cronológico: el orden en que hay que
+leer cada parte para entender la conclusión. Los intentos que se descartaron
+por el camino están recogidos en `docs/BITACORA.md` y no en la memoria.
 
-El primer modelo se cuenta como grupo de control, no como error. Sin él no se
-podría demostrar que el rediseño hacía falta ni cuantificar lo que aportó.
+El primer modelo se presenta como grupo de control. Sin él no se podría
+comprobar que el rediseño hacía falta ni cuantificar lo que aportó.
 
 La memoria, con sus anexos, está en [`docs/MEMORIA/`](../docs/MEMORIA/README.md).
 El glosario está en [`GLOSARIO.md`](GLOSARIO.md).
@@ -52,10 +52,11 @@ El glosario está en [`GLOSARIO.md`](GLOSARIO.md).
 
 |  | Iteración 1 | Iteración 2 |
 |---|---|---|
-| Qué es un positivo | ignición registrada en EGIF | celda con superficie quemada en EFFIS |
+| Qué es un positivo | ignición registrada en EGIF (Estadística General de Incendios Forestales) | celda con superficie quemada en EFFIS (*European Forest Fire Information System*) |
 | Qué es un negativo | la misma celda en otros días | otras celdas del mismo día |
-| Contra qué se evalúa | superficie quemada y partes del MITECO | lo mismo, y ahora coincide con el entrenamiento |
+| Contra qué se evalúa | superficie quemada y partes del MITECO (Ministerio para la Transición Ecológica y el Reto Demográfico) | lo mismo, y ahora coincide con el entrenamiento |
 
-La tercera fila resume el trabajo. En la iteración 1 la etiqueta de
-entrenamiento y la de evaluación eran cosas distintas, y la métrica de
-desarrollo no lo detectaba.
+La tercera fila recoge el problema de la iteración 1: la etiqueta de
+entrenamiento (una ignición) y la de evaluación (superficie quemada) eran
+distintas, y el AUC (*Area Under the ROC Curve*) de desarrollo no lo
+detectaba.

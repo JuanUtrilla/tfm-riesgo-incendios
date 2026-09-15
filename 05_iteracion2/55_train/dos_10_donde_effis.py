@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 10: el DÓNDE con etiqueta de SUPERFICIE QUEMADA (EFFIS).
+Dos modelos, paso 10: el dónde con etiqueta de superficie quemada (EFFIS).
 
-NO TOCA PRODUCCIÓN. Lee expansión; escribe modelo en expansión y
+No toca producción. Lee expansión; escribe modelo en expansión y
 salida/dos_10_mapa_donde_effis.npz.
 
-=============================================================================
-POR QUÉ
-=============================================================================
-`dos_09` midió la temporada 2026: el mapa DÓNDE entrenado con igniciones EGIF
-se hunde los días de megaincendio (Luesia, La Mierla, Navaluenga, Niebla,
-Riglos: su decil superior contiene el 0-7 % de las celdas quemadas). El EGIF
-cuenta igniciones, que se concentran en el noroeste; la superficie quemada
-se concentra en otro sitio. Aquí la etiqueta es «≥1 celda-día `is_fire`
-(EFFIS ≥5 ha) en 2008-2020» — el mismo juez con el que se evalúa — y se
-mide en 2026 si el mapa cambia lo que importa. Prevalencia por celda ~1,8 %.
-Para 2019-2020 esta etiqueta está contaminada (usa esos años): solo vale
-para 2021+ y para la temporada 2026.
+Por qué
+-------
+`dos_09` midió la temporada 2026 sobre perímetros EFFIS: el mapa dónde
+entrenado con igniciones EGIF se hunde los días de megaincendio (Luesia, La
+Mierla, Navaluenga, Niebla, Riglos: su decil superior contiene el 0-7 % de
+las celdas quemadas). El EGIF cuenta igniciones, que se concentran en el
+noroeste; la superficie quemada se concentra en otro sitio. Aquí la etiqueta
+es «≥1 celda-día `is_fire` (EFFIS ≥5 ha) en 2008-2020», la misma fuente con
+la que se compara, y se mira en 2026 si el mapa cambia lo que importa.
+Prevalencia por celda ~1,8 %. Para 2019-2020 esta etiqueta está contaminada
+(usa esos años): solo vale para 2021+ y para la temporada 2026.
 """
 import numpy as np, pandas as pd
 import config, config_expansion as ce

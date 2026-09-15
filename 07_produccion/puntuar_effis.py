@@ -1,35 +1,36 @@
 #!/usr/bin/env python3
 """
-Puntúa cada día los dos mapas contra el área quemada de EFFIS, y acumula.
+Puntúa cada día los mapas contra el área quemada de EFFIS y acumula.
 
-NO TOCA PRODUCCIÓN. Escribe salida/puntuacion_effis.csv y, con --informe,
-salida/veredicto_acumulado.json.
+Seguimiento diario de la temporada 2026. No toca producción. Escribe
+salida/puntuacion_effis.csv y, con --informe, salida/veredicto_acumulado.json.
+La validación del trabajo es el replay de 2025-2026 (06_comparacion/replay_*);
+este script sirvió para seguir la temporada en marcha y hoy `verificar_mapas.py`
+reutiliza el geojson que descarga.
 
-=============================================================================
-QUÉ AGUJERO TAPA
-=============================================================================
-El cron ya genera los dos mapas cada día, y `comparar_produccion.py` mide si
-se PARECEN. Pero parecerse no es acertar: sin esto, el veredicto se quedaría
-congelado en los 17 días de julio de 2026 por muchos días que pasaran, que
-era justo el argumento para montar el cron en paralelo.
+Qué agujero tapa
+----------------
+El cron ya genera los mapas cada día, y `comparar_produccion.py` mide si se
+parecen. Parecerse no es acertar: sin esto, el veredicto se quedaría congelado
+en los 17 días de julio de 2026 por muchos días que pasaran, que era justo el
+argumento para montar el cron en paralelo.
 
-Aquí se puntúa el ACIERTO de cada mapa contra la superficie realmente quemada
+Aquí se puntúa el acierto de cada mapa contra la superficie realmente quemada
 y se apila en un CSV. Cada corrida recalcula el veredicto con todos los días.
 
-Ya no hace falta reconstruir producción desde el colector horario (que además
-se paró el 27-jul): el cron genera su mapa de verdad.
+Ya no hace falta reconstruir producción desde el colector horario (que se paró
+el 27-jul): el cron genera su mapa.
 
-=============================================================================
-LA LATENCIA DE EFFIS MANDA EL DISEÑO
-=============================================================================
+La latencia de EFFIS manda el diseño
+------------------------------------
 Cartografiar un perímetro lleva días: entre FIREDATE y LASTUPDATE hay una
 mediana de 6 días, media 9 y cola hasta 164. El propio repo de EFFIS avisa de
 que los 2-3 últimos días están sistemáticamente incompletos.
 
-Por eso NO se puntúa el día en curso, sino una VENTANA PASADA que se reescribe
+Por eso no se puntúa el día en curso, sino una ventana pasada que se reescribe
 entera en cada corrida: los polígonos que llegan tarde se recogen solos y las
 filas convergen. Puntuar el día D el propio día D daría cero incendios y
-metería ruido a la baja en los dos mapas por igual.
+metería ruido a la baja en todos los mapas por igual.
 
 Uso:
     python puntuar_effis.py --refrescar          # baja EFFIS y puntúa
@@ -57,7 +58,7 @@ CAMPOS = ["id", "FIREDATE", "LASTUPDATE", "COUNTRY", "PROVINCE", "COMMUNE",
 
 
 def refrescar():
-    """Perímetros de la temporada en curso, solo España. WFS abierto, sin key."""
+    """Descarga los perímetros de la temporada en curso, solo España. WFS abierto, sin clave."""
     import requests
     try:
         r = requests.get(WFS, timeout=600, params={
@@ -91,11 +92,11 @@ def refrescar():
 
 
 def mapas(fecha):
-    """{nombre: mapa} para esa fecha, o None si faltan producción o malla.
+    """Devuelve {nombre: mapa} para esa fecha, o None si falta el mapa de la malla.
 
     21/08/2026: se añaden `unico` y `pareja` (modelos de etiqueta EFFIS,
     `dos_riesgo_hoy.py`) cuando existan. Son los candidatos a producción y
-    aquí es donde se juzgan cada día, con la misma verdad-terreno."""
+    aquí se puntúan cada día con la misma verdad de terreno."""
     p = f"{config.FUENTE}/prototipo/cache/malla_prob_{fecha}.npz"
     md = config.salida("mapas_diarios")
     m = next((r for r in (f"{md}/riesgo_hoy_{fecha}.npz",
@@ -173,7 +174,7 @@ def guardar(filas):
 
 
 def informe(df):
-    """Veredicto con TODOS los días acumulados, remuestreando días."""
+    """Calcula el veredicto con todos los días acumulados, remuestreando días."""
     julio = []
     if os.path.exists(BASE_JULIO):
         julio = json.load(open(BASE_JULIO))["dias"]
@@ -186,7 +187,7 @@ def informe(df):
 
     # --- foto del acumulado de hoy ------------------------------------------
     # Antes de las salidas tempranas de abajo: el histórico tiene que anotarse
-    # AUNQUE todavía no haya 3 días con mapa de producción, que es justo la
+    # aunque todavía no haya 3 días con mapa de producción, que es justo la
     # fase en la que interesa ver cómo se va formando el criterio.
     rng0 = np.random.default_rng(0)
     hay_prod = "auc_produccion" in d and d["auc_produccion"].notna().sum() >= 3
@@ -235,9 +236,9 @@ def informe(df):
     print(f"VEREDICTO ACUMULADO — {len(d)} días · "
           f"{int(w.sum()):,} celdas quemadas")
     print("=" * 68)
-    # MEDIA de las medianas diarias, no mediana de medianas: así la tabla
-    # cuadra con la diferencia emparejada de abajo (mediana de medianas puede
-    # salir con el signo contrario y no es lo que se contrasta).
+    # media de las medianas diarias, no mediana de medianas: así la tabla
+    # cuadra con la diferencia emparejada de abajo (la mediana de medianas
+    # puede salir con el signo contrario y no es lo que se contrasta).
     print(f"{'mapa':<14}{'pctl medio/día':>16}{'AUC medio':>12}{'n días':>8}")
     for nom in ("produccion", "malla", "unico", "r10", "pareja"):
         if f"pctl_{nom}" in d:

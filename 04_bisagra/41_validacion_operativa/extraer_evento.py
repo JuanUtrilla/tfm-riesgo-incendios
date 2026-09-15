@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Extracción EVENTO-PRIMERO (geolocalizada + temporal) para validar la hipótesis
-del modelo de riesgo antes de escalar a los 21k puntos EGIF.
+Extracción evento a evento (geolocalizada y temporal) para comprobar la
+hipótesis del modelo de riesgo antes de escalar a los 21k puntos EGIF.
 
 Para cada incendio conocido descarga, en el punto exacto y una ventana temporal
 alrededor de la fecha:
@@ -13,8 +13,8 @@ lo cruza con el FWI y genera por evento:
   - eventos_validacion/<evento>.csv   (serie diaria)
   - eventos_validacion/<evento>.png   (gráfico con la fecha del incendio marcada)
 
-Puerta de decisión: si FWI/sequedad se disparan antes del fuego frente al baseline
-de la ventana, la tesis se sostiene -> escalar a EGIF completo.
+Puerta de decisión: si el FWI y la sequedad suben antes del fuego respecto al
+baseline de la ventana, la hipótesis se sostiene y se escala a EGIF completo.
 
 Requisitos: cdsapi + ~/.cdsapirc con la key CDS/ECMWF, xarray, netCDF4, pandas, matplotlib.
 Las descargas se cachean en eventos_validacion/_raw/ (relanzar es seguro y resumible).
@@ -46,7 +46,7 @@ VENTANA_DESPUES = 15  # días después
 URL_CDS = "https://cds.climate.copernicus.eu/api"    # ERA5-Land
 URL_EWDS = "https://ewds.climate.copernicus.eu/api"  # FWI
 
-# Incendios candidato. Coordenadas aproximadas -> refinar con EGIF Civio cuando se escale.
+# Incendios candidatos. Coordenadas aproximadas; se refinan con EGIF Civio al escalar.
 EVENTOS = [
     dict(nombre="galicia_ponteareas_2017", lat=42.17, lon=-8.50, fecha=date(2017, 10, 15),
          desc="Oleada de Galicia (Ponteareas, Rías Baixas)"),
@@ -170,9 +170,9 @@ def era5_diario(ev, ini, fin):
     df["time"] = pd.to_datetime(df["time"])
     df = df.drop_duplicates("time").sort_values("time").reset_index(drop=True)
 
-    # --- Desacumulación de tp/ssrd ANTES de recortar la ventana ---
+    # --- Desacumulación de tp/ssrd antes de recortar la ventana ---
     # En ERA5-Land tp y ssrd acumulan desde las 00 UTC del día de pronóstico: el
-    # valor de las 00:00 contiene el día ANTERIOR completo y el de las 01:00 solo
+    # valor de las 00:00 contiene el día anterior completo y el de las 01:00 solo
     # la primera hora del día en curso. Incremento horario = diff, salvo a las
     # 01:00 (reinicio de la acumulación), donde el incremento es el propio valor.
     # Cada incremento pertenece al día de (time - 1h).

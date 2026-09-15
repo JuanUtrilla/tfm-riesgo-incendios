@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 1: la tabla POR CELDA (498.530 celdas peninsulares).
+Dos modelos, paso 1: la tabla por celda (498.530 celdas peninsulares).
 
-NO TOCA PRODUCCIÓN. Lee el cubo y el EGIF; escribe en expansión.
+No toca producción. Lee el cubo y el EGIF; escribe en expansión.
 
-=============================================================================
-POR QUÉ
-=============================================================================
-El modelo DÓNDE (susceptibilidad) no se entrena sobre muestras celda-día sino
-sobre CELDAS: una fila por celda, estáticas como features y la densidad
+Por qué
+-------
+El modelo dónde (susceptibilidad) se entrena sobre celdas, no sobre muestras
+celda-día: una fila por celda, las estáticas como features y la densidad
 histórica de fuego como etiqueta. Esta tabla es su dataset, y también lo que
 necesita la fase 1 para medir la autocorrelación espacial y la cota de lo que
 explican las estáticas solas.
@@ -20,16 +19,16 @@ usa producción hoy):
   clc_* (CLC_2018, las 6 proporciones + arable + urbano), aspect_1..8,
   is_natura2000, ccaa, lat, lon, x3035, y3035, bloque_100km, idx_nodo (ERA5).
   + climatología meteo de la celda (FWI medio jun-sep 2008-2014, tmax, hr_min,
-    prec anual) → "clima", que es estático y servible.
+    prec anual): el "clima", que es estático y servible.
 
 Etiquetas / densidades (separadas en el tiempo para no hacer trampa):
-  egif_0814          incendios EGIF ≥1 ha en la celda 2008-2014 (PREVIOS al
+  egif_0814          incendios EGIF ≥1 ha en la celda 2008-2014 (previos al
                      dataset: la única densidad histórica usable como feature)
   egif_0814_10km     ídem a <10 km (suavizado)
   egif_1518 / egif_19 / egif_20   incendios EGIF en la celda por periodo de split
   egif_1520_10km     a <10 km, 2015-2020 (etiqueta suavizada)
   effis_1520, effis_2124   días con is_fire (EFFIS ≥5 ha) por periodo
-  effis_2124_10km    a <10 km (la verdad-terreno operativa, fuera del EGIF)
+  effis_2124_10km    a <10 km (la verdad terreno operativa, fuera del EGIF)
 
 Salida: EXPANSION/dataset/celdas.parquet
 """
@@ -49,8 +48,8 @@ ANIOS_CLIM = (2008, 2014)
 
 
 def suaviza_10km(campo):
-    """Suma en una ventana 21×21 (≈10 km de radio). Es cuadrada, no circular:
-    da igual para una densidad y es 50× más rápida."""
+    """Suma en una ventana 21×21 (≈10 km de radio). La ventana es cuadrada
+    en vez de circular: para una densidad da igual y es 50× más rápida."""
     return uniform_filter(campo.astype(np.float32), size=2 * R10 + 1,
                           mode="constant") * (2 * R10 + 1) ** 2
 

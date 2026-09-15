@@ -1,60 +1,57 @@
 #!/usr/bin/env python3
 """
-La comparación seria: producción (AEMET + IDW) contra la malla, julio 2026,
-con las áreas quemadas de EFFIS como juez.
+Comparación de producción (AEMET + IDW) contra la malla en julio de 2026,
+con las áreas quemadas de EFFIS como referencia.
 
-NO TOCA PRODUCCIÓN. Escribe salida/julio2026_*.png / .json.
+No toca producción. Escribe salida/julio2026_*.png / .json.
 
-=============================================================================
-POR QUÉ ESTA Y NO LA DEL 20-AGO
-=============================================================================
-La comparación del 20-ago fue de UN día y 35 celdas con detección FIRMS. Con
-eso no se decide nada: mide acuerdo, no acierto. Y encima FIRMS de [D−5, D−1]
-es FEATURE de los dos mapas, así que las detecciones del día están
+Por qué esta comparación y no la del 20-ago
+-------------------------------------------
+La comparación del 20-ago fue de un día y 35 celdas con detección FIRMS. Con
+eso no se decide nada: mide acuerdo, no acierto. Y FIRMS de [D-5, D-1] es
+feature de los dos mapas, así que las detecciones del día están
 correlacionadas con una entrada que ambos comparten.
 
-Aquí hay tres cosas mejores:
+Aquí se mejoran tres cosas:
 
- 1. VARIOS DÍAS. El colector horario de AEMET (proyecto hermano
-    `aemet_horario_verano2026`) cubre 2026-07-01 → 07-27, 864 estaciones. Eso
-    permite reconstruir el camino de producción sin llamar a su API — que es
+ 1. Varios días. El colector horario de AEMET (proyecto hermano
+    `aemet_horario_verano2026`) cubre 2026-07-01 a 07-27, 864 estaciones. Eso
+    permite reconstruir el camino de producción sin llamar a su API, que es
     lo que hizo tardar 2h30 la corrida del 20-ago.
 
- 2. VERDAD-TERRENO DE VERDAD. `effis_ba_season_ES.geojson`: 1.871 polígonos
-    de ÁREA QUEMADA con fecha. Superficie real, no detecciones puntuales de
-    satélite. Y no es entrada de ningún mapa.
+ 2. Verdad-terreno de superficie. `effis_ba_season_ES.geojson`: 1.871
+    polígonos de área quemada con fecha. Superficie real, no detecciones
+    puntuales de satélite. Y no es entrada de ningún mapa.
 
- 3. MISMA TEMPORADA que la que se quiere servir.
+ 3. La misma temporada que se quiere servir.
 
-=============================================================================
-LO QUE SE COMPARA, Y LO QUE SE DEJA FIJO
-=============================================================================
-Las dos ramas comparten TODO lo no-meteo: estáticas y CLC del cubo,
+Qué se compara y qué se deja fijo
+---------------------------------
+Las dos ramas comparten todo lo no meteorológico: estáticas y CLC del cubo,
 vegetación y LST de la climatología mensual, EGIF, FIRMS, rayos, calendario y
-el MISMO modelo (`xgb_v2_prototipo`). Sólo cambia de dónde sale la meteo:
+el mismo modelo (`xgb_v2_prototipo`). Solo cambia de dónde sale la meteo:
 
-    producción : 705 estaciones AEMET → features por estación → IDW k=8 con
-                 corrección de altitud (GAMMA) → celdas
-    malla      : 5.605 nodos ERA5-Land → cada celda toma su nodo
+    producción : 705 estaciones AEMET -> features por estación -> IDW k=8 con
+                 corrección de altitud (GAMMA) -> celdas
+    malla      : 5.605 nodos ERA5-Land -> cada celda toma su nodo
 
-Julio 2026 está ENTERO dentro del reanálisis (era5land_diario llega al 13-ago),
-así que la malla va sin rama de previsión. Es deliberado: aquí se mide el
-IDW contra los nodos, que es una pregunta distinta de la del módulo 2b.
+Julio de 2026 está entero dentro del reanálisis (era5land_diario llega al
+13-ago), así que la malla va sin rama de previsión. Es deliberado: aquí se
+mide el IDW contra los nodos, que es una pregunta distinta de la del módulo 2b.
 
-=============================================================================
-DOS DECISIONES QUE HAY QUE CONOCER PARA LEER LOS NÚMEROS
-=============================================================================
-· SPIN-UP IGUALADO. El colector empieza el 1-jul y no hay mayo-junio de AEMET
+Dos decisiones que hay que conocer para leer los números
+--------------------------------------------------------
+- Spin-up igualado. El colector empieza el 1-jul y no hay mayo-junio de AEMET
   sin volver a su API. Si la malla arrancase en mayo y AEMET en julio, la
-  ventaja sería del método, no del dato. Así que AMBAS ramas arrancan el FWI
-  el 1-jul con el mismo estado inicial, y sólo se evalúa desde el 15-jul
-  (≥14 días de spin-up). Un DC bajo deprime las dos por igual y la métrica
-  es el ORDEN dentro de cada día, donde un desplazamiento común se cancela.
+  ventaja sería del método, no del dato. Así que ambas ramas arrancan el FWI
+  el 1-jul con el mismo estado inicial, y solo se evalúa desde el 15-jul
+  (>=14 días de spin-up). Un DC bajo deprime las dos por igual y la métrica
+  es el orden dentro de cada día, donde un desplazamiento común se cancela.
 
-· VIENTO. Producción, cuando tira de la API diaria, aproxima `viento_max` por
-  min(1,5×velmedia, racha). Aquí se usa el máximo horario real del colector,
+- Viento. Producción, cuando tira de la API diaria, aproxima `viento_max` por
+  min(1,5 x velmedia, racha). Aquí se usa el máximo horario real del colector,
   que es la definición del cubo y la que usa `serie_diaria_colector`. Es un
-  dato MEJOR que el de producción: si acaso, la favorece.
+  dato mejor que el de producción: si acaso, la favorece.
 
 Uso: python comparar_julio2026.py [--desde 2026-07-15] [--hasta 2026-07-27]
 """
@@ -90,10 +87,10 @@ FEATS_TEMP = {"t2m_max", "t2m_min", "t2m_max_med_7d"}
 
 
 def estaciones():
-    """La MISMA tabla que usa producción (`tiempo_real._estaciones`).
+    """La misma tabla que usa producción (`tiempo_real._estaciones`).
 
     Se lee el parquet directamente en vez de importar `tiempo_real`: ese
-    módulo arrastra el repo de entrenamiento entero, y de él sólo hace falta
+    módulo arrastra el repo de entrenamiento entero, y de él solo hace falta
     esta tabla."""
     return pd.read_parquet(
         f"{config.FUENTE}/prototipo/estaciones_prototipo.parquet") \
@@ -147,7 +144,7 @@ def features_aemet(S, fwi, est, ids, fechas, k, mes):
 
 
 def idw(est, ids, ok, ds, es_esp, k=8):
-    """Pesos IDW estaciones→celdas peninsulares, como `mapa_riesgo_hoy`."""
+    """Pesos IDW de estaciones a celdas peninsulares, como `mapa_riesgo_hoy`."""
     xs, ys = ds["x"].values, ds["y"].values
     gx, gy = np.meshgrid(xs, ys)
     cel = np.column_stack([gx[es_esp], gy[es_esp]])
@@ -186,7 +183,7 @@ def quemadas(dia, ds, es_esp, ruta=EFFIS):
     sel = sel.set_crs(4326, allow_override=True).to_crs(3035)
     xs, ys = ds["x"].values, ds["y"].values
     px, ay = xs[1] - xs[0], abs(ys[1] - ys[0])
-    # from_origin quiere la esquina NOROESTE y un paso vertical POSITIVO. En
+    # from_origin quiere la esquina noroeste y un paso vertical positivo. En
     # este cubo `y` va de norte a sur (paso -1000), así que el norte es ys[0];
     # pasarle el paso negativo devolvía una máscara vacía sin avisar.
     norte = max(ys[0], ys[-1]) + ay / 2
@@ -228,7 +225,7 @@ def main(a):
             S["viento_max"].values[:, j] * 3.6, S["prec"].values[:, j],
             meses)["fwi"]
 
-    # --- la rama malla, con el MISMO arranque del FWI (1-jul) --------------
+    # --- la rama malla, con el mismo arranque del FWI (1-jul) --------------
     print("  ERA5-Land en los nodos (arranque igualado el 1-jul)...", flush=True)
     n = np.load(config.NODOS)
     la, lo, idx_nodo = n["nodo_lat"], n["nodo_lon"], n["idx_nodo"]
@@ -390,8 +387,8 @@ def main(a):
         print(f"{nom:<14}{r['pctl_mediano']:>14.1f}{r['pctl_medio']:>13.1f}"
               f"{am:>12.3f}")
 
-    # BOOTSTRAP POR DÍAS, no por celdas. Las celdas de un mismo incendio no
-    # son independientes: remuestrearlas da un intervalo absurdamente estrecho
+    # Bootstrap por días, no por celdas. Las celdas de un mismo incendio no
+    # son independientes: remuestrearlas da un intervalo demasiado estrecho
     # (con estos datos, [+4,2, +5,3] en vez de [-2,1, +10,4]). La unidad de
     # muestreo real es el día, y son 17.
     rng = np.random.default_rng(0)

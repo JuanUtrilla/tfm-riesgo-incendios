@@ -2,27 +2,28 @@
 """
 Verificación del módulo 2: ¿está bien la agregación horaria → diaria de CDS?
 
-NO SOBRESCRIBE NADA. Solo imprime y escribe dataset/malla_02_verificacion.json.
+No sobrescribe nada. Solo imprime y escribe dataset/malla_02_verificacion.json.
 
-QUÉ COMPARA. El diario derivado de ERA5-Land horario (CDS) contra el diario que
+Qué compara: el diario derivado de ERA5-Land horario (CDS) contra el diario que
 sirve Open-Meteo, en los puntos de 250 estaciones AEMET y sobre el mismo
 periodo (1-may → 13-ago 2026).
 
-LO QUE DEBE SALIR, y es un test con dos filos:
+Lo que debe salir (el test tiene dos filos):
 
-· `tmax` y `hr_min` → DEBEN CUADRAR CASI EXACTO. Open-Meteo toma esas dos de
-  ERA5-Land, la misma fuente que CDS. Si no cuadran, el fallo es MÍO: o la
-  agregación max/min o la derivación de HR por Magnus desde el punto de rocío.
+· `tmax` y `hr_min` deben cuadrar casi exacto. Open-Meteo toma esas dos de
+  ERA5-Land, la misma fuente que CDS. Si no cuadran, el fallo está en este
+  script: o en la agregación max/min o en la derivación de HR por Magnus desde
+  el punto de rocío.
 
-· `prec` y `viento_max` → DEBEN SALIR MÁS BAJOS EN CDS. Open-Meteo los toma de
+· `prec` y `viento_max` deben salir más bajos en CDS. Open-Meteo los toma de
   ERA5 (31 km), no de ERA5-Land, y en §6 se midió que por eso llueve el doble
   que el cubo (1,38 vs 0,69 mm/día) y sopla de más (4,12 vs 3,63 m/s). Aquí CDS
   sirve ERA5-Land puro en las cuatro, que es justo el arreglo que §6 predijo.
   Si `prec` de CDS se acerca al 0,69 del cubo, la predicción se cumple.
 
-⚠️ El fallo que este test busca por encima de todo: si la regla del acumulado
-de `total_precipitation` fuera una suma de horarios en vez del acumulado
-diario, `prec` saldría ~24× más alta. Eso se vería aquí de inmediato.
+Ojo: el fallo que este test busca por encima de todo es el del acumulado. Si la
+regla de `total_precipitation` fuera una suma de horarios en vez del acumulado
+diario, `prec` saldría ~24× más alta, y eso se vería aquí de inmediato.
 
 Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_02_verificar.py
 """

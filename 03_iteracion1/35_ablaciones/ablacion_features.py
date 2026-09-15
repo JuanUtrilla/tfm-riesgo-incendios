@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Ablaciones del Modelo B — los dos experimentos que sostienen la discusión:
+Ablaciones del Modelo B: los dos experimentos que sostienen la discusión.
 
-1. FWI ABSOLUTO vs PERCENTIL LOCAL (la contribución del TFM, §7.1-N5: la
+1. FWI absoluto frente a percentil local (la contribución del TFM, §7.1-N5: la
    ablación en GBDT no está publicada). Tres variantes del modelo meteo:
-     M-abs   meteo con FWI absoluto, SIN percentil/anomalía local
-     M-pctl  meteo con percentil/anomalía local, SIN FWI absoluto ni ventanas FWI
+     M-abs   meteo con FWI absoluto, sin percentil/anomalía local
+     M-pctl  meteo con percentil/anomalía local, sin FWI absoluto ni ventanas FWI
      M-ambos meteo completo (absoluto + local)
 
-2. SOLO CALENDARIO (mes, dia_anio, es_festivo, ccaa): cuantifica cuánto del
-   rendimiento es estacionalidad pura — honestidad metodológica: si calendario
-   solo ya rinde mucho, parte del AUC del modelo completo no es "meteo".
+2. Solo calendario (mes, dia_anio, es_festivo, ccaa): cuantifica cuánto del
+   rendimiento es estacionalidad pura. Si el calendario solo ya rinde mucho,
+   parte del AUC del modelo completo no es "meteo" y conviene decirlo.
    (Precedente: AUC 0.737 con solo variables temporales, Fire 9(6):217.)
 
 Mismo protocolo que entrenar_modelo.py (split congelado, early stopping en val,
@@ -50,9 +50,10 @@ EXPERIMENTOS = {
 }
 
 # 3. Sesgo de muestreo en autorregresivas de 90d: el buffer de exclusión
-# (12,5 km × ±10 d) garantiza que los NEGATIVOS tengan 0 fuegos a <10 km en los
-# últimos 10 días, los positivos no → parte de la señal de n_fuegos_*_90d es la
-# regla de muestreo, no física. Se mide cuánto cae el modelo completo sin ellas.
+# (12,5 km × ±10 d) garantiza que los negativos tengan 0 fuegos a <10 km en los
+# últimos 10 días, y los positivos no, así que parte de la señal de
+# n_fuegos_*_90d es la regla de muestreo y no física. Se mide cuánto cae el
+# modelo completo sin ellas.
 FEATS_90D_SESGADAS = ["n_fuegos_1km_90d", "n_fuegos_10km_90d"]
 
 

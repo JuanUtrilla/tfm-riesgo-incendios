@@ -2,15 +2,13 @@
 """
 Módulo 2b, paso 2: el híbrido real. ¿Sirve para producción?
 
-NO TOCA PRODUCCIÓN. Escribe salida/prueba_hibrido.json.
+No toca producción. Escribe salida/prueba_hibrido.json.
 
-=============================================================================
-POR QUÉ HACE FALTA ESTE PASO
-=============================================================================
-El paso 1 (`malla_02b_prueba.py`) midió el IFS PURO contra la climatología de
+Por qué hace falta este paso
+El paso 1 (`malla_02b_prueba.py`) midió el IFS puro contra la climatología de
 ERA5-Land y salió 2,18 % de saturación, contra 0,23 % del reanálisis. El
 argumento del repo original era: "si el IFS puro sale aceptable, el híbrido lo
-será por construcción". Pero el IFS puro NO sale aceptable, así que ese
+será por construcción". Pero el IFS puro no sale aceptable, así que ese
 argumento no cierra y hay que medir el híbrido de verdad.
 
 Y el híbrido no es IFS puro. Producción sirve así:
@@ -23,14 +21,12 @@ El FWI es un integrador con memoria larga (DC ~52 días). En el híbrido casi
 todo el estado viene del reanálisis y el IFS solo empuja los últimos días. La
 pregunta es cuánto de los 2,18 % sobrevive a eso.
 
-=============================================================================
-CÓMO SE MIDE SIN REHACERLO TODO CADA DÍA
-=============================================================================
+Cómo se mide sin rehacerlo todo cada día
 Reconstruir el híbrido día a día parecía caro y por eso el repo original midió
 las dos cotas en vez del híbrido. No hace falta: el estado del FWI en D−L−1 es
-el MISMO para todos los días objetivo, porque esa rama es siempre reanálisis.
+el mismo para todos los días objetivo, porque esa rama es siempre reanálisis.
 
-Así que se corre el FWI sobre ERA5-Land UNA vez guardando (FFMC, DMC, DC) de
+Así que se corre el FWI sobre ERA5-Land una vez guardando (FFMC, DMC, DC) de
 cada día, y para cada día objetivo D se reanuda desde el estado de D−L−1 y se
 avanzan solo los L+1 días de previsión. De O(días²) a O(días·L).
 

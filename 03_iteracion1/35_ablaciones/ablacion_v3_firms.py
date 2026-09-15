@@ -1,38 +1,38 @@
 #!/usr/bin/env python3
 """
-v3 — Ablación que decide si merece la pena sustituir la autorregresiva EGIF
+v3: ablación que decide si merece la pena sustituir la autorregresiva EGIF
 caducada por su equivalente FIRMS.
 
-LA PREGUNTA MAL PLANTEADA
+La pregunta mal planteada
 "¿Rinde más el modelo con `n_fuegos_10km_mismomes_hist` (EGIF) o con las
-features FIRMS?" — medido sobre 2019/2020, gana el EGIF, porque en esos años el
-registro EGIF está completo. Pero ESE NO ES EL ESCENARIO DE PRODUCCIÓN.
+features FIRMS?". Medido sobre 2019/2020 gana el EGIF, porque en esos años el
+registro EGIF está completo. Pero ese no es el escenario de producción.
 
-LA PREGUNTA BIEN PLANTEADA
+La pregunta bien planteada
 En producción (2026) el EGIF está congelado en 2020: la feature no ve los
 incendios de 2021-2026 y se degrada un poco más cada año. Su rendimiento real
 está en algún punto entre "como en 2019" (si el pasado lejano bastara) y "como
 si no existiera" (si la información reciente fuera lo que aporta). Por tanto:
 
-  cota superior del daño = lo que se pierde al ELIMINAR la feature (variante B)
+  cota superior del daño = lo que se pierde al eliminar la feature (variante B)
 
 Y la decisión correcta es comparar esa cota con lo que cuesta el reemplazo:
 
   A  v2 completo (46 feats, EGIF)              ← lo que se mide hoy, no lo que se opera
-  B  v2 SIN la autorregresiva EGIF (45)        ← cota inferior de producción a futuro
+  B  v2 sin la autorregresiva EGIF (45)        ← cota inferior de producción a futuro
   C  v2 sin EGIF + FIRMS (49)                  ← el reemplazo no caducable
   D  v2 completo + FIRMS (50)                  ← ¿son complementarias?
 
 Si C ≳ B, el reemplazo recupera lo que el EGIF congelado acabará perdiendo y
-además nunca caduca → merece la pena para producción.
+nunca caduca: merece la pena para producción.
 Si C ≈ A, el reemplazo es gratis y la decisión es obvia.
 Si C < B, las features FIRMS no aportan y hay que quedarse con B (retirar la
 feature caducada sin más) o asumir A con la limitación documentada.
 
-Se reporta AUC-PR, AUC-ROC y AUC-PR NORMALIZADO. Este último es imprescindible
+Se reporta AUC-PR, AUC-ROC y AUC-PR normalizado. Este último es imprescindible
 aquí: la prevalencia del dataset varía por año (15,2% en 2018 … 37,0% en 2017,
 consecuencia de que las pseudo-ausencias se sortearon uniformemente dentro del
-SPLIT y no del año), y el suelo del AUC-PR es exactamente la prevalencia, así
+split y no del año), y el suelo del AUC-PR es exactamente la prevalencia, así
 que los AUC-PR de años distintos no son comparables entre sí en crudo.
 
     AUC-PR normalizado = (AP − prevalencia) / (1 − prevalencia)

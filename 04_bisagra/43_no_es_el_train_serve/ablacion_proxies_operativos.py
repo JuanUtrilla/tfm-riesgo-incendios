@@ -1,75 +1,70 @@
 #!/usr/bin/env python3
 """
-Ablación de los PROXIES OPERATIVOS — cuánto cuesta que producción no tenga
+Ablación de los proxies operativos: cuánto cuesta que producción no tenga
 los datos que el modelo vio al entrenar.
 
-NO SOBRESCRIBE NADA. Escribe solo `dataset/ablacion_proxies_operativos.json`.
+No sobrescribe nada. Escribe solo `dataset/ablacion_proxies_operativos.json`.
 
-=============================================================================
-LA PREGUNTA
-=============================================================================
+La pregunta
+
 El modelo se entrena con el cubo IberFire, donde NDVI, LAI, SWI010 y LST
 varían día a día y los rayos (WGLC) son reales. En producción (2026) nada de
 eso existe:
 
-  · satélite → climatología mensual congelada de la celda (MODELOS_Y_FEATURES §2a)
-  · rayos    → 0.0 fijo (WGLC acaba en 2023)
+  · satélite: climatología mensual congelada de la celda (MODELOS_Y_FEATURES §2a)
+  · rayos:    0.0 fijo (WGLC acaba en 2023)
 
-La validación operativa da AUC-ROC 0,64 frente al 0,923 del test 2020. Buena
+La evaluación operativa da AUC-ROC 0,64 frente al 0,923 del test 2020. Buena
 parte de ese hueco es definicional (prevalencia 1,1% vs 25% de diseño, etiqueta
 distinta, unidad estación±25 km vs celda de 1 km). Este script mide la parte
-que SÍ es degradación de datos, en el único sitio donde se puede medir: el
-entorno de entrenamiento, donde tenemos las dos versiones de cada feature.
+que sí es degradación de datos, en el único sitio donde se puede medir: el
+entorno de entrenamiento, donde están las dos versiones de cada feature.
 
-=============================================================================
-LAS DOS PREGUNTAS QUE HAY QUE SEPARAR (y que casi nadie separa)
-=============================================================================
-Congelar una feature en inferencia tiene DOS costes distintos:
+Las dos preguntas que hay que separar
 
-  (1) COSTE DE INFORMACIÓN — la feature deja de traer la anomalía diaria.
-      Inevitable: el dato no existe.
-  (2) COSTE DE DESAJUSTE   — el modelo aprendió a leer una distribución y en
-      inferencia le llega otra. EVITABLE: basta reentrenar con el proxy.
+Congelar una feature en inferencia tiene dos costes distintos:
+
+  (1) Coste de información: la feature deja de traer la anomalía diaria.
+      Inevitable, porque el dato no existe.
+  (2) Coste de desajuste: el modelo aprendió a leer una distribución y en
+      inferencia le llega otra. Evitable, basta reentrenar con el proxy.
 
 Producción hoy paga los dos: `xgb_v2` se entrenó con satélite real y en 2026
 se le sirve climatología. Por eso cada variante se corre en dos modos:
 
-  MISMATCH  — entrena con el dato real, evalúa con el proxy  → lo que pasa HOY
-  COHERENTE — entrena y evalúa con el proxy                  → lo que pasaría
-                                                                si se reentrena
+  mismatch   entrena con el dato real, evalúa con el proxy: lo que pasa hoy
+  coherente  entrena y evalúa con el proxy: lo que pasaría si se reentrena
 
-Si COHERENTE > MISMATCH, hay puntos de AUC tirados por no reentrenar, y eso es
+Si coherente > mismatch, hay puntos de AUC perdidos por no reentrenar, y eso es
 una recomendación accionable para la memoria, no una limitación a declarar.
 
-=============================================================================
-CÓMO SE CONSTRUYE LA CLIMATOLOGÍA (y por qué es un límite superior)
-=============================================================================
-Producción congela la media mensual DE LA CELDA (2020-24, precalculada del
+Cómo se construye la climatología (y por qué es un límite superior)
+
+Producción congela la media mensual de la celda (2020-24, precalculada del
 cubo). Aquí no se puede reproducir exactamente: el dataset es una muestra y la
-mediana de filas por (celda, mes) es 1 — la media de la celda sería el propio
-valor y la ablación no haría nada. Se aproxima agregando espacialmente:
+mediana de filas por (celda, mes) es 1, así que la media de la celda sería el
+propio valor y la ablación no haría nada. Se aproxima agregando espacialmente:
 
     (10 km, mes) → (25 km, mes) → (bloque 100 km, mes) → (mes)
 
 bajando de nivel solo si el grupo tiene <3 filas. Estimada con 2015-2019
-(train+val), NUNCA con 2020, para que el test siga siendo limpio.
+(train+val), nunca con 2020, para que el test siga siendo limpio.
 
-⚠️ Esta aproximación destruye MÁS información que producción: elimina la
-anomalía diaria e interanual (como producción) pero además difumina el detalle
+Ojo: esta aproximación destruye más información que producción: elimina la
+anomalía diaria e interanual (como producción) y difumina también el detalle
 espacial dentro de 10-25 km (producción lo conserva, es climatología por
-celda). Por tanto **el coste medido es un LÍMITE SUPERIOR** del coste real de
+celda). Por tanto el coste medido es un límite superior del coste real de
 congelar. Se acota por abajo con la variante SIN, que elimina la feature del
 todo: congelar no puede costar más que eliminar (en modo coherente).
 
-=============================================================================
-PROTOCOLO
-=============================================================================
+Protocolo
+
 El congelado de v1/v2/v3: train 2015-2018 · val 2019 (early stopping) · test
 2020. Mismas 46 features e hiperparámetros que el gemelo de protocolo cuyo
-número (0,9234 ROC / 0,8316 PR) figura en xgb_v3_metadata.json — la variante
+número (0,9234 ROC / 0,8316 PR) figura en xgb_v3_metadata.json; la variante
 CONTROL debe reproducirlo, y si no lo hace el resto no vale nada.
 
-IC95 por bootstrap agrupado por BLOQUE de 100 km, no por fila: dentro de un
+IC95 por bootstrap agrupado por bloque de 100 km, no por fila: dentro de un
 bloque las celdas comparten meteo, vegetación e historial de fuego, y
 remuestrear filas independientes fingiría una precisión que no hay.
 
@@ -94,7 +89,7 @@ RUTA_FEATS = DIR / "modelos" / "xgb_v2_prototipo_features.json"
 SALIDA = DIR / "dataset" / "ablacion_proxies_operativos.json"
 
 # Las que producción sirve como climatología mensual congelada. `ndvi_med_30d`
-# entra aquí porque ranking_diario.py le asigna el MISMO valor mensual que a
+# entra aquí porque ranking_diario.py le asigna el mismo valor mensual que a
 # `ndvi` (no una media de 30 días real): en producción son la misma columna.
 SATELITE = ["ndvi", "ndvi_med_30d", "lai", "swi010", "lst"]
 CLIM_ORIGEN = {"ndvi": "ndvi", "ndvi_med_30d": "ndvi",   # comparten proxy
@@ -120,7 +115,7 @@ def cargar():
 
 
 def climatologia(df, feats):
-    """Media mensual por vecindad espacial, estimada SIN el año de test.
+    """Media mensual por vecindad espacial, estimada sin el año de test.
 
     Devuelve un DataFrame con una columna por feature, alineado con `df`, y el
     reparto de filas por nivel de agregación usado (para poder declararlo)."""
@@ -186,7 +181,7 @@ def evaluar(y, p):
 
 
 def boot_delta(y, p_ref, p_var, bloques, rng):
-    """IC95 de AUC-ROC(variante) − AUC-ROC(control), remuestreando BLOQUES."""
+    """IC95 de AUC-ROC(variante) − AUC-ROC(control), remuestreando bloques."""
     ids = np.unique(bloques)
     idx_por_bloque = {b: np.where(bloques == b)[0] for b in ids}
     d = []

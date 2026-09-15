@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-EDA del dataset del Modelo B — SOLO sobre el split train (2015-2018), para que
+EDA del dataset del Modelo B, solo sobre el split train (2015-2018), para que
 ninguna decisión de diseño se tome mirando val/test (anti-leakage §7.4-V4).
 
 Entrada:  dataset/dataset_modelo_v1.parquet
-Salidas:  eda/eda_distribuciones.png   distribuciones por clase de las features clave
+Salidas:  eda/eda_distribuciones.png   distribuciones por clase de las features principales
           eda/eda_estacionalidad.png   positivos/negativos por mes + día del año
           eda/eda_normalizacion_local.png  el argumento FWI absoluto vs percentil local
           eda/eda_correlaciones.png    matriz de correlación (Spearman) de features
           stdout: estadísticos que van a la bitácora
 
-Gráfico clave para la memoria: eda_normalizacion_local — muestra que el FWI
+El gráfico que va a la memoria es eda_normalizacion_local: muestra que el FWI
 absoluto de los días de incendio varía mucho entre CCAA (Galicia arde con FWI
-bajo, Andalucía necesita FWI alto) pero el PERCENTIL local de los días de
+bajo, Andalucía necesita FWI alto) pero el percentil local de los días de
 incendio es alto en todas → justifica la feature fwi_pctl_local (§7.1-N5).
 """
 
@@ -62,7 +62,7 @@ def main():
     axes[1].set_xlabel("día del año"); axes[1].set_title("Positivos por día del año")
     fig.tight_layout(); fig.savefig(f"{DIR}/eda/eda_estacionalidad.png", dpi=130)
 
-    # --- 3. normalización local: EL gráfico de la memoria ---
+    # --- 3. normalización local: el gráfico de la memoria ---
     ccaa_top = pos["ccaa"].value_counts().head(8).index
     fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharey=False)
     datos_abs = [pos.loc[pos.ccaa == c, "fwi"].dropna() for c in ccaa_top]

@@ -1,39 +1,37 @@
 #!/usr/bin/env python3
 """
-Descarga ERA5-Land horario de 2026 para el EXPERIMENTO B.
+Descarga ERA5-Land horario de 2026 para el experimento B.
 
-NO SOBRESCRIBE NADA. Escribe solo en dataset/era5_2026/.
+No sobrescribe nada. Escribe solo en dataset/era5_2026/.
 
-=============================================================================
-PARA QUÉ
-=============================================================================
-La validación operativa da AUC-ROC 0,64 frente al 0,923 del test 2020. El
-experimento A (`ablacion_proxies_operativos.py`) ya descartó que la causa sea
-congelar el satélite o anular los rayos: eso vale −0,0045.
+Para qué
+--------
+La puntuación operativa sobre 2026 da AUC-ROC 0,64 frente al 0,923 del test
+2020. El experimento A (`ablacion_proxies_operativos.py`) ya descartó que la
+causa sea congelar el satélite o anular los rayos: eso vale −0,0045.
 
-Queda una hipótesis viva: **la meteo**. En entrenamiento las 20 features
+Queda una hipótesis viva: la meteo. En entrenamiento las 20 features
 meteorológicas salen de ERA5-Land (dentro del cubo IberFire, reescalado a
 1 km); en producción salen de estación AEMET y de forecast municipal. Son
 sensores distintos, definiciones distintas y resoluciones distintas.
 
-Este script baja la MISMA fuente que vio el modelo al entrenar, para los días
-de 2026 que ya están validados, y así poder puntuar el modelo tres veces sobre
+Este script baja la misma fuente que vio el modelo al entrenar, para los días
+de 2026 que ya están puntuados, y así poder evaluar el modelo tres veces sobre
 los mismos días y las mismas etiquetas:
 
     ERA5-Land (como en entrenamiento) → AEMET observada → AEMET forecast
 
-La diferencia entre el primero y los otros dos ES la degradación de datos,
+La diferencia entre el primero y los otros dos es la degradación de datos,
 aislada de todo lo demás (misma etiqueta, mismo modelo, mismas estáticas).
 
-=============================================================================
-DECISIONES QUE NO SON OBVIAS
-=============================================================================
-· `tp` (precipitación) es ACUMULADA desde las 00 UTC del día y se resetea a las
+Decisiones que no son obvias
+----------------------------
+· `tp` (precipitación) es acumulada desde las 00 UTC del día y se resetea a las
   01:00. Verificado empíricamente el 18/08/2026 en 42,7N 8,2W: el 15-may sube
   de 0,065 a 2,126 mm a lo largo del día, el valor de las 00:00 del 16-may
   sigue siendo 2,126, y a las 01:00 vuelve a 0. Por tanto:
       precipitación del día D = tp a las 00:00 del día D+1
-  De ahí que el rango baje un día MÁS del último evaluado.
+  De ahí que el rango baje un día más del último evaluado.
 
 · El rango empieza 80 días antes del primer día a evaluar: es el `DIAS_SPINUP`
   que usa ranking_diario.py para el arranque del FWI. Menos spinup daría un DC
@@ -63,7 +61,7 @@ SALIDA = DIR / "dataset" / "era5_2026"
 INICIO = pd.Timestamp("2026-04-12")
 FIN = pd.Timestamp("2026-08-14")
 
-AREA = [45, -10, 35, 5]          # N, W, S, E — Iberia peninsular
+AREA = [45, -10, 35, 5]          # N, W, S, E; Iberia peninsular
 VARIABLES = ["2m_temperature", "2m_dewpoint_temperature",
              "10m_u_component_of_wind", "10m_v_component_of_wind",
              "total_precipitation"]

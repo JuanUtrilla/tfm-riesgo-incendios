@@ -1,42 +1,40 @@
 #!/usr/bin/env python3
 """
-La malla contra los rankings SELLADOS del prototipo por estación, 24 días.
+La malla contra los rankings sellados del prototipo por estación, 24 días.
 
-NO TOCA PRODUCCIÓN. Escribe salida/rankings_effis.csv y .json.
+No toca producción. Escribe salida/rankings_effis.csv y .json.
 
-=============================================================================
-POR QUÉ ESTO EXISTÍA Y NO LO ESTABA USANDO
-=============================================================================
+Por qué existía esto y no se estaba usando
+------------------------------------------
 El proyecto hermano `aemet_horario_verano2026` lleva guardando su salida
 operativa diaria: `rankings/prevision_D0_<fecha>.csv`, 687 estaciones con su
 probabilidad, del 22-jul al 18-ago de 2026. Son 24 días de sistema real,
 sellados en su momento, que ya estaban en disco.
 
 Con el reanálisis llegando al 14-ago, se solapan 24 días. Eso dobla largamente
-los 17 días de julio que teníamos, sin esperar a que pase la temporada.
+los 17 días de julio que ya había, sin esperar a que pase la temporada.
 
-=============================================================================
-⚠️ ESTO NO ES UN CARA A CARA JUSTO. ES UNA COTA SUPERIOR.
-=============================================================================
-El ranking de cada día es una PREVISIÓN (`dias_forecast=1`, meteo prevista de
-AEMET). La malla que se compara aquí usa REANÁLISIS de ese mismo día, o sea
+Aviso: la comparación favorece a la malla; el resultado es una cota superior
+---------------------------------------------------------------------------
+El ranking de cada día es una previsión (`dias_forecast=1`, meteo prevista de
+AEMET). La malla que se compara aquí usa reanálisis de ese mismo día, o sea
 con la meteo ya observada. Tiene ventaja de retrovisor.
 
-Y no es una ventaja pequeña: medido en `malla_02b_hibrido.py`, servir con
+Y la ventaja no es pequeña: medido en `malla_02b_hibrido.py`, servir con
 previsión en vez de reanálisis dispara la saturación de 0,23 % a 2,05 %. La
 rama de previsión pesa.
 
-Así que lo de aquí se lee como COTA SUPERIOR de la malla, no como empate ni
+Así que lo de aquí se lee como cota superior de la malla, no como empate ni
 como victoria. Hacerlo justo exige reconstruir el híbrido (reanálisis hasta
-D−7 + IFS archivado) para los 24 días, y eso son ~22.400 unidades de
+D-7 + IFS archivado) para los 24 días, y eso son ~22.400 unidades de
 Open-Meteo contra 10.000 diarias: dos o tres días de cuota. Queda anotado.
 
-FIRMS sí se reconstruye bien: el API admite ventanas de 5 días terminadas en
-una fecha pasada, así que cada día lleva su [D−5, D−1] real. Sin eso la malla
-iría ciega a los incendios en curso y perdería por un motivo falso — que es
+FIRMS sí se reconstruye bien: la API admite ventanas de 5 días terminadas en
+una fecha pasada, así que cada día lleva su [D-5, D-1] real. Sin eso la malla
+iría ciega a los incendios en curso y perdería por un motivo falso, que es
 exactamente el error que se coló en la comparación del 20-ago.
 
-ETIQUETA. Estación positiva si hay superficie quemada de EFFIS a menos de
+Etiqueta: estación positiva si hay superficie quemada de EFFIS a menos de
 25 km ese día, el mismo criterio que usa la validación del proyecto hermano.
 
 Uso: python comparar_rankings.py
@@ -70,32 +68,32 @@ load_dotenv(f"{config.FUENTE}/.env")
 RANKINGS = ("/home/charredgem/Desktop/Master/aemet_horario_verano2026/"
             "rankings/prevision_D0_%s.csv")
 RADIO_KM = 25
-# días de la ventana FIRMS [D−n, D−1]. 7 = la del entrenamiento.
+# días de la ventana FIRMS [D-n, D-1]. 7 = la del entrenamiento.
 VENTANA_FIRMS = int(os.environ.get("TFM_FIRMS_DIAS", 7))
 
 
 def firms_dia(dia, ds):
-    """FIRMS [D−5, D−1] de una fecha PASADA, cacheado. Ventana de 5 días.
+    """FIRMS [D-5, D-1] de una fecha pasada, cacheado. Ventana de 5 días.
 
-    31/08/2026 — FUGA DE FUTURO CORREGIDA. La API de FIRMS interpreta
-    `/{rango}/{fecha}` como `rango` días HACIA ADELANTE desde `fecha`,
-    inclusive; no hacia atrás. Pasar D−1 devolvía [D−1, D+3]: el mapa del día D
+    31/08/2026, fuga de futuro corregida. La API de FIRMS interpreta
+    `/{rango}/{fecha}` como `rango` días hacia adelante desde `fecha`,
+    inclusive; no hacia atrás. Pasar D-1 devolvía [D-1, D+3]: el mapa del día D
     llevaba dentro los focos del propio incendio y de los tres días siguientes.
     Se veía en que `prod` no perdía acierto al alejarse del día del fuego
-    (63 %→62 % de incendios grandes de D−0 a D−2) mientras que `prod_sin_firms`
-    sí (31 %→18 %), y en que los 33 incendios de ≥500 ha tenían un foco FIRMS a
-    menos de 5 km en su ventana «pasada» (control aleatorio: 1,2 %).
-    Para obtener [D−5, D−1] hay que pedir como inicio D−5.
+    (63 % a 62 % de incendios grandes de D-0 a D-2) mientras que `prod_sin_firms`
+    sí (31 % a 18 %), y en que los 33 incendios de >=500 ha tenían un foco FIRMS
+    a menos de 5 km en su ventana «pasada» (control aleatorio: 1,2 %).
+    Para obtener [D-5, D-1] hay que pedir como inicio D-5.
 
-    31/08/2026 — DESAJUSTE TRAIN/SERVE. El modelo se ENTRENÓ con
-    `[D−7, D−1]` (`extraer_features_historia.py:117`, y de ahí el nombre
+    31/08/2026, desajuste train/serve. El modelo se entrenó con
+    `[D-7, D-1]` (`extraer_features_historia.py:117`, y de ahí el nombre
     `frp_max_50km_7d`), pero toda la tubería de servicio pedía 5 días. Como
     `n_detec_50km_7d` es un conteo, en producción llegaba ~29 % más bajo de lo
     que el modelo aprendió. `VENTANA_FIRMS` fija la ventana; el valor por
     defecto es 7 para que coincida con el entrenamiento. Se cachea en
     `_firms{n}/` para poder comparar las dos.
 
-    Producción NUNCA estuvo afectada: `riesgo_hoy.py` y el `firms_api.py` del
+    Producción nunca estuvo afectada: `riesgo_hoy.py` y el `firms_api.py` del
     repo hermano llaman sin fecha de inicio (`.../-10,35,5,44/5`), que son los
     5 últimos días hasta hoy. La fuga solo se materializó aquí porque la caché
     de junio y julio se descargó en agosto, cuando el futuro ya existía.
@@ -105,7 +103,7 @@ def firms_dia(dia, ds):
     os.makedirs(os.path.dirname(cache), exist_ok=True)
     if not os.path.exists(cache):
         import requests
-        # la API tope a 5 días por petición ("Invalid day range. Expects [1..5]"),
+        # la API topa a 5 días por petición ("Invalid day range. Expects [1..5]"),
         # así que una ventana de 7 se arma con dos llamadas consecutivas.
         trozos, ini = [], dia - pd.Timedelta(days=n)
         while ini < dia:

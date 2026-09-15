@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""F2 - Los tres disenios de muestreo sobre la misma rejilla celda x dia.
+"""F2 - Los tres diseños de muestreo sobre la misma rejilla celda x día.
 
-Esquema, no datos: reproduce la logica de
+Esquema sin datos: reproduce la lógica de
 `05_iteracion2/52_muestreo/dos_12_muestrear_effis.py:97-134`
 (negativos `cuando`, negativos `donde`, banco `eval_dia`).
-Rejilla 4 x 4 a proposito (pedido del 09/09/2026: pequenia y legible).
+Rejilla 4 x 4 a propósito (pedido del 09/09/2026: pequeña y legible).
 Uso:  python f2_disenios.py
 """
 import matplotlib.pyplot as plt
@@ -40,19 +40,19 @@ def main():
     fig, axes = plt.subplots(1, 3, figsize=(ANCHO * 0.8, 2.25))
     pos = {(PY_, PX): (BERMELLON, "+")}
 
-    # a) iteracion 1: la misma celda, otros dias (fila)
+    # a) iteración 1: la misma celda, otros días (fila)
     a = dict(pos)
     for ix in (0, 3):
         a[(PY_, ix)] = (AZUL, "−")
     rejilla(axes[0], a, "a) iteración 1\nmisma celda,\notros días")
 
-    # b) iteracion 2: otras celdas, el mismo dia (columna)
+    # b) iteración 2: otras celdas, el mismo día (columna)
     b = dict(pos)
     for iy in (0, 3):
         b[(iy, PX)] = (AZUL, "−")
     rejilla(axes[1], b, "b) iteración 2\notras celdas,\nel mismo día")
 
-    # c) lo que se pide en operacion: ordenar la columna entera
+    # c) lo que se pide en operación: ordenar la columna entera
     c = dict(pos)
     for iy in range(NY):
         if (iy, PX) not in c:

@@ -1,15 +1,15 @@
 """Descarga CAPE + precipitación convectiva + K-index diarios de ERA5 single levels.
 
 Proxy de "dry lightning" para el Modelo B (ver ESTADO_ARTE_ML_INCENDIOS.md y DATOS.md
-§features_extra/ → rayos). OJO: ERA5-Land NO tiene CAPE — se usa el dataset derivado
+§features_extra/ → rayos). Ojo: ERA5-Land no tiene CAPE; se usa el dataset derivado
 de estadísticas diarias de ERA5 single levels (0.25°, CC-BY), misma API cdsapi.
 
 Idempotente: un NetCDF por año y estadística en rayos_data/era5_cape/; si el fichero
-existe y pesa >100 KB se salta. Relanzar sin miedo.
+existe y pesa >100 KB se salta. Se puede relanzar las veces que haga falta.
 
 Uso: python descargar_cape_era5.py [cape|kindex|cp]
-Sin argumento procesa las 3 variables en secuencia; con argumento, solo esa —
-permite lanzar 3 procesos en paralelo (el CDS admite varias peticiones por usuario).
+Sin argumento procesa las 3 variables en secuencia; con argumento, solo esa, lo
+que permite lanzar 3 procesos en paralelo (el CDS admite varias peticiones por usuario).
 """
 import os
 import sys
@@ -24,7 +24,7 @@ DIR_SALIDA = Path(__file__).parent / "rayos_data" / "era5_cape"
 AREA = [44.5, -10.0, 35.5, 4.5]
 ANIOS = range(2010, 2026)
 
-# (clave, nombre_fichero, estadística diaria, variable) — una variable por petición:
+# (clave, nombre_fichero, estadística diaria, variable). Una variable por petición:
 # el CDS rechaza por coste las peticiones anuales multivariable en este dataset.
 PETICIONES = [
     ("cape", "cape_dailymax", "daily_maximum", "convective_available_potential_energy"),
@@ -36,7 +36,7 @@ PETICIONES = [
 def _retrieve_con_reintentos(cliente, dataset, request, destino, max_intentos=50):
     """El CDS a veces rechaza por límite temporal de peticiones en cola por
     usuario ('Number queued requests ... temporarily limited'). En vez de morir,
-    esperar y reintentar — la limitación suele levantarse en minutos."""
+    esperar y reintentar; la limitación suele levantarse en minutos."""
     for intento in range(1, max_intentos + 1):
         try:
             cliente.retrieve(dataset, request, destino)
@@ -55,8 +55,8 @@ def _retrieve_con_reintentos(cliente, dataset, request, destino, max_intentos=50
 def _limpiar_huerfanos():
     """Borra trabajos accepted/running de este dataset que quedaran encolados en
     el CDS por ejecuciones anteriores matadas (ocupan el cupo de cola de la
-    cuenta y hacen que TODA petición nueva sea rechazada — lección del
-    15/07/2026). OJO: no lanzar este script varias veces a la vez, la limpieza
+    cuenta y hacen que toda petición nueva sea rechazada; lección del
+    15/07/2026). Ojo: no lanzar este script varias veces a la vez, la limpieza
     de un proceso borraría los trabajos vivos del otro."""
     try:
         from ecmwf.datastores import Client as DSClient

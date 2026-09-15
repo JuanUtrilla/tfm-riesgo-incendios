@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Convierte seccion_ML_divulgativa.md en PDF (markdown + weasyprint; no hay pandoc).
-Las «Notas para el autor», separadas por una doble raya, van en pagina aparte."""
+Las «Notas para el autor», separadas por una doble raya, van en página aparte."""
 import pathlib
 import markdown
 from weasyprint import HTML

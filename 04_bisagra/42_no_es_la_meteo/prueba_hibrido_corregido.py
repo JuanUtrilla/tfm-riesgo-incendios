@@ -2,28 +2,28 @@
 """
 ¿Se salva el híbrido corrigiendo el viento del IFS? (§6ter, continuación)
 
-NO SOBRESCRIBE NADA. Escribe dataset/prueba_hibrido_corregido.json.
+No sobrescribe nada. Escribe dataset/prueba_hibrido_corregido.json.
 
-DE DÓNDE VIENE. El híbrido (ERA5 hasta D−6 + IFS los últimos días) satura el
+De dónde viene. El híbrido (ERA5 hasta D−6 + IFS los últimos días) satura el
 percentil al 2,2 %, contra el 0,8 % del reanálisis puro y el 0,2 % de
-referencia. El diagnóstico: los extremos del FWI no salen del DC (memoria ~52
-días, que aporta el reanálisis) sino del ISI, que depende del FFMC (~1 día) y
-es EXPONENCIAL en el viento. Y el viento del IFS va mal contra el cubo:
-r = 0,745 y +0,79 m/s de sesgo. La precipitación también (r = 0,748, +0,72 mm).
+referencia. El diagnóstico: los extremos del FWI salen del ISI, que depende del
+FFMC (~1 día) y es exponencial en el viento, y no del DC (memoria ~52 días, que
+aporta el reanálisis). Y el viento del IFS va mal contra el cubo: r = 0,745 y
++0,79 m/s de sesgo. La precipitación también (r = 0,748, +0,72 mm).
 
-LA CORRECCIÓN. Mapeo de cuantiles IFS → escala del cubo, por estación. Es
-monótono, luego conserva el orden —y por tanto la información— y solo reescala.
+La corrección. Mapeo de cuantiles IFS → escala del cubo, por estación. Es
+monótono, luego conserva el orden (y por tanto la información) y solo reescala.
 Es la misma técnica que usa `auditoria_train_serve.py`, allí para simular el
 desajuste y aquí para deshacerlo.
 
-SIN FUGA: la transformación se ajusta con los meses de 2024 fuera de jun-sep
+Sin fuga: la transformación se ajusta con los meses de 2024 fuera de jun-sep
 (feb-may y oct-dic; el archivo del IFS empieza el 2024-02-03, no hay 2023) y se
 evalúa sobre jun-sep 2024. En producción se ajustaría sobre el solape histórico
 con el cubo y se aplicaría en adelante.
 
-SALVEDAD: al no haber solape en temporada, la calibración es FUERA DE
-TEMPORADA. La distribución del viento en invierno no es la del verano, así que
-esto es una cota INFERIOR de lo que daría un mapeo calibrado en jun-sep de
+Salvedad: al no haber solape en temporada, la calibración es fuera de
+temporada. La distribución del viento en invierno no es la del verano, así que
+esto es una cota inferior de lo que daría un mapeo calibrado en jun-sep de
 otros años.
 
 Escenarios, todos con L=6 (el retraso real de ERA5-Land):
@@ -49,7 +49,8 @@ Q = np.linspace(0, 1, 201)          # rejilla de cuantiles para el mapeo
 
 
 def ajusta_qm(src, ref, m_fit):
-    """Mapeo de cuantiles por estación, ajustado solo con m_fit (2023)."""
+    """Mapeo de cuantiles por estación, ajustado solo con los días de m_fit
+    (2024 fuera de temporada)."""
     out = src.copy()
     for j in range(src.shape[1]):
         a, b = src[m_fit, j], ref[m_fit, j]
@@ -67,9 +68,9 @@ def main():
     fechas = pd.date_range(SPIN, FIN, freq="D")
     meses = fechas.month.values
     # El archivo del IFS empieza el 2024-02-03: 2023 está vacío. Se calibra
-    # con los meses de 2024 FUERA de la ventana de evaluación (feb-may y
+    # con los meses de 2024 fuera de la ventana de evaluación (feb-may y
     # oct-dic) y se evalúa en jun-sep. No hay fuga, pero sí una salvedad que
-    # hay que declarar: la calibración es FUERA DE TEMPORADA, y la
+    # hay que declarar: la calibración es fuera de temporada, y la
     # distribución del viento de invierno no es la del verano.
     m_fit = np.asarray((fechas.year == 2024)
                        & ~((fechas.month >= EVAL[0]) & (fechas.month <= EVAL[1])))

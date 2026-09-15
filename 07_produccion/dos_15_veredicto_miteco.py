@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-Veredicto RÁPIDO: los mapas de cada día juzgados con el parte de MITECO del
+Veredicto rápido: los mapas de cada día puntuados con el parte de MITECO del
 día siguiente. Cierra el bucle en 24 h (EFFIS tarda 6-9 días).
 
-NO TOCA PRODUCCIÓN ni TFM-RAG. Descarga el parte a salida/miteco/, lee los
-históricos de TFM-RAG en solo lectura, reutiliza su parser y el geocodificador
-de `validar_miteco.py` del repo original (importados, no copiados). Escribe
-salida/veredicto_miteco.csv y salida/veredicto_miteco.json.
+Seguimiento diario de la temporada 2026; la validación del trabajo es el
+replay de 2025-2026. No toca producción ni TFM-RAG. Descarga el parte a
+salida/miteco/, lee los históricos de TFM-RAG en solo lectura, reutiliza su
+parser y el geocodificador de `validar_miteco.py` del repo original
+(importados, no copiados). Escribe salida/veredicto_miteco.csv y
+salida/veredicto_miteco.json. El CSV de incidentes recientes que deja en
+salida/ lo usa `capa_verdad` para pintar el mapa de mañana.
 
-=============================================================================
-CÓMO (ver ESTUDIO_MITECO_DIARIO.md para las medidas que lo justifican)
-=============================================================================
+Cómo (ver ESTUDIO_MITECO_DIARIO.md para las medidas que lo justifican)
+----------------------------------------------------------------------
 · El "Parte Definitivo de Intervenciones (día previo)" del día D se publica
   el D+1 hacia las 13-15 h. Se descarga y, si su fecha es nueva, se guarda.
 · Incidente = primera aparición de su `incident_key` (el 97 % no trae fecha
@@ -19,13 +21,13 @@ CÓMO (ver ESTUDIO_MITECO_DIARIO.md para las medidas que lo justifican)
 · Mapas del día D: producción (caché del prototipo), malla (`riesgo_hoy`),
   único y pareja (`dos_riesgo_hoy`). Solo el último mapa guardado para esa
   fecha (la pasada D0 pisa la D+1 de la víspera: es lo que se publicó
-  para HOY esa mañana).
+  para ese día esa mañana).
 · Métricas por día: AUC (celdas del incidente contra el resto de España),
   percentil mediano, y si el incidente cae en ALTO/EXTREMO (≥p90).
 · Se reescriben los últimos 10 días (por si llega un parte tardío) y se
   recalcula el acumulado con bootstrap por días.
 
-~4 incidentes/día: un día no decide nada; semanas sí.
+Unos 4 incidentes/día: un día no decide nada; semanas sí.
 """
 
 import glob
@@ -58,8 +60,8 @@ PAGINA = ("https://www.miteco.gob.es/es/biodiversidad/temas/"
 
 
 def descargar():
-    """El parte de hoy (datos de ayer). Misma página y mismo criterio de
-    enlace que el downloader de TFM-RAG, pero con regex en vez de bs4 (el
+    """Descarga el parte de hoy (datos de ayer). Misma página y mismo criterio
+    de enlace que el descargador de TFM-RAG, pero con regex en vez de bs4 (el
     entorno tfm_fuego no lo tiene); la fecha del parte la saca su parser."""
     import re
     import unicodedata
@@ -104,7 +106,7 @@ def descargar():
 
 
 def incidentes():
-    """Primera aparición de cada incidente, geocodificada."""
+    """Devuelve la primera aparición de cada incidente, geocodificada."""
     if os.path.isdir(RAG):
         sys.path.insert(0, f"{RAG}/src")
         from miteco_rag.parseo_y_chuncking import parse_miteco_pdf
@@ -182,7 +184,7 @@ def main():
     desde = hoy - pd.Timedelta(days=args.ventana)
     # los incidentes recientes, geocodificados, para que `capa_verdad` los
     # pinte en el mapa de mañana sin volver a parsear los PDF (que es lo caro
-    # de este script). El mapa se dibuja ANTES que este paso en la cadena, así
+    # de este script). El mapa se dibuja antes que este paso en la cadena, así
     # que usa siempre el parte de la corrida anterior: es el último publicado.
     rec = inc[inc.fecha >= hoy - pd.Timedelta(days=15)]
     rec[["fecha", "lat", "lon", "localizacion", "provincia", "n_medios"]] \

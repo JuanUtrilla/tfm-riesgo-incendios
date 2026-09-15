@@ -1,44 +1,42 @@
 #!/usr/bin/env python3
 """
-Pipeline de malla — módulo 2: descarga de ERA5-Land desde CDS.
+Pipeline de malla, módulo 2: descarga de ERA5-Land desde CDS.
 
-NO TOCA PRODUCCIÓN. Escribe en `malla_data/`.
+No toca producción. Escribe en `malla_data/`.
 
-=============================================================================
-POR QUÉ CDS Y NO OPEN-METEO (medido el 19/08/2026)
-=============================================================================
+Por qué CDS y no Open-Meteo (medido el 19/08/2026)
+--------------------------------------------------
 La primera versión de este módulo tiraba de Open-Meteo. No da la cuota:
 su coste es nº de nodos × tramos de 14 días, o sea 250 × 8 = 2.000 unidades
 por lote y ~46.000 para la serie completa, contra un límite gratuito de 10.000
 al día. Reventaba la cuota por 4-5× solo con el reanálisis, y habría que
-pagarlo CADA día en un cron. No es una limitación cosmética: es bloqueante.
+pagarlo cada día en un cron. Es una limitación bloqueante.
 
-CDS además simplifica el diseño. Devuelve una CAJA lat/lon en la malla nativa
-de 0,1°, no 5.605 consultas puntuales: se indexa igual que el cubo. El mapeo
-celda→nodo del módulo 1 pasa a ser celda→(iy,ix) de este NetCDF.
+CDS simplifica el diseño. Devuelve una caja lat/lon en la malla nativa
+de 0,1°, en vez de 5.605 consultas puntuales: se indexa igual que el cubo. El
+mapeo celda→nodo del módulo 1 pasa a ser celda→(iy,ix) de este NetCDF.
 
-CDS NO sirve para la previsión: encola las peticiones y no es de baja
+CDS no sirve para la previsión: encola las peticiones y no es de baja
 latencia. Para el historial da igual (ERA5-Land lleva ~6 días de retraso de
-todas formas), pero D y D+1 tendrán que venir del open data del ECMWF —
-módulo 2b.
+todas formas), pero D y D+1 tendrán que venir del open data del ECMWF
+(módulo 2b).
 
-=============================================================================
-AGREGACIÓN HORARIA → DIARIA, Y EL AVISO DE LA PRECIPITACIÓN
-=============================================================================
-CDS sirve ERA5-Land HORARIO; el modelo necesita diario. Las reglas replican
+Agregación horaria → diaria, y el aviso de la precipitación
+-----------------------------------------------------------
+CDS sirve ERA5-Land horario; el modelo necesita diario. Las reglas replican
 las del cubo:
 
     tmax, tmin   max/min de 2m_temperature
     hr_min       min de la HR horaria, derivada de T y punto de rocío (Magnus)
-    viento_max   max de sqrt(u²+v²) a 10 m  (máx. de MEDIAS horarias, NO racha:
+    viento_max   max de sqrt(u²+v²) a 10 m  (máx. de medias horarias, no racha:
                  el FWI explota con rachas, ISI ~ exp(0,05·v))
     prec         total diario de total_precipitation
 
-⚠️ `total_precipitation` de ERA5-Land es ACUMULADO desde las 00 UTC y se
-reinicia cada día. El total del día NO es la suma de los horarios —eso lo
-multiplicaría por ~24— sino el valor de las 00:00 del día SIGUIENTE. Aquí se
+Ojo: `total_precipitation` de ERA5-Land es acumulado desde las 00 UTC y se
+reinicia cada día. El total del día no es la suma de los horarios (eso lo
+multiplicaría por ~24) sino el valor de las 00:00 del día siguiente. Aquí se
 resuelve desplazando el sello temporal una hora hacia atrás antes de agrupar
-por día y tomando el máximo del acumulado. Este es EXACTAMENTE el error que
+por día y tomando el máximo del acumulado. Este es exactamente el error que
 produciría un sesgo frío del FWI como el diagnosticado en §6.
 
 El módulo trae `--verificar`, que contrasta lo agregado contra los diarios de
@@ -122,7 +120,7 @@ def a_diario(ds):
         "viento_max": v.groupby(dia).max("valid_time"),
     })
     # precipitación: acumulada desde las 00 UTC y con reinicio diario. El total
-    # del día es el acumulado máximo, y las 00:00 pertenecen al día ANTERIOR.
+    # del día es el acumulado máximo, y las 00:00 pertenecen al día anterior.
     tp = ds["tp"] * 1000.0                                    # m → mm
     dia_p = (tp["valid_time"] - pd.Timedelta(hours=1)).dt.floor("D")
     out["prec"] = tp.groupby(dia_p).max("valid_time")

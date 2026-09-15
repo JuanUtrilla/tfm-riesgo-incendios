@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Mapa nacional de riesgo HOY (D0) y MAÑANA (D1) — job de GitHub Actions (TFM).
+Mapa nacional de riesgo de hoy (D0) y mañana (D1), job de GitHub Actions (TFM).
 
-Port autocontenido de TFM_fuego/mapa_riesgo_hoy.py: NO necesita el cubo
+Port autocontenido de TFM_fuego/mapa_riesgo_hoy.py: no necesita el cubo
 IberFire (29 GB). Las capas del cubo que el modelo usa por celda están
 congeladas en `modelo/malla/` (ver TFM_fuego/exportar_malla_gh.py):
 estáticas (elevación, CLC, población...), climatología mensual 2020-24 de
@@ -12,17 +12,17 @@ meteo, y esa sale de las estaciones AEMET:
 1. Serie diaria de todas las estaciones (ranking_diario.serie_diaria_todas:
    API climatologías + colector horario del repo, spin-up FWI 80 días).
 2. Para D0/D1: predicción municipal AEMET por estación (1 fetch por municipio,
-   throttled ~40 req/min, reintentos con espera si 429) y el FWI se PROPAGA
+   throttled ~40 req/min, reintentos con espera si 429) y el FWI se propaga
    desde lo observado con la meteo prevista (diseño MODELO_B_BITACORA §19).
-3. Features por estación → prob por estación (se archivan en
+3. Features por estación y prob por estación (se archivan en
    `rankings/prevision_D{0,1}_<fecha>.csv`: el commit sella la predicción).
 4. Las 19 features meteo se interpolan a la malla de 1 km (IDW k=8 en
    EPSG:3035, corrección de altitud −6,5 °C/km en temperaturas; vpd_max se
-   recalcula) + capas congeladas + FIRMS NRT + calendario → XGBoost →
-   `mapas/mapa_D0.jpg` y `mapas/mapa_D1.jpg` + tabla top-20 en el README.
+   recalcula) + capas congeladas + FIRMS NRT + calendario; con eso XGBoost
+   produce `mapas/mapa_D0.jpg` y `mapas/mapa_D1.jpg` y la tabla top-20 del README.
 
-CAVEAT (memoria): la resolución EFECTIVA de la meteo es la densidad de la red
-(~30-50 km); el 1 km lo aportan estáticas y vegetación.
+Limitación (para la memoria): la resolución efectiva de la meteo es la densidad
+de la red (~30-50 km); el 1 km lo aportan estáticas y vegetación.
 
 Uso: python3 mapa_diario.py   (necesita AEMET_API_KEY; FIRMS_MAP_KEY opcional)
 """
@@ -60,7 +60,7 @@ FEATS_TEMP = {"t2m_max", "t2m_min", "t2m_max_med_7d"}   # corrección de altitud
 def capa_base(ax, nx, ny, capitales=True):
     """Dibuja límites de CCAA y provincias (solo la línea, sin topónimos de
     región) y las capitales de provincia, desde `modelo/malla/limites.npz`
-    (congelado, ver exportar_limites.py). Las líneas van ENCIMA del raster
+    (congelado, ver exportar_limites.py). Las líneas van encima del raster
     porque un imshow opaco las taparía, pero con trazo fino y gris para que
     lean como fondo. Si el .npz no está, el mapa sale igual que antes."""
     import matplotlib.patheffects as pe
@@ -93,8 +93,8 @@ def capa_base(ax, nx, ny, capitales=True):
 def firms_detecciones():
     """Detecciones FIRMS NRT [D-5, D-1] sobre Iberia (excluye hoy). Vacío solo
     si no hay key (uso local); si la API falla, `descargar` levanta FirmsCaido
-    en vez de devolver 0 detecciones — con las features de fuego a cero el
-    mapa saldría igual pero mal, y además se perdería la verificación del día
+    en vez de devolver 0 detecciones; con las features de fuego a cero el
+    mapa saldría igual pero mal, y se perdería la verificación del día
     (`verificar_prevision` no distingue 'sin focos' de 'sin datos')."""
     key = os.environ.get("FIRMS_MAP_KEY")
     if not key:
@@ -107,10 +107,10 @@ def firms_detecciones():
 # ------------------------------------------------- forecast municipal AEMET
 
 def forecast_municipio(cod):
-    """Predicción diaria AEMET del municipio → filas futuras (tmax, tmin,
+    """Predicción diaria AEMET del municipio, como filas futuras (tmax, tmin,
     hr_min, viento_max m/s, prec). Precipitación prevista: la predicción da
-    PROBABILIDAD, no cantidad → 0 si prob<60%, 2 mm si ≥60% (conservador
-    hacia el riesgo; documentado). None si la API no responde."""
+    probabilidad y no cantidad, así que 0 si prob<60% y 2 mm si ≥60%
+    (conservador hacia el riesgo; documentado). None si la API no responde."""
     key = os.environ["AEMET_API_KEY"]
     d = None
     for intento in range(3):
@@ -155,8 +155,8 @@ def forecast_municipio(cod):
 
 
 def forecast_openmeteo(pend):
-    """Fallback en BLOQUE cuando el presupuesto AEMET se agota (los runners de
-    GitHub sufren 429 masivos de AEMET — medido 22/07: ~5× más lento que en
+    """Fallback en bloque cuando el presupuesto AEMET se agota (los runners de
+    GitHub sufren 429 masivos de AEMET; medido el 22/07: ~5× más lento que en
     local). Open-Meteo: gratuito, sin key, ~100 estaciones por petición.
     pend: DataFrame con idema/lat/lon. Devuelve {idema: DataFrame de filas}."""
     out = {}
@@ -178,7 +178,7 @@ def forecast_openmeteo(pend):
                     timeout=60)
                 d = r.json() if r.ok else None
                 # un lote de 100 ubicaciones cuenta como ~100 llamadas del
-                # límite por minuto (~600/min) → backoff largo si rechaza
+                # límite por minuto (~600/min), de ahí el backoff largo si rechaza
                 if d is not None and not (isinstance(d, dict) and d.get("error")):
                     datos = d
                     break
@@ -257,8 +257,8 @@ def evaluar_estaciones(objetivos, est):
     """Features por estación para cada fecha objetivo (con forecast si la
     fecha va más allá de lo observado). Forecast en dos niveles: AEMET
     municipal (primario, 1 fetch/municipio) hasta agotar un presupuesto de
-    tiempo (PRESUPUESTO_AEMET_S, def. 35 min — en runners de GitHub los 429
-    de AEMET son masivos y sin tope el job muere por timeout, medido 22/07),
+    tiempo (PRESUPUESTO_AEMET_S, def. 35 min; en runners de GitHub los 429
+    de AEMET son masivos y sin tope el job muere por timeout, medido el 22/07),
     y Open-Meteo en bloque para las estaciones restantes.
     Devuelve {objetivo: DataFrame} con features + idema/nombre/lat/lon."""
     import hashlib
@@ -284,7 +284,7 @@ def evaluar_estaciones(objetivos, est):
         series[idema] = (s, s.loc[int(comp[-1]), "fecha"])
 
     # --- fase 2: forecasts. Orden por hash del idema: estable entre días pero
-    # geográficamente mezclado (los idema van por provincias — si el
+    # geográficamente mezclado (los idema van por provincias; si el
     # presupuesto corta, la cobertura AEMET sigue siendo nacional)
     necesitan = sorted(
         (i for i, (s, ult) in series.items() if ult < fin and i in muni.index),
@@ -398,9 +398,9 @@ def generar_mapa(obj, rk, estat, det, modelo, feats, salida,
                  det_overlay=None, etiqueta_focos="ayer"):
     """Interpola la meteo de rk a la malla, predice y guarda el JPG.
     det alimenta las features FIRMS de la malla (ventana D-5…D-1);
-    det_overlay (si se da) es lo que se DIBUJA encima — permite pintar los
+    det_overlay (si se da) es lo que se dibuja encima; permite pintar los
     focos del propio día evaluado en mapas retrospectivos sin contaminar
-    las features (mostrar ≠ alimentar)."""
+    las features (mostrar no es alimentar)."""
     from scipy.spatial import cKDTree
     es_esp = estat["is_spain"]
     xs, ys = estat["x"], estat["y"]
@@ -423,7 +423,7 @@ def generar_mapa(obj, rk, estat, det, modelo, feats, salida,
     F = {k: v for k, v in estat.items() if k not in ("is_spain", "x", "y")}
     z_est = rk["elevacion"].values
     for c in FEATS_IDW:
-        if c in FEATS_TEMP:  # a nivel del mar → interpolar → devolver a la altitud
+        if c in FEATS_TEMP:  # se baja al nivel del mar, se interpola y se devuelve a la altitud
             F[c] = interpolar(rk[c].values + GAMMA * z_est) - GAMMA * F["elevacion"]
         else:
             F[c] = interpolar(rk[c].values)
@@ -481,7 +481,7 @@ def generar_mapa(obj, rk, estat, det, modelo, feats, salida,
                label=f"estaciones AEMET (n={len(rk)}) — de ellas sale la "
                      f"meteo interpolada")
     capa_base(ax, nx, ny)
-    # capa visual de verdad-terreno (NUNCA feature del día evaluado): focos
+    # capa visual de verdad-terreno (nunca feature del día evaluado): focos
     # térmicos FIRMS de los últimos 5 días, el más reciente destacado
     det = det if det_overlay is None else det_overlay
     if len(det):
@@ -529,14 +529,16 @@ def generar_mapa(obj, rk, estat, det, modelo, feats, salida,
     return resumen
 
 
-# -------------------------------------------- verificación predicción→real
+# -------------------------------------------- verificación predicción frente a real
 
 def verificar_prevision(det, fecha, ruta_csv):
-    """Contrasta una previsión SELLADA (CSV commiteado antes de que ocurriera)
+    """Contrasta una previsión sellada (CSV commiteado antes de que ocurriera)
     con los focos FIRMS del día `fecha`. Cada foco se empareja con su estación
-    más cercana (≤35 km, como la validación del TFM). Métrica clave: lift =
-    (% de focos en zonas previstas ALTO/EXTREMO) / (% de estaciones en
-    ALTO/EXTREMO) — cuánto mejor que el azar señaló el modelo dónde ardería.
+    más cercana (≤35 km, el mismo criterio que en la validación del TFM). La
+    métrica principal es el lift = (% de focos en zonas previstas ALTO/EXTREMO)
+    / (% de estaciones en ALTO/EXTREMO), es decir, cuánto mejor que el azar
+    señaló el modelo dónde ardería. Es seguimiento en operación; la validación
+    del trabajo es el replay de 2025-2026.
     Devuelve dict de métricas o None si no hay previsión/datos."""
     if not ruta_csv.exists() or not len(det):
         return None
@@ -674,9 +676,9 @@ def main():
         if h == 0:
             tabla_readme(rk, obj)
 
-    # verificación de AYER: lo que el modelo dijo (CSV sellado por commit)
+    # verificación de ayer: lo que el modelo dijo (CSV sellado por commit)
     # frente a los focos FIRMS que realmente hubo. D0 = dicho ayer por la
-    # mañana; D1 = dicho ANTEAYER para ayer (forecast puro).
+    # mañana; D1 = dicho anteayer para ayer (forecast puro).
     ayer = hoy - pd.Timedelta(days=1)
     vers = []
     for tipo in ["D0", "D1"]:

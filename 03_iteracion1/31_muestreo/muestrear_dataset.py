@@ -8,16 +8,16 @@ rellena con features extraídas del datacubo IberFire y de las fuentes propias.
 Diseño congelado (PROXIMOS_PASOS.md §⭐ Fase 2 + ESTADO_ARTE_ML_INCENDIOS.md §7.3):
 - Positivos: incendios EGIF con coordenadas, asignados a su celda 1 km de
   IberFire (EPSG:3035), deduplicados por (celda, fecha).
-- SOLO años 2015-2020: el EGIF de Civio está incompleto a partir de 2021 por
+- Solo años 2015-2020: el EGIF de Civio está incompleto a partir de 2021 por
   el lag de consolidación del registro oficial (2021: 888, 2022: 226, 2023: 23
-  incendios — 2022 fue en realidad el peor año según GWIS). Incluir esos años
+  incendios; 2022 fue en realidad el peor año según GWIS). Incluir esos años
   contaminaría tanto los positivos (faltan) como los negativos (días de fuego
   real sin registrar pasarían por pseudo-ausencias).
 - Pseudo-ausencias 1:3: misma celda que un positivo, día aleatorio sin fuego
   dentro de los años del mismo split (así región y susceptibilidad quedan
-  emparejadas y el modelo discrimina el CUÁNDO; la fecha uniforme deja que el
-  modelo aprenda la estacionalidad — señal deseada según la literatura).
-- Buffer de exclusión: un día NO puede ser negativo si hay un incendio EGIF a
+  emparejadas y el modelo discrimina el cuándo; la fecha uniforme deja que el
+  modelo aprenda la estacionalidad, señal deseada según la literatura).
+- Buffer de exclusión: un día no puede ser negativo si hay un incendio EGIF a
   <12,5 km en ±10 días (mismo criterio que `is_near_fire` de IberFire: caja
   25x25 celdas x 10 días).
 - Split temporal congelado: train 2015-2018 / val 2019 / test 2020.

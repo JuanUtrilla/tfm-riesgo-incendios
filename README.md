@@ -1,10 +1,11 @@
 # Predicción diaria de riesgo de incendio forestal en España
 
-Este repositorio contiene el módulo de aprendizaje automático del TFM: la
-ingesta y el tratamiento de los datos, el primer modelo y su puesta en
-producción, el diagnóstico de por qué su acierto de laboratorio no se
-trasladaba a la operación, el rediseño, la evaluación sobre dos temporadas
-completas y la cadena que publica cada mañana el mapa del día.
+Este repositorio contiene el módulo de aprendizaje automático de un Trabajo
+Fin de Máster (TFM). Recoge la ingesta y el tratamiento de los datos, el
+primer modelo y su puesta en producción, y el diagnóstico de por qué su acierto
+de laboratorio no se trasladaba a la operación. Recoge también el rediseño, la
+evaluación sobre dos temporadas completas y la cadena que publica cada mañana
+el mapa del día.
 
 ## Los mapas de hoy y mañana
 
@@ -14,37 +15,41 @@ completas y la cadena que publica cada mañana el mapa del día.
 
 Se generan cada madrugada en GitHub Actions (`.github/workflows/mapa_diario.yml`,
 hacia las 03:03 en verano y las 02:02 en invierno, hora de Madrid). Hay una
-imagen para hoy y otra para mañana. En cada una, a la izquierda, el modelo
-elegido (r10) en escala absoluta, que indica cuánto riesgo hay, con la cifra del
-día: el porcentaje de España en nivel EXTREMO y su posición entre los días de
-referencia. A la derecha, el mismo modelo por percentil del día, que indica
-dónde mirar. Los veinte últimos días quedan en `publicado/`, y de cada uno hay
-además una versión verificada (`verificado_<fecha>.png`): el mismo mapa con
-los perímetros de EFFIS y los incidentes del parte del MITECO de ese día
-encima, dibujada días después, cuando esa verdad ya se conoce
-(`07_produccion/README.md`).
+imagen para hoy y otra para mañana. En cada una, a la izquierda, está el modelo
+elegido (r10) en escala absoluta, que indica cuánto riesgo hay. Lleva la cifra
+del día: el porcentaje de España en nivel EXTREMO y su posición entre los días
+de referencia. A la derecha está el mismo modelo por percentil del día, que
+indica dónde mirar. Los veinte últimos días quedan en `publicado/`. De cada uno
+hay también una versión verificada (`verificado_<fecha>.png`). Es el mismo mapa
+con los perímetros de EFFIS y los incidentes del parte del MITECO de ese día
+encima, dibujado días después, cuando esos datos ya están publicados
+(`07_produccion/README.md`). EFFIS es el *European Forest Fire Information
+System* y el MITECO, el Ministerio para la Transición Ecológica y el Reto
+Demográfico.
 
 ## El resultado en un párrafo
 
-El primer modelo alcanzó un AUC de 0.89 en su conjunto de test. Servido a diario
-y medido contra la superficie quemada real, dio entre 0.57 y 0.64. La
-diferencia no era sobreajuste ni un cambio de fuente meteorológica: el muestreo
-y la etiqueta de entrenamiento definían la pregunta «¿es hoy un día peligroso
-en esta celda?», y en operación se le hacía otra, «¿cuál de las 498,530 celdas
+El primer modelo alcanzó un AUC (*Area Under the ROC Curve*) de 0.89 en su
+conjunto de test. Servido a diario y medido contra la superficie quemada real,
+dio entre 0.57 y 0.64. Se descartaron el sobreajuste y el cambio de fuente
+meteorológica como causas. La diferencia estaba en el muestreo y en la
+etiqueta de entrenamiento, que definían la pregunta «¿es hoy un día peligroso
+en esta celda?». En operación se le hacía otra: «¿cuál de las 498,530 celdas
 arde hoy?». Con el conjunto de entrenamiento rediseñado para esa segunda
-pregunta se entrenó un segundo modelo. Reproducidas día a día las temporadas de
-2025 y 2026 con la previsión disponible cada víspera (250 días, protocolo
-escrito antes de ejecutar), el modelo único con etiqueta EFFIS y diez negativos
-por positivo (r10) pasa de 0.743 a 0.807 en 2025 (Δ +0.064, IC95 [+0.027,
-+0.101]) y de 0.658 a 0.762 en 2026 (Δ +0.104, IC95 [+0.065, +0.144]). Gana dos
-de cada tres días, y predecir a un día vista cuesta lo mismo que conocer el
-tiempo real (Δ −0.003, IC que cruza el cero).
+pregunta se entrenó un segundo modelo. Se reprodujeron día a día las temporadas
+de 2025 y 2026 con la previsión disponible cada víspera (250 días, con el
+protocolo escrito antes de ejecutar). El modelo único con etiqueta EFFIS y diez
+negativos por positivo (r10) pasó de 0.743 a 0.807 en 2025 (Δ +0.064, IC95
+[+0.027, +0.101]). En 2026 pasó de 0.658 a 0.762 (Δ +0.104, IC95 [+0.065,
++0.144]). IC es el intervalo de confianza. Supera al primer modelo en dos de
+cada tres días. Usar la previsión a un día vista en lugar del reanálisis
+no cambia el resultado (Δ −0.003, con un IC que cruza el cero).
 
 ## Cómo se lee el repositorio
 
-Las carpetas siguen el orden de la memoria, no el orden en que se hicieron las
-cosas. Cada una tiene un `README.md` con lo que hace cada script y para qué se
-usó.
+Las carpetas siguen el orden de la memoria, que no coincide con el orden en que
+se hizo el trabajo. Cada una tiene un `README.md` con lo que hace cada script y
+para qué se usó.
 
 | Carpeta | Qué contiene |
 |---|---|
@@ -61,14 +66,17 @@ usó.
 
 Por dónde empezar: `00_marco/README.md` para el hilo, `04_bisagra/README.md`
 para el diagnóstico, `docs/REPLAY_VEREDICTO.md` para el resultado final y
-`docs/TRAZABILIDAD.md` para saber qué script produjo cada número.
+`docs/TRAZABILIDAD.md` para saber qué script produjo cada número. EGIF es la
+Estadística General de Incendios Forestales, la etiqueta de la primera
+iteración.
 
 ## Reproducibilidad
 
 Los datos crudos (el cubo IberFire de 29 GB, el reanálisis, los históricos de
-AEMET) no están en el repositorio; se descargan con los scripts de `01_datos/`.
-Para trabajar sin esperar a las descargas, `muestras/` lleva un recorte de julio
-de 2026 con el que la rama de servicio corre en un portátil:
+AEMET, la Agencia Estatal de Meteorología) no están en el repositorio; se
+descargan con los scripts de `01_datos/`. Para trabajar sin esperar a las
+descargas, `muestras/` lleva un recorte de julio de 2026 con el que la rama de
+servicio corre en un portátil:
 
 ```bash
 source entorno.sh                 # PYTHONPATH y rutas de datos

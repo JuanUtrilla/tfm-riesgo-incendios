@@ -1,28 +1,26 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 33: la «anomalía de la punta 2026», explicada.
+Dos modelos, paso 33: la «anomalía de la punta 2026», explicada.
 
-NO TOCA PRODUCCIÓN NI NINGÚN REPO. Lee los CSV del replay; escribe
+No toca producción ni ningún repo. Lee los CSV del replay y escribe
 salida/dos_33_*.csv.
 
-=============================================================================
-LA ANOMALÍA
-=============================================================================
+La anomalía
+-----------
 En el replay de 2025 los candidatos ganan a producción en la punta del ranking
 (hectáreas quemadas dentro del top 2 % del mapa): pareja 32,3 %, único 28,8 %,
 r10 26,3 %, producción 22,0 %. En 2026 el orden se invierte y producción manda:
 11,5 % contra 5,9-7,1 % de los únicos.
 
 La hipótesis que quedó viva el 02/09/2026 fue que el radio de 50 km de las
-variables FIRMS es demasiado grosero y arrastra la puntuación hacia lo YA
+variables FIRMS es demasiado grosero y arrastra la puntuación hacia lo ya
 quemado en lugar de hacia la ignición nueva.
 
-=============================================================================
-LA EXPLICACIÓN, MUCHO MÁS SIMPLE
-=============================================================================
-No hace falta ninguna hipótesis sobre FIRMS: **es un solo día**.
+La explicación, mucho más simple
+--------------------------------
+No hace falta ninguna hipótesis sobre FIRMS: es un solo día.
 
-El 23-jul-2026 ardieron 21.348 ha —el 8 % de toda la temporada— y producción
+El 23-jul-2026 ardieron 21.348 ha (el 8 % de toda la temporada) y producción
 colocó el 89,5 % de esas hectáreas en su top 2 %, contra el 5,6 % de r10 y el
 0 % del único y la pareja. Ese día aporta él solo 7,1 de los 11,5 puntos de
 producción.
@@ -31,8 +29,8 @@ Quitándolo, el orden vuelve a ser el de 2025.
 
 La métrica es la culpable: al ponderar por hectáreas sobre una temporada, unos
 pocos días dominan (en 2026 los cinco días mayores son el 62 % de las
-hectáreas; en 2025, el 67 %). Este script lo demuestra con dos análisis que
-deberían acompañar SIEMPRE a una cifra ponderada por hectáreas:
+hectáreas; en 2025, el 67 %). Este script lo muestra con dos análisis que
+deberían acompañar siempre a una cifra ponderada por hectáreas:
 
   · dejar fuera un día cada vez, y mirar el rango del resultado;
   · intervalo de confianza por remuestreo de días.
@@ -54,7 +52,7 @@ SAL = config.salida("dos_33")
 
 
 def pond(d, m):
-    """% de hectáreas quemadas que caen dentro del top 2 % del mapa."""
+    """Porcentaje de hectáreas quemadas que caen dentro del top 2 % del mapa."""
     c = f"top2_ha_{m}"
     return 100 * (d[c] / 100 * d.area_ha).sum() / d.area_ha.sum()
 

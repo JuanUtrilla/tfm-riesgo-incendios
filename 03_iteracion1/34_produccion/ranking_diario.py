@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """
-Ranking diario de riesgo de incendio — job de GitHub Actions (TFM).
+Ranking diario de riesgo de incendio, job de GitHub Actions (TFM).
 
 Autocontenido: usa solo activos del propio repo (modelo XGBoost, estáticas y
 climatologías por estación en `modelo/`, BD del colector en `data/`) más la API
 de AEMET (secret AEMET_API_KEY) y opcionalmente FIRMS (secret FIRMS_MAP_KEY).
 
 Flujo:
-1. Serie diaria de TODAS las estaciones desde hoy-80 días (spin-up del FWI;
+1. Serie diaria de todas las estaciones desde hoy-80 días (spin-up del FWI;
    la memoria del DC es ~52 días): API `todasestaciones` + colector horario
    del repo para los últimos días sin consolidar.
 2. FWI propio (fwi_canadiense) + features del modelo de producción
    (xgb_v2_prototipo) para el último día completo de cada estación.
-3. Guarda `rankings/ranking_<fecha>.csv` → el commit de GitHub sella la fecha
-   de la predicción (validación prospectiva a prueba de trampas).
+3. Guarda `rankings/ranking_<fecha>.csv`; el commit de GitHub sella la fecha
+   de la predicción, de modo que queda constancia de que se emitió antes del
+   día (la validación del trabajo es el replay de 2025-2026).
 
 Diseño y racional: TFM_fuego/MODELO_B_BITACORA.md §14-§19.
 """
@@ -72,14 +73,14 @@ def serie_diaria_todas():
         "idema": df["indicativo"], "fecha": pd.to_datetime(df["fecha"]),
         "tmax": num(df["tmax"]), "tmin": num(df["tmin"]),
         "hr_min": num(df.get("hrMin", pd.Series(dtype=float))),
-        # fmin, NO minimum: `minimum` propaga NaN, así que si a la estación le
-        # falta CUALQUIERA de los dos campos el viento salía NaN — y muchas
+        # fmin y no minimum: `minimum` propaga NaN, así que si a la estación le
+        # falta cualquiera de los dos campos el viento salía NaN, y muchas
         # automáticas no reportan `racha` en el diario. Medido el 18/08/2026:
         # NaN en el 16,3% de las estaciones-día y en 128 de 858 estaciones
-        # (15%) durante TODA la serie. El fallo era silencioso: fwi_canadiense
+        # (15%) durante toda la serie. El fallo era silencioso: fwi_canadiense
         # trata el viento NaN igual que viento 0 (FWI 35,7 frente a 58,0 con
         # 15 km/h), así que esas estaciones entraban al modelo con el FWI
-        # hundido ~22 puntos sin que nada avisara. `fmin` usa el valor que haya.
+        # hundido unos 22 puntos sin que nada avisara. `fmin` usa el valor que haya.
         "viento_max": np.fmin(velmedia * 1.5, racha),
         "prec": num(df["prec"].replace("Ip", "0")), "n_horas": 24})
 
@@ -105,7 +106,7 @@ def serie_diaria_todas():
 def firms_frp(est):
     """FRP máx / nº detecciones a <50 km en [D-5, D-1] (opcional: sin key, 0).
 
-    Si hay key, un fallo de la API ya NO se traga como 0 detecciones: eso
+    Si hay key, un fallo de la API ya no se traga como 0 detecciones: eso
     metía features falseadas al modelo con el run en verde. `descargar`
     reintenta y, si no hay respuesta, levanta FirmsCaido."""
     key = os.environ.get("FIRMS_MAP_KEY")

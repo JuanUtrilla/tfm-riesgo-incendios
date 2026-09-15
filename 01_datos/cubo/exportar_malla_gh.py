@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Exporta a ~35 MB de npz/csv lo ÚNICO que el mapa nacional necesita del cubo
+Exporta a ~35 MB de npz/csv solo lo que el mapa nacional necesita del cubo
 IberFire (29 GB), para que mapa_diario.py pueda correr en GitHub Actions sin
-el cubo. Se ejecuta UNA VEZ en local (y otra vez solo si cambia el modelo).
+el cubo. Se ejecuta una vez en local (y otra vez solo si cambia el modelo).
 
 Genera en <repo colector>/modelo/malla/:
-- estaticas.npz     — 13 capas estáticas 2D (float32) + x/y/is_spain
-- mensual_m6..9.npz — clim. mensual 2020-24 de NDVI/LAI/SWI/LST + EGIF mismo-mes
+- estaticas.npz:     13 capas estáticas 2D (float32) + x/y/is_spain
+- mensual_m6..9.npz: clim. mensual 2020-24 de NDVI/LAI/SWI/LST + EGIF mismo-mes
                       (reutiliza malla_mensual de mapa_riesgo_hoy, misma caché)
-- estacion_municipio.csv — idema → código INE del municipio más cercano
+- estacion_municipio.csv: idema → código INE del municipio más cercano
                       (evita el maestro de municipios en cada run de Actions)
 
 Uso: python3 exportar_malla_gh.py

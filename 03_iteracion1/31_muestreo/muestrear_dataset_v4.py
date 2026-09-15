@@ -1,38 +1,36 @@
 #!/usr/bin/env python3
 """
-Muestreador v4 — tabla maestra con el EGIF actualizado (Civio, release 09/07/2026).
+Muestreador v4: tabla maestra con el EGIF actualizado (Civio, release 09/07/2026).
 
-NO SOBRESCRIBE NADA. Lee `egif_civio_2026-08.csv` y escribe
+No sobrescribe nada. Lee `egif_civio_2026-08.csv` y escribe
 `dataset/muestra_maestra_v4.parquet`. El muestreador v1 y su salida quedan
 intactos y siguen reproduciendo los resultados de la memoria actual.
 
-=============================================================================
-QUÉ CAMBIA RESPECTO A muestrear_dataset.py (v1)
-=============================================================================
+Qué cambia respecto a muestrear_dataset.py (v1)
 
-1. DOS AÑOS MÁS DE ETIQUETA.
+1. Dos años más de etiqueta.
    El CSV de v1 se descargó el 30/06/2026, nueve días antes de que Civio
    republicase el dataset consolidando 2021 para toda España y casi todo 2022.
-   El corte en 2020 de v1 era correcto CON AQUELLOS DATOS; con los nuevos es
+   El corte en 2020 de v1 era correcto con aquellos datos; con los nuevos es
    una pérdida gratuita. Verificado año × provincia: 2021 pasa de 888 registros
    en 25 provincias a 2.897 en 50, y 2022 de 226 en 7 provincias a 2.520 en 48.
 
-2. SPLIT NUEVO: train 2015-2020 / val 2021 / test 2022.
-   v1 testeaba sobre 2020. Testear sobre 2022 —242.436 ha, el peor año de la
-   serie, con Losacio y Bejís dentro— es mucho más exigente y mucho más
-   defendible: es el escenario en el que a un sistema de riesgo se le pide que
-   funcione, y el modelo no lo ha visto nunca.
+2. Split nuevo: train 2015-2020 / val 2021 / test 2022.
+   v1 testeaba sobre 2020. Testear sobre 2022 (242.436 ha, el peor año de la
+   serie, con Losacio y Bejís dentro) es más exigente y más defendible: es el
+   escenario en el que a un sistema de riesgo se le pide que funcione, y el
+   modelo no lo ha visto nunca.
 
-3. FILTRO DE FRONTERA PARA 2022 (lo único conceptualmente nuevo).
-   A 2022 le siguen faltando Navarra y Cantabria. Eso NO produce etiquetas
-   erróneas por sí solo —una comunidad sin positivos simplemente no aporta
-   celdas al diseño caso-control—, pero sí contamina el BUFFER DE EXCLUSIÓN:
+3. Filtro de frontera para 2022 (lo único conceptualmente nuevo).
+   A 2022 le siguen faltando Navarra y Cantabria. Eso no produce etiquetas
+   erróneas por sí solo (una comunidad sin positivos simplemente no aporta
+   celdas al diseño caso-control), pero sí contamina el buffer de exclusión:
    una celda de La Rioja o de Burgos podría sortear como "día sin fuego" un día
    en que ardió algo a 8 km al otro lado de la frontera, y el buffer no lo vería
    porque ese incendio no está en el CSV. Se excluyen del año 2022 todas las
    celdas a <15 km de Navarra o Cantabria (códigos 15 y 6 de la capa
    `AutonomousCommunities` de IberFire).
-   Se excluyen sus positivos TAMBIÉN, no solo sus negativos: perder unos pocos
+   Se excluyen sus negativos y también sus positivos: perder unos pocos
    positivos es barato; mantener falsos negativos en el año de test, no.
    Las Palmas (prov. 35) también falta en 2022 y no se trata: IberFire no cubre
    Canarias, así que esas celdas nunca entran en el dataset.
@@ -44,7 +42,7 @@ entre v3 y v4 tienen que ser atribuibles a los datos nuevos, no al muestreo.
 Uso:
     /home/charredgem/miniconda3/envs/tfm_fuego/bin/python muestrear_dataset_v4.py
 
-⚠️ El python3 del sistema no tiene xarray. Usar el del entorno `tfm_fuego`.
+Ojo: el python3 del sistema no tiene xarray. Usar el del entorno `tfm_fuego`.
 """
 
 import os
@@ -134,7 +132,7 @@ def main() -> None:
               .reset_index(drop=True))
     print(f"Positivos únicos (celda, fecha): {len(pos)}")
 
-    # --- 2b. Aplicar el filtro de frontera SOLO al año incompleto ---
+    # --- 2b. Aplicar el filtro de frontera solo al año incompleto ---
     anio_pos = pd.DatetimeIndex(pos["fecha"]).year
     d_frontera, _ = arbol_frontera.query(
         np.column_stack([xs[pos["ix"]], ys[pos["iy"]]]))

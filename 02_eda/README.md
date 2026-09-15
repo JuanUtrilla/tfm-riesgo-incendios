@@ -11,16 +11,17 @@ El documento completo está en [`ANALISIS_CUBO.md`](ANALISIS_CUBO.md).
 
 ### Entrenar con el cubo y servir con ERA5-Land
 
-Había que saber si la meteorología del cubo IberFire servía para entrenar o
-hacía falta bajar 72 meses de ERA5-Land (unas 30 horas de cola en el CDS).
-Sirve: el cubo es ERA5-Land reprocesado. Temperatura máxima, humedad y viento
-coinciden en los nodos con correlación 0.987-0.998 y sesgo cero. Solo difiere
-la precipitación (la del cubo es la de ERA5-Land dividida por 2.02).
+Se comprobó si la meteorología del cubo IberFire servía para entrenar o si
+hacía falta bajar 72 meses de ERA5-Land (unas 30 horas de cola en el CDS, el
+*Climate Data Store* de Copernicus). El cubo es ERA5-Land reprocesado.
+Temperatura máxima, humedad y viento coinciden en los nodos con correlación
+0.987-0.998 y sesgo cero. Solo difiere la precipitación (la del cubo es la de
+ERA5-Land dividida por 2.02).
 
 ### La prevalencia real
 
-Celdas-día con `is_fire` (EFFIS, celda con al menos 5 ha quemadas) por cada
-100,000:
+Celdas-día con `is_fire` (EFFIS, *European Forest Fire Information System*;
+celda con al menos 5 ha quemadas) por cada 100,000:
 
 | Año | Anual | Verano (jun-sep) | Días con alguna celda | Máximo de celdas en un día |
 |---|---|---|---|---|
@@ -31,11 +32,11 @@ Celdas-día con `is_fire` (EFFIS, celda con al menos 5 ha quemadas) por cada
 
 En un verano normal arden entre 2 y 6 celdas de cada 100,000 al día. El
 conjunto de la iteración 1 tenía un 25 % de positivos por construcción. Esa
-distancia, medida aquí, es la que anticipa el problema de especificación del
-capítulo 4.
+distancia anticipa el problema de especificación del capítulo 4.
 
-Solo el 2.97 % de las celdas tuvo alguna ignición EGIF entre 2015 y 2020, y el
-2.68 % alguna celda EFFIS entre 2021 y 2024.
+Solo el 2.97 % de las celdas tuvo alguna ignición EGIF (Estadística General de
+Incendios Forestales) entre 2015 y 2020, y el 2.68 % tuvo superficie quemada
+según EFFIS entre 2021 y 2024.
 
 ![Prevalencia real del fuego y persistencia de la etiqueta](../docs/MEMORIA/figs/f7_prevalencia.png)
 
@@ -44,10 +45,11 @@ Solo el 2.97 % de las celdas tuvo alguna ignición EGIF entre 2015 y 2020, y el
 ### La etiqueta persiste
 
 La probabilidad de que una celda con fuego hoy siga con fuego mañana es 0.51;
-a los 3 días, 0.23; a los 7, 0.04. `is_fire` marca días ardiendo, no
-igniciones. Por eso las evaluaciones con EFFIS usan `primer_dia` (fuego hoy y
-no ayer): 7,301 de las 28,135 celdas-día de los veranos de evaluación. Contar
-los días de arrastre sería puntuar el mismo incendio varias veces.
+a los 3 días, 0.23; a los 7, 0.04. `is_fire` marca todos los días en que una
+celda sigue ardiendo, y no solo el de la ignición. Por eso las evaluaciones
+con EFFIS usan `primer_dia` (fuego hoy y no ayer): 7,301 de las 28,135
+celdas-día de los veranos de evaluación. Contar los días de arrastre sería
+puntuar el mismo incendio varias veces.
 
 ### La autocorrelación decide cómo se parten los datos
 
@@ -60,11 +62,11 @@ los días de arrastre sería puntuar el mismo incendio varias veces.
 | FWI medio de verano | 0.99 | 0.95 |
 
 EFFIS a 1 km es casi todo perímetro: celdas contiguas del mismo incendio.
-Partir al azar entre entrenamiento y prueba infla el AUC en +0.036 frente a
-partir por bloques de 100 km. Por eso todas las particiones del trabajo son
-espaciales o temporales.
+Partir al azar entre entrenamiento y prueba infla el AUC (*Area Under the ROC
+Curve*) en +0.036 frente a partir por bloques de 100 km. Por eso todas las
+particiones del trabajo son espaciales o temporales.
 
-### Qué script produce cada cosa
+### Qué script produce cada resultado
 
 | Script | Qué mide | Dónde está |
 |---|---|---|
@@ -73,15 +75,16 @@ espaciales o temporales.
 | `dos_04_analisis.py` | Autocorrelación, coste de la partición aleatoria, susceptibilidad estática | `05_iteracion2/54_analisis/` |
 | `malla_02_vs_cubo.py` | El cubo frente a ERA5-Land nativo | `04_bisagra/42_no_es_la_meteo/prototipo_TFM_fuego/` |
 
-Cada uno vive en el capítulo donde se ejecuta; aquí se leen sus resultados
-juntos.
+Cada script está en la carpeta del capítulo donde se ejecuta; aquí se reúnen
+sus resultados.
 
 ## Parte B. El dataset de la iteración 1
 
 `eda_dataset.py`, el único script de esta carpeta, calcula distribuciones por
-clase, correlaciones, estacionalidad y la normalización local del FWI sobre el
-split de entrenamiento: 53,563 filas (13,577 positivos y 39,986 negativos). El
-resumen numérico está en [`figuras/eda_resumen.log`](figuras/eda_resumen.log).
+clase, correlaciones, estacionalidad y la normalización local del FWI (*Fire
+Weather Index*) sobre el split de entrenamiento. Ese split tiene 53,563 filas
+(13,577 positivos y 39,986 negativos). El resumen numérico está en
+[`figuras/eda_resumen.log`](figuras/eda_resumen.log).
 
 Medianas de positivos frente a negativos:
 
@@ -95,16 +98,16 @@ Medianas de positivos frente a negativos:
 | `popdens` | 9.67 | 9.67 |
 | `dist_carreteras` | 0.63 | 0.63 |
 
-Dos lecturas. Las variables estáticas no separan nada en este diseño: población
-y distancia a carreteras tienen la misma mediana en los dos grupos. Es lo
-esperable con negativos tomados de la misma celda en otros días, y es lo que el
-capítulo 4 acaba demostrando.
+De la tabla salen dos lecturas. La primera: las variables estáticas no separan
+nada en este diseño, porque población y distancia a carreteras tienen la misma
+mediana en los dos grupos. Es lo esperable con negativos tomados de la misma
+celda en otros días, y el capítulo 4 mide esa consecuencia.
 
-El percentil local del FWI separa mejor que el FWI absoluto. En Galicia un FWI
-de 3.1 ya es el percentil 91.7 de su historia, y en Canarias un 41.4 se queda en
-el 72.8. Como ablación (`03_iteracion1/35_ablaciones/ablacion_features.py`),
-añadir el percentil local al FWI absoluto aporta +0.042 de AUC-PR (de 0.668 a
-0.710).
+La segunda: el percentil local del FWI separa mejor que el FWI absoluto. En
+Galicia un FWI de 3.1 ya es el percentil 91.7 de su historia, y en Canarias un
+41.4 se queda en el 72.8. Como ablación
+(`03_iteracion1/35_ablaciones/ablacion_features.py`), añadir el percentil local
+al FWI absoluto aporta +0.042 de AUC-PR (de 0.668 a 0.710).
 
 ![El FWI absoluto frente al percentil local](../docs/MEMORIA/figs/f8_normalizacion.png)
 
@@ -112,7 +115,7 @@ añadir el percentil local al FWI absoluto aporta +0.042 de AUC-PR (de 0.668 a
 
 ![Qué separa un positivo de un negativo en el conjunto de la iteración 1](../docs/MEMORIA/figs/f3_separacion.png)
 
-*Medianas de positivos y negativos: la meteorología separa, las variables estáticas no.*
+*Medianas de positivos y negativos: las variables meteorológicas separan los dos grupos y las estáticas coinciden.*
 
 ### Figuras
 
@@ -126,5 +129,5 @@ añadir el percentil local al FWI absoluto aporta +0.042 de AUC-PR (de 0.668 a
 ## Lo que se dejó fuera
 
 El bloque de visión por satélite (Sentinel-2, D-Fire, timelapses y los casos de
-Sotalvo, Luna y Ponteareas) fue trabajo real, pero no entra en la memoria.
-Sigue en el repositorio original.
+Sotalvo, Luna y Ponteareas) se desarrolló, pero no entra en la memoria. Se
+conserva en el repositorio original.

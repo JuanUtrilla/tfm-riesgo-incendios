@@ -2,46 +2,40 @@
 """
 Módulo 2b, paso 4: reajustar el mapeo IFS→ERA5-Land con toda la malla.
 
-NO TOCA PRODUCCIÓN. Escribe salida/mapeo_ifs_a_era5land.npz (el que usa
+No toca producción. Escribe salida/mapeo_ifs_a_era5land.npz (el que usa
 `riesgo_hoy.py`) y salida/reajuste_mapeo.json. El mapeo anterior queda en
 salida/mapeo_ifs_a_era5land_120nodos.npz.
 
-=============================================================================
-POR QUÉ REAJUSTAR
-=============================================================================
+Por qué reajustar
 El mapeo en uso se ajustó con 120 nodos y jun-jul 2024: unas 7.300 parejas
 (nodo, día). El mapeo tiene 501 puntos de cuantil, así que el extremo de la
-curva —el percentil 99,9, que es justo el que decide la saturación— se estima
+curva (el percentil 99,9, que es justo el que decide la saturación) se estima
 con un puñado de muestras. Ahí es donde más se nota ampliar la muestra.
 
-=============================================================================
-LA CUOTA MANDA EL DISEÑO
-=============================================================================
+La cuota manda el diseño
 Open-Meteo cobra nodos × tramos de 14 días. La temporada jun-sep son 9 tramos:
 
     5.605 nodos x 9 tramos = 50.445 unidades  ·  límite: 10.000 al día
 
-No cabe en un día. Y el límite es TAMBIÉN por minuto (~600): un lote de 200
+No cabe en un día. Y el límite es también por minuto (~600): un lote de 200
 nodos cuesta 1.800 unidades y devuelve 429 él solo.
 
 De ahí las dos decisiones:
 
- 1. LOTES DE 50 nodos (450 unidades) con un minuto de espera. Unas 22 min
+ 1. Lotes de 50 nodos (450 unidades) con un minuto de espera. Unos 22 min
     consumen la cuota diaria.
- 2. TEMPORADA COMPLETA POR NODO, iterando nodos en orden disperso (barajado
+ 2. Temporada completa por nodo, iterando nodos en orden disperso (barajado
     con semilla fija). Cada día de cuota añade ~1.100 nodos con la serie
-    ENTERA, que es lo que sirve para ajustar; lo contrario —todos los nodos
-    con dos semanas— daría un mapeo atado a un único régimen de tiempo.
+    entera, que es lo que sirve para ajustar; lo contrario (todos los nodos
+    con dos semanas) daría un mapeo atado a un único régimen de tiempo.
 
 Es reanudable: se relanza al día siguiente y sigue por donde iba, hasta
 completar los 5.605. Con lo bajado hasta el momento ya reajusta y valida, así
 que cada pasada deja un mapeo mejor que el anterior.
 
-=============================================================================
-VALIDACIÓN, SIN CIRCULARIDAD
-=============================================================================
+Validación, sin circularidad
 Igual que en el paso 3: se ajusta con jun-jul y se evalúa con ago-sep. Y se
-compara contra el mapeo viejo de 120 nodos SOBRE LOS MISMOS días y nodos, que
+compara contra el mapeo viejo de 120 nodos sobre los mismos días y nodos, que
 es la única forma de saber si ampliar la muestra sirvió de algo.
 
 Uso:

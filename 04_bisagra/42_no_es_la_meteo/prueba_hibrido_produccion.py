@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-La configuración REAL de producción: reanálisis para el historial + IFS para
+La configuración real de producción: reanálisis para el historial + IFS para
 los últimos días y D+1.  (§6ter)
 
-NO SOBRESCRIBE NADA. Escribe dataset/prueba_hibrido_produccion.json.
+No sobrescribe nada. Escribe dataset/prueba_hibrido_produccion.json.
 
 Las dos cotas ya están medidas contra el cubo (jun-sep 2024, 120 estaciones):
 
@@ -11,15 +11,15 @@ Las dos cotas ya están medidas contra el cubo (jun-sep 2024, 120 estaciones):
     IFS puro  (todo previsión)   corr 0,935 · sesgo +0,41 · pctl ≥99,9 = 2,4 %
     (referencia CUBO                                        pctl ≥99,9 = 0,2 %)
 
-El IFS puro NO vale: satura casi tanto como AEMET (3,3 %). Pero producción
-nunca correría con IFS puro — el reanálisis llega hasta D−6 y la previsión solo
+El IFS puro no vale: satura casi tanto como AEMET (3,3 %). Pero producción
+nunca correría con IFS puro: el reanálisis llega hasta D−6 y la previsión solo
 cubre la cola. Como el FWI es recursivo con memoria larga (DC ~52 días, DMC
 ~12 d, FFMC ~1 d), el estado en D lo fija casi todo el reanálisis y la
 previsión solo mueve el FFMC/ISI.
 
-Esta prueba simula el híbrido EXACTAMENTE, no por aproximación:
+Esta prueba simula el híbrido de forma exacta, sin aproximaciones:
 
-  1. Se corre el FWI con ERA5 sobre toda la serie guardando el ESTADO
+  1. Se corre el FWI con ERA5 sobre toda la serie guardando el estado
      (ffmc, dmc, dc) de cada día.
   2. Para cada día de evaluación D se retoma el estado del día D−L y se
      avanzan L días con la meteo del IFS.

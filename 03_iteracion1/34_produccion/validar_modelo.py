@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-Validación prospectiva del modelo a nivel ESTACIÓN-DÍA.
+Seguimiento del modelo en operación a nivel estación-día, contra los focos
+FIRMS (o los perímetros EFFIS) de la temporada en curso. Es un control de
+seguimiento; la validación del trabajo es el replay de 2025-2026.
 
-Complementa (no sustituye) la verificación diaria de `mapa_diario.
-verificar_prevision`, que mide el lift usando el foco como unidad. Ese enfoque
-tiene dos límites conocidos: un incendio grande aporta cientos de píxeles VIIRS
-y domina el día (pseudo-replicación), y el lift solo mira el corte ALTO/EXTREMO.
-Aquí la unidad es la estación-día (n≈684/día), lo que permite métricas de
-discriminación estándar y, sobre todo, comparar el modelo con baselines.
+Complementa la verificación diaria de `mapa_diario.verificar_prevision`, que
+mide el lift usando el foco como unidad. Ese enfoque tiene dos límites
+conocidos: un incendio grande aporta cientos de píxeles VIIRS y domina el día
+(pseudo-replicación), y el lift solo mira el corte ALTO/EXTREMO. Aquí la unidad
+es la estación-día (n≈684/día), lo que permite métricas de discriminación
+estándar y comparar el modelo con baselines.
 
 Etiqueta: y=1 si hubo alguna detección VIIRS a ≤ RADIO km de la estación ese día.
 
@@ -67,7 +69,7 @@ def focos(desde, hasta):
 
 def previsiones():
     """Todos los CSV de predicción del repo, con su tipo y el día al que se
-    refieren. D0/D1 están SELLADOS por commit antes del día evaluado; retro es
+    refieren. D0/D1 están sellados por commit antes del día evaluado; retro es
     hindcast (mismo modelo, meteo observada) y ranking_* es el día ya cerrado."""
     filas = []
     for ruta in sorted(RANKINGS.glob("*.csv")):
@@ -104,8 +106,8 @@ def etiquetar(prev, det_dia, radio_km):
 def perimetros_effis(area_min_ha):
     """Perímetros de área quemada de EFFIS proyectados a EPSG:3035, indexados
     por día de inicio del incendio (FIREDATE). Requiere haber ejecutado
-    descargar_effis.py. Etiqueta más limpia que VIIRS: superficie realmente
-    cartografiada, no anomalía térmica."""
+    descargar_effis.py. Etiqueta más limpia que VIIRS, porque es superficie
+    cartografiada y no una anomalía térmica."""
     from shapely.geometry import shape
     from shapely.ops import transform as sh_transform
     from pyproj import Transformer
@@ -253,7 +255,7 @@ def main():
         print(cal.reindex(["BAJO", "MODERADO", "ALTO", "EXTREMO"]).dropna()
               .to_string())
         # el AUC agregado mezcla días con prevalencias distintas; la media de
-        # los AUC diarios mide solo la discriminación DENTRO de cada día
+        # los AUC diarios mide solo la discriminación dentro de cada día
         dia_auc = val[val["tipo"] == tipo]["auc_roc"].dropna()
         if len(dia_auc):
             print(f"    AUC-ROC medio por día: {dia_auc.mean():.3f} "

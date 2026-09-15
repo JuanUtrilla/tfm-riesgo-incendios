@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Mapa de FOCOS ACTIVOS — evidencia satelital pura, sin modelo (job ligero de
+Mapa de focos activos: evidencia satelital pura, sin modelo (job ligero de
 GitHub Actions, 3×/día por la tarde).
 
 Complementa al mapa de riesgo: el modelo predice a día vista y su JPG se
@@ -12,7 +12,7 @@ NRT se publica ~3 h tras la pasada → un fuego de las 14:00 aparece ~17:00.
 Límites (en el pie del mapa): no ve fuegos pequeños o bajo nubes, puede dar
 falsos positivos (industria, solar). Evidencia, no servicio de emergencias.
 
-Salida: mapas/focos_activos.jpg (README) — hoy en rojo, ayer en naranja.
+Salida: mapas/focos_activos.jpg (README); hoy en rojo, ayer en naranja.
 Uso: FIRMS_MAP_KEY=... python3 focos_activos.py
 """
 

@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-Modelo B v4 — entrenamiento con el EGIF consolidado y test sobre 2022.
+Modelo B v4: entrenamiento con el EGIF consolidado y test sobre 2022.
 
-NO SOBRESCRIBE NADA. Escribe solo ficheros con sufijo _v4.
+No sobrescribe nada. Escribe solo ficheros con sufijo _v4.
 
-=============================================================================
-QUÉ CAMBIA RESPECTO A v3, Y POR QUÉ ESO HACE EL EXPERIMENTO LIMPIO
-=============================================================================
-v3 y v4 se entrenan con los MISMOS AÑOS (2015-2020) y las MISMAS 46 features.
+Qué cambia respecto a v3
+------------------------
+v3 y v4 se entrenan con los mismos años (2015-2020) y las mismas 46 features.
 Lo único que cambia entre ellos son los datos:
 
   · La etiqueta. El EGIF que usaba v3 se descargó el 30/06/2026; Civio
@@ -20,37 +19,36 @@ Lo único que cambia entre ellos son los datos:
     excluyen las celdas a <15 km de esas comunidades para que el muestreador no
     sortee como "día sin fuego" un día en que ardió al otro lado).
 
-Que todo lo demás sea idéntico es deliberado: cualquier diferencia de métrica
-entre v3 y v4 es atribuible a los DATOS, no al modelo.
+Todo lo demás se mantiene idéntico a propósito: cualquier diferencia de
+métrica entre v3 y v4 se debe a los datos y no al modelo.
 
-=============================================================================
-EL PROTOCOLO, Y LA REGLA QUE NO SE ROMPE
-=============================================================================
+Protocolo
+---------
     train 2015-2020 · val 2021 · test 2022
 
-**2022 es el año catastrófico de la serie** —Losacio, Sierra de la Culebra,
-Bejís; 242.436 ha— y no se mira hasta el final. Toda decisión (hiperparámetros,
-nº de árboles, cortes de alerta) se toma en VAL 2021. El test se usa UNA vez.
+2022 es el año catastrófico de la serie (Losacio, Sierra de la Culebra, Bejís;
+242.436 ha) y no se mira hasta el final. Toda decisión (hiperparámetros,
+número de árboles, cortes de alerta) se toma en val 2021. El test se usa una
+sola vez.
 
-Testear sobre el peor año nunca visto es el argumento fuerte de la defensa: si
-el modelo aguanta ahí, aguanta.
+Probar sobre el peor año, nunca visto en entrenamiento, es el argumento más
+sólido que tiene el modelo: si aguanta ahí, aguanta.
 
-=============================================================================
-LAS TRES COMPARACIONES QUE PRODUCE
-=============================================================================
-1. BASELINES obligatorios sobre el mismo test: FWI a secas y percentil local de
-   FWI. `PROXIMOS_PASOS.md` lo dice sin rodeos — si el XGBoost no supera al FWI
+Las tres comparaciones que produce
+----------------------------------
+1. Baselines obligatorios sobre el mismo test: FWI a secas y percentil local de
+   FWI. `PROXIMOS_PASOS.md` lo deja claro: si el XGBoost no supera al FWI
    puro, no hay defensa posible. Se reporta salga como salga.
 
-2. **v3 sobre el MISMO test 2022.** v3 nunca vio 2021 ni 2022, así que puede
+2. v3 sobre el mismo test 2022. v3 nunca vio 2021 ni 2022, así que puede
    puntuarse en las mismas filas. Es la comparación limpia de "¿mejora el EGIF
-   consolidado?", y es lo que pide el hito 7. Ojo a la asimetría que hay que
+   consolidado?", y es lo que pide el hito 7. Hay una asimetría que conviene
    declarar: las filas de test las define el muestreo v4, y v3 se evalúa sobre
    ellas; no al revés (el muestreo v3 no tenía 2022).
 
-3. IC95 por bootstrap **agrupado por bloque de 100 km**, no por fila: dentro de
+3. IC95 por bootstrap agrupado por bloque de 100 km, no por fila: dentro de
    un bloque las celdas comparten meteo, vegetación e historial, y remuestrear
-   filas independientes fingiría una precisión que no existe.
+   filas como si fueran independientes daría una precisión que no existe.
 
 Salidas (todas nuevas):
   modelos/xgb_v4.ubj · modelos/xgb_v4_metadata.json · dataset/metricas_v4.json
@@ -81,7 +79,7 @@ SAL_METRICAS = DIR / "dataset" / "metricas_v4.json"
 
 # Cobertura operativa de los cortes de v2/v3 (bitácora §15). Se reproduce para
 # que el sistema de avisos no cambie de comportamiento al cambiar de modelo:
-# lo que se recalcula es el UMBRAL que produce esa cobertura, no la cobertura.
+# se recalcula el umbral que produce esa cobertura y la cobertura se mantiene.
 COBERTURA = {"MODERADO": 0.348, "ALTO": 0.220, "EXTREMO": 0.135}
 
 PARAMS_BASE = dict(learning_rate=0.05, max_depth=6, min_child_weight=5,
@@ -95,8 +93,8 @@ COMUNES = dict(tree_method="hist", eval_metric="aucpr", enable_categorical=True,
 
 
 def ap_norm(y, p):
-    """AUC-PR normalizado: (AP − prevalencia)/(1 − prevalencia). Necesario para
-    comparar splits con prevalencias distintas — el suelo del AP es la
+    """AUC-PR normalizado: (AP − prevalencia)/(1 − prevalencia). Hace falta para
+    comparar splits con prevalencias distintas: el suelo del AP es la
     prevalencia, así que los AP crudos no son comparables entre sí."""
     prev = float(np.mean(y))
     return float((average_precision_score(y, p) - prev) / (1 - prev))
@@ -124,7 +122,7 @@ def metricas(y, p, y_val=None, p_val=None):
 
 
 def boot_ic(y, p, bloques, rng, n=N_BOOT):
-    """IC95 de AUC-ROC remuestreando BLOQUES de 100 km."""
+    """IC95 de AUC-ROC remuestreando bloques de 100 km."""
     ids = np.unique(bloques)
     idx = {b: np.where(bloques == b)[0] for b in ids}
     v = []
@@ -149,7 +147,7 @@ def main():
     print(f"prevalencias: {tr.label.mean():.1%} / {va.label.mean():.1%} / "
           f"{te.label.mean():.1%}\n")
 
-    # ---- selección de hiperparámetros MIRANDO SOLO VAL --------------------
+    # ---- selección de hiperparámetros mirando solo val --------------------
     print("=== selección en val 2021 (el test no se toca) ===")
     cand = {}
     for nombre, P in [("base", PARAMS_BASE), ("tuned", PARAMS_TUNED)]:
@@ -168,7 +166,7 @@ def main():
 
     p_va = modelo.predict_proba(va[FEATS])[:, 1]
 
-    # ---- EL TEST, una sola vez -------------------------------------------
+    # ---- el test, una sola vez -------------------------------------------
     rng = np.random.default_rng(SEED)
     y_te = te.label.values
     bloques = te.bloque_100km.values
@@ -189,7 +187,7 @@ def main():
         print(f"  baseline {nom:<9} AUC-ROC {res[nom]['auc_roc']:.4f} "
               f"{res[nom]['ic95_auc_roc']} · AUC-PR {res[nom]['auc_pr']:.4f}")
 
-    # ---- v3 sobre EL MISMO test ------------------------------------------
+    # ---- v3 sobre el mismo test ------------------------------------------
     if V3.exists():
         m3 = xgb.XGBClassifier()
         m3.load_model(str(V3))

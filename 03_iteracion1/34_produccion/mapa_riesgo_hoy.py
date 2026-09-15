@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Mapa nacional de riesgo EN TIEMPO REAL para HOY (D) y MAÑANA (D+1).
+Mapa nacional de riesgo en tiempo real para hoy (D) y mañana (D+1).
 
-Motor ("Ruta 1", diseño 16/07/2026): las 19 features METEO se calculan por
+Motor ("Ruta 1", diseño 16/07/2026): las 19 features meteo se calculan por
 estación AEMET (tiempo_real.evaluar_todas con fecha objetivo: serie observada
-+ predicción municipal AEMET + FWI propio propagado) y se INTERPOLAN a la
++ predicción municipal AEMET + FWI propio propagado) y se interpolan a la
 malla IberFire de 1 km (IDW k=8 en EPSG:3035, con corrección de altitud
 −6,5 °C/km para las temperaturas; vpd_max se recalcula tras corregir). El
 resto se calcula celda a celda igual que mapa_riesgo_dia.py: vegetación y LST
@@ -12,12 +12,12 @@ resto se calcula celda a celda igual que mapa_riesgo_dia.py: vegetación y LST
 estación), estáticas y CLC del cubo, EGIF mismo-mes por convolución, FIRMS
 NRT en malla, rayos=0 (moda). Modelo: xgb_v2_prototipo (el de producción).
 
-CAVEAT (memoria): la resolución EFECTIVA de la meteo es la densidad de la red
-(~30-50 km); el 1 km lo aportan estáticas y vegetación. Mismo enfoque que los
-mapas operativos de peligro de AEMET (interpolación de red + índice).
+Limitación (para la memoria): la resolución efectiva de la meteo es la densidad
+de la red (~30-50 km); el 1 km lo aportan estáticas y vegetación. Mismo enfoque
+que los mapas operativos de peligro de AEMET (interpolación de red + índice).
 
 Uso:  python3 mapa_riesgo_hoy.py [--dias 0 1]
-      0 = HOY, 1 = MAÑANA (D+1), -1 = ayer observado (prueba sin forecast)
+      0 = hoy, 1 = mañana (D+1), -1 = ayer observado (prueba sin forecast)
 Salida: eda/mapa_riesgo_rt_<fecha>.png + prototipo/cache/malla_prob_<fecha>.npz
 """
 
@@ -77,7 +77,7 @@ def malla_estaticas(ds):
 
 def malla_mensual(ds, mes):
     """Climatología mensual 2020-24 de vegetación/LST + EGIF mismo-mes por
-    celda (caché npz por mes — mismas definiciones que el prototipo)."""
+    celda (caché npz por mes, con las mismas definiciones que el prototipo)."""
     ruta = f"{DIR}/prototipo/cache/malla_mensual_m{mes}.npz"
     if os.path.exists(ruta):
         return dict(np.load(ruta))
@@ -128,8 +128,8 @@ def malla_firms(ds):
 
 
 def interpolador_idw(rk, ds, es_esp, k=8):
-    """Prepara pesos IDW estaciones→celdas peninsulares (una vez por día).
-    Devuelve función feat_por_estación (array n_est) → campo 2D."""
+    """Prepara pesos IDW de estaciones a celdas peninsulares (una vez por día).
+    Devuelve una función que pasa de feature por estación (array n_est) a campo 2D."""
     est = trm._estaciones()
     rk = rk.merge(est.reset_index()[["idema", "x3035", "y3035"]], on="idema")
     ny, nx = ds.sizes["y"], ds.sizes["x"]
@@ -153,7 +153,7 @@ def interpolador_idw(rk, ds, es_esp, k=8):
 
 
 def generar_mapa(objetivo, ds, es_esp, estat, previsto):
-    """Genera el mapa nacional para la fecha objetivo. previsto=False → usa el
+    """Genera el mapa nacional para la fecha objetivo. Con previsto=False usa el
     ranking observado (último día completo por estación, sin API forecast)."""
     fstr = str(objetivo.date())
     mes, dia_anio = objetivo.month, objetivo.dayofyear
@@ -172,7 +172,7 @@ def generar_mapa(objetivo, ds, es_esp, estat, previsto):
     F = dict(estat)
     z_est = rk["elevacion"].values
     for c in FEATS_IDW:
-        if c in FEATS_TEMP:  # a nivel del mar → interpolar → devolver a la altitud
+        if c in FEATS_TEMP:  # se baja al nivel del mar, se interpola y se devuelve a la altitud
             F[c] = interpolar(rk[c].values + GAMMA * z_est) - GAMMA * F["elevacion"]
         else:
             F[c] = interpolar(rk[c].values)

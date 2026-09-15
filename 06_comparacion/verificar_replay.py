@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """Verificación de punta a punta del replay (PENDIENTE.md §1, 01/09/2026).
 
-Reproduce el mapa del 21-ago-2026 —día con pasada IFS real en local
-(salida/ifs_malla_2026-08-21.parquet), mapa servido (mapas_diarios/
-dos_riesgo_2026-08-21.npz) y dentro del rango del archivo histórico— y lo
+Reproduce el mapa del 21-ago-2026 (día con pasada IFS real en local,
+salida/ifs_malla_2026-08-21.parquet, mapa servido en mapas_diarios/
+dos_riesgo_2026-08-21.npz y dentro del rango del archivo histórico) y lo
 compara con el servido. Si no se parecen, el archivo de entradas no vale
 para evaluar modelos y hay que saberlo antes de bajar más temporadas.
 
 Tres diferencias inevitables respecto a la corrida real, que se parchean:
-  1. El reanálisis de hoy llega más allá del 14-ago → se trunca al 13-ago
-     (la pasada IFS del 21 empieza el 14: ese día el reanálisis acababa el 13).
-  2. `firms_nrt` pide siempre los últimos 5 días hasta HOY → se sustituye por
-     `comparar_rankings.firms_dia` con ventana 5 ([D−5, D−1] de la fecha
-     pasada, cacheado en _firms5/), que devuelve las mismas dos rejillas.
-  3. Las salidas pisarían las servidas → se respaldan antes y se restauran
+  1. El reanálisis de hoy llega más allá del 14-ago: se trunca al 13-ago
+     (la pasada IFS del 21 empieza el 14; ese día el reanálisis acababa el 13).
+  2. `firms_nrt` pide siempre los últimos 5 días hasta la fecha actual: se
+     sustituye por `comparar_rankings.firms_dia` con ventana 5 ([D−5, D−1] de
+     la fecha pasada, cacheado en _firms5/), que devuelve las mismas dos rejillas.
+  3. Las salidas pisarían las servidas: se respaldan antes y se restauran
      al final pase lo que pase; las del replay quedan en archivo_ifs/replay_21ago/.
 
-NO toca ningún .py de los repos (los md5 de PROCEDENCIA.md siguen valiendo):
+No toca ningún .py de los repos (los md5 de PROCEDENCIA.md siguen valiendo):
 todo es monkeypatch desde fuera. No escribe en ningún veredicto.
 """
 import hashlib

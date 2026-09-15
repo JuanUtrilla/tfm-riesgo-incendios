@@ -11,15 +11,15 @@ Salida:   dataset/dataset_modelo_v1.parquet  (tabla final de entrenamiento)
 Pasos (cada uno documentado para la memoria):
 1. Join 1:1 de los tres bloques por id_muestra (assert de cardinalidad).
 2. Features derivadas:
-   - vpd_max (kPa): Magnus sobre t2m_max y rh_min — proxy de sequedad atmosférica
+   - vpd_max (kPa): Magnus sobre t2m_max y rh_min, proxy de sequedad atmosférica
      que la literatura sitúa como driver dominante de propagación (Fire Ecology 2026).
-   - dia_anio: día del año crudo (sin codificación cíclica — árboles, §7.1-N7).
+   - dia_anio: día del año crudo, sin codificación cíclica (árboles, §7.1-N7).
 3. Filtrado de negativos ambiguos: pseudo-ausencias con is_near_fire_dia=1
    (fuego EFFIS a <12,5 km en los 10 días previos que el buffer EGIF no vio:
    típicamente incendios del lado portugués o perímetros grandes). Los positivos
-   NO se filtran (su is_near_fire refleja su propio incendio).
+   no se filtran (su is_near_fire refleja su propio incendio).
 4. QC: rangos físicos, % NaN por feature y split, duplicados, prevalencia final
-   por split (el ratio del test queda FIJADO y reportado — AUC-PR no es
+   por split (el ratio del test queda fijado y reportado, porque AUC-PR no es
    comparable entre prevalencias distintas, §7.3-D5).
 5. NaN se dejan como NaN (manejo nativo de XGBoost, §7.1-N3). Sin escalado,
    sin winsorización, sin imputación (§7.5 checklist negativo).
@@ -93,7 +93,7 @@ def main():
     tabla_nan = tabla_nan[(tabla_nan > 0).any(axis=1)]
     print(tabla_nan.to_string() if len(tabla_nan) else "  sin NaN")
 
-    # --- prevalencia final por split (FIJADA para la memoria) ---
+    # --- prevalencia final por split (fijada para la memoria) ---
     print("\n== Prevalencia final por split ==")
     t = df.groupby(["split", "label"]).size().unstack()
     t["ratio_neg_pos"] = (t[0] / t[1]).round(3)

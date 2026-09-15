@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Dos modelos — paso 20: ¿de verdad arde donde el mapa dice que va a arder?
+Dos modelos, paso 20: comprueba si arde donde el mapa dice que va a arder.
 
-dos_14 midió el reparto por NIVEL (BAJO/MODERADO/ALTO/EXTREMO). Esto es la
-misma pregunta pero mirada como la mira un jefe de guardia: si hoy solo puedo
+dos_14 midió el reparto por nivel (BAJO/MODERADO/ALTO/EXTREMO). Aquí se hace
+la misma pregunta como la haría un jefe de guardia: si hoy solo se puede
 vigilar el 1 % del territorio, ¿cuánto de lo que arde cae dentro?
 
 Para cada uno de los 74 días de la temporada 2026 (mapas de dos_09, verdad
@@ -15,11 +15,11 @@ top-k del día:
   lift       = precisión / prevalencia del día
   dias_pilla = % de días con fuego en que el top-k atrapa al menos una celda
 
-Agregado POOLED (suma de celdas sobre los 74 días), que es lo que se puede
+Agregado agrupado (suma de celdas sobre los 74 días), que es lo que se puede
 enseñar: «el 1 % más alto concentró el X % de lo quemado». IC por bootstrap
-de días (los días son la unidad independiente, no las celdas).
+de días (la unidad independiente es el día, no la celda).
 
-NO TOCA PRODUCCIÓN. Solo lee. Escribe salida/dos_20_aciertos.{json,csv}.
+No toca producción: solo lee. Escribe salida/dos_20_aciertos.{json,csv}.
 """
 
 import glob
@@ -158,7 +158,7 @@ def main():
 
 
 def figura(R):
-    """Curva cobertura vs. top-k: cuánto de lo quemado atrapas vigilando k %."""
+    """Curva cobertura frente a top-k: cuánto de lo quemado se atrapa vigilando el k %."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt

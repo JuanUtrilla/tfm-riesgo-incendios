@@ -2,29 +2,25 @@
 """
 Módulo 2b, paso 1: ¿arregla el denominador de ERA5-Land la saturación del IFS?
 
-NO TOCA PRODUCCIÓN. Escribe salida/prueba_denominador_ifs.json.
+No toca producción. Escribe salida/prueba_denominador_ifs.json.
 
-=============================================================================
-LA PREGUNTA
-=============================================================================
-El mapa de HOY y MAÑANA no puede salir del reanálisis: ERA5-Land llega con
+La pregunta
+El mapa de hoy y mañana no puede salir del reanálisis: ERA5-Land llega con
 ~6 días de retraso. Tiene que venir del IFS (previsión). Y el IFS ya se midió
-en el repo original contra el denominador del CUBO:
+en el repo original contra el denominador del cubo:
 
     saturación de fwi_pctl_local (% en pctl >= 99,9), 120 estaciones
         cubo (referencia)      0,22 %
         ERA5 reanálisis        0,76 %
         IFS previsión          2,44 %   ← inaceptable
 
-Si esos 2,44 % vienen del NUMERADOR —el IFS tiene la cola más gorda, máximo
-136,7 contra 107,2 del cubo— cambiar el denominador no arregla nada y el 02b
-no sirve tal cual. Si vienen del DESAJUSTE entre numerador y denominador, la
+Si esos 2,44 % vienen del numerador (el IFS tiene la cola más gorda, máximo
+136,7 contra 107,2 del cubo) cambiar el denominador no arregla nada y el 02b
+no sirve tal cual. Si vienen del desajuste entre numerador y denominador, la
 climatología de ERA5-Land del módulo 4 lo cancela igual que hizo con el
 reanálisis, y el 02b sale adelante.
 
-=============================================================================
-DISEÑO: 2x2, QUE ES LO QUE SEPARA LA CAUSA
-=============================================================================
+Diseño: 2x2, que es lo que separa la causa
 Medir solo "IFS contra clim ERA5-Land" no distingue las dos hipótesis. Con
 las cuatro celdas sí:
 
@@ -35,19 +31,19 @@ las cuatro celdas sí:
     · C alto y B bajo  → el problema era el desajuste. El 02b sale adelante.
     · B y C los dos altos → el problema es la cola del IFS. Hay que replantear.
     · D alto y A bajo  → confirma que el efecto es del denominador, no del
-      numerador, que es la tesis de todo el pipeline.
+      numerador, que es la hipótesis de todo el pipeline.
 
-MUESTRA. 120 nodos, el mismo tamaño que el experimento original para que las
+Muestra. 120 nodos, el mismo tamaño que el experimento original para que las
 cifras sean del mismo orden de precisión. Se excluyen los 226 nodos costeros
 sin dato. Evaluación jun-sep 2024, fuera del periodo de la climatología
 (2008-2012).
 
-SPIN-UP. Los dos numeradores arrancan el 1-jun-2024, el mismo día, para que
-la comparación no mezcle el efecto del spin-up con el de la fuente. Es además
+Spin-up. Los dos numeradores arrancan el 1-jun-2024, el mismo día, para que
+la comparación no mezcle el efecto del spin-up con el de la fuente. Es también
 lo único que hay en disco de ERA5-Land. Que ese arranque tardío no mueve el
 resultado está medido en el módulo 5: −0,30 de FWI a BUI alto, corr 0,9999.
 
-CUOTA. Open-Meteo cobra nodos × tramos de 14 días y limita POR MINUTO, no
+Cuota. Open-Meteo cobra nodos × tramos de 14 días y limita por minuto, no
 solo al día: 120 nodos × 9 tramos = 1.080 unidades, pero mandarlas seguidas
 devuelve 429. De ahí el freno de PAUSA segundos entre lotes y el reintento
 con retroceso. La descarga se cachea por lotes, así que un corte no tira lo
@@ -189,10 +185,10 @@ def clim_cubo(la, lo):
     for m in range(EVAL[0], EVAL[1] + 1):
         idx = np.where((anios >= ANIOS_CLIM_CUBO[0])
                        & (anios <= ANIOS_CLIM_CUBO[1]) & (meses == m))[0]
-        # Se lee la REJILLA ENTERA por bloques y se indexa despues. Indexar
+        # Se lee la rejilla entera por bloques y se indexa después. Indexar
         # 120 puntos sueltos en el isel obliga al NetCDF a traer los chunks
-        # completos igualmente, y sale ~10x mas lento (medido: >13 min por mes
-        # contra ~1 min asi).
+        # completos igualmente, y sale ~10x más lento (medido: >13 min por mes
+        # contra ~1 min así).
         trozos = []
         for i in range(0, len(idx), 30):
             blo = ds["FWI"].isel(time=idx[i:i + 30]).values

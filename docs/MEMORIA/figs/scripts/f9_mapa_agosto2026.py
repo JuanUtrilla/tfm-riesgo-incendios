@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""F9 - El mismo dia segun produccion y segun el r10, y la resta entre ambos.
+"""F9 - El mismo día según producción y según el r10, y la resta entre ambos.
 
-Dia: 7 de agosto de 2026 (44.672 ha, el segundo mayor de la temporada). Mapas
-del replay con la pasada IFS de la vispera (`archivo_ifs/replay/2026/ifs/`),
-pintados en percentil del dia como hace `07_produccion/dos_riesgo_hoy.py`; las
-celdas EFFIS de primer dia (`replay/verdad_2026/`) en negro.
+Día: 7 de agosto de 2026 (44.672 ha, el segundo mayor de la temporada). Mapas
+del replay con la pasada IFS de la víspera (`archivo_ifs/replay/2026/ifs/`),
+pintados en percentil del día como hace `07_produccion/dos_riesgo_hoy.py`; las
+celdas EFFIS de primer día (`replay/verdad_2026/`) en negro.
 Uso:  python f9_mapa_agosto2026.py   [TFM_ARCHIVO=<ruta a archivo_ifs>]
 """
 import os

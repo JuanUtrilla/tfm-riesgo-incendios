@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """
-¿Y con la PREVISIÓN del ECMWF (IFS) en vez del reanálisis? (§6bis)
+¿Y con la previsión del ECMWF (IFS) en vez del reanálisis? (§6bis)
 
-NO SOBRESCRIBE NADA. Escribe dataset/prueba_ifs_produccion.json.
+No sobrescribe nada. Escribe dataset/prueba_ifs_produccion.json.
 
-En §6 se validó ERA5(-Land) REANÁLISIS contra el cubo: r=0,976. Pero
-producción necesita servir D y D+1, y para eso no hay reanálisis: hay
-PREVISIÓN. El IFS operativo es otro modelo (ciclo más moderno que el
+En §6 se validó el reanálisis ERA5(-Land) contra el cubo: r=0,976. Pero
+producción necesita servir D y D+1, y para eso no hay reanálisis, solo
+previsión. El IFS operativo es otro modelo (ciclo más moderno que el
 congelado de ERA5, y 0,25° ≈ 28 km en vez de 9 km), así que su acuerdo con el
-cubo NO se puede dar por supuesto a partir de §6.
+cubo no se puede dar por supuesto a partir de §6.
 
 Esta prueba lo mide con el mismo diseño: mismas 120 estaciones, mismos días
 (jun-sep 2024), misma implementación de FWI, cubo cacheado de la corrida
 anterior.
 
-INTERPRETACIÓN. La arquitectura real es híbrida: reanálisis para el historial
+Interpretación. La arquitectura real es híbrida: reanálisis para el historial
 (hasta D−6) y previsión solo para los últimos días y D+1. Simular eso
 exactamente exige una reconstrucción rodante día a día. En su lugar se miden
 las dos cotas, que es suficiente para decidir:
 
-    ERA5 puro  → cota SUPERIOR del híbrido (todo reanálisis)   [§6: −2,0]
-    IFS puro   → cota INFERIOR del híbrido (todo previsión)    [esta prueba]
+    ERA5 puro  → cota superior del híbrido (todo reanálisis)   [§6: −2,0]
+    IFS puro   → cota inferior del híbrido (todo previsión)    [esta prueba]
 
 Si el IFS puro ya sale aceptable, el híbrido lo será por construcción, porque
 el FWI es un integrador con memoria larga (DC ~52 días) y en el híbrido la

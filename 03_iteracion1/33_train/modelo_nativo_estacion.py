@@ -1,61 +1,58 @@
 #!/usr/bin/env python3
 """
-MODELO NATIVO DE PRODUCCIÓN — entrenar donde se sirve.
+Modelo nativo de producción: entrenar donde se sirve.
 
-NO MODIFICA NADA. Crea solo ficheros nuevos con prefijo `nativo_`.
+No modifica nada. Crea solo ficheros nuevos con prefijo `nativo_`.
 
-=============================================================================
-LA IDEA, Y POR QUÉ ES LA RESPUESTA DE VERDAD A "QUE PRODUCCIÓN SEA IGUAL QUE
-ENTRENAMIENTO"
-=============================================================================
+La idea
+-------
 Hasta ahora se ha intentado que producción se parezca al entrenamiento:
 descongelar features, arreglar el percentil del FWI, corregir el viento. Eso
 es cerrar el *train/serve skew*, y `auditoria_train_serve.py` acaba de medir
-cuánto vale: **como mucho 0,04 de AUC**, frente a un hueco de 0,28 entre el
-0,92 del test y el 0,64 operativo. Es decir, se puede cerrar entero y quedarse
-casi igual.
+cuánto vale: como mucho 0,04 de AUC, frente a un hueco de 0,28 entre el
+0,92 del test y el 0,64 operativo. Se puede cerrar entero y quedarse casi
+igual.
 
-La razón es que el resto del hueco NO es desajuste de datos: es que las dos
-cifras responden a preguntas distintas. El 0,92 se midió sobre celdas de 1 km,
-etiqueta EGIF ≥1 ha, prevalencia de diseño 25 % con negativos sorteados lejos
-de cualquier fuego. El sistema opera sobre estaciones-día, todas candidatas,
-con prevalencia real.
+El resto del hueco no viene de un desajuste de datos: las dos cifras responden
+a preguntas distintas. El 0,92 se midió sobre celdas de 1 km, etiqueta EGIF
+≥1 ha, prevalencia de diseño 25 % con negativos sorteados lejos de cualquier
+fuego. El sistema opera sobre estaciones-día, todas candidatas, con
+prevalencia real.
 
-Así que se le da la vuelta al problema: **en vez de forzar producción a
+Así que se le da la vuelta al problema: en vez de forzar producción a
 parecerse al laboratorio, se entrena en el laboratorio con las unidades y los
-datos de producción.**
+datos de producción.
 
   unidad     = (estación, día)               ← la que se sirve
   features   = las que produce el pipeline    ← las que se sirven
   fuente     = AEMET                          ← la que se sirve
   prevalencia= la real, sin sortear negativos ← la que se sirve
 
-Con esto el desajuste entrenamiento/inferencia es **cero por construcción**, y
-—más importante— la métrica que salga es directamente la que el sistema va a
-tener en la calle. No hay traducción que hacer ni excusa que dar.
+Con esto el desajuste entrenamiento/inferencia es cero por construcción y la
+métrica que salga es directamente la que el sistema va a tener en la calle,
+sin traducción de por medio.
 
-=============================================================================
-DECISIONES, TODAS APOYADAS EN MEDICIONES PREVIAS
-=============================================================================
-· SPLIT `train 2015-2020 / val 2021 / test 2022`, el mismo que v4. Permite
-  comparar contra el modelo del cubo en igualdad de años y usar 2022 —el peor
-  año de la serie— como test nunca visto.
-· SIN features de FIRMS ni de rayos. No es pereza: `ablacion_v3_firms.py` midió
-  que la propensión FIRMS aporta −0,0001, y `ablacion_proxies_operativos.py`
-  que los rayos aportan 0 (y quitarlos mejora +0,0015). Incluirlas solo añadiría
+Decisiones (todas apoyadas en mediciones previas)
+-------------------------------------------------
+· Split `train 2015-2020 / val 2021 / test 2022`, el mismo que v4. Permite
+  comparar contra el modelo del cubo en igualdad de años y usar 2022 (el peor
+  año de la serie) como test nunca visto.
+· Sin features de FIRMS ni de rayos. `ablacion_v3_firms.py` midió que la
+  propensión FIRMS aporta −0,0001, y `ablacion_proxies_operativos.py` que los
+  rayos aportan 0 (y quitarlos mejora +0,0015). Incluirlas solo añadiría
   superficie de desajuste a cambio de nada.
 · Satélite y estáticas: las climatologías mensuales congeladas de
-  `estaciones_prototipo.parquet`, que son EXACTAMENTE las que usa producción.
-  Aquí no son un proxy degradado: son la fuente real de las dos partes.
+  `estaciones_prototipo.parquet`, que son exactamente las que usa producción.
+  Aquí no son un proxy degradado, sino la fuente real de las dos partes.
 · `fwi_pctl_local` contra `clim_fwi_aemet`, la climatología homogénea
-  construida hoy — mismo origen que el numerador, que era el fallo de §10.3.b-bis.
-· NEGATIVOS SIN SORTEAR. Todas las estaciones-día de la temporada entran. Es lo
+  construida hoy, con el mismo origen que el numerador (el fallo de §10.3.b-bis
+  era justo ese).
+· Negativos sin sortear. Todas las estaciones-día de la temporada entran. Es lo
   que hace que la métrica sea trasladable, y también lo que la baja: con
   prevalencia real el problema es mucho más difícil que con 25 % de diseño.
 
-=============================================================================
-LO QUE ESTE MODELO NO ARREGLA
-=============================================================================
+Lo que este modelo no arregla
+-----------------------------
 La resolución espacial. Una estación representa su entorno, no una celda de
 1 km, así que este modelo no puede pintar el mapa de 1 km: es un ordenador de
 estaciones. El mapa seguiría necesitando interpolación. Se declara y no se
@@ -259,7 +256,7 @@ def main():
         k = max(1, int(len(g) * 0.10))
         top = np.argsort(-p)[:k]
         out["lift_decil"] = round(float(g.label.values[top].mean() / base), 2)
-        # baseline: el FWI percentil, calculado con la MISMA fuente
+        # baseline: el FWI percentil, calculado con la misma fuente
         b = g["fwi_pctl_local"].fillna(g["fwi_pctl_local"].median()).values
         out["auc_roc_fwi_pctl"] = round(float(roc_auc_score(g.label, b)), 4)
         out["auc_roc_fwi"] = round(float(roc_auc_score(g.label, g["fwi"].values)), 4)

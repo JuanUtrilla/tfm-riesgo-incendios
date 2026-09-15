@@ -1,65 +1,64 @@
 #!/usr/bin/env python3
 """
-Validación del modelo contra los PARTES OFICIALES DE MITECO — la fuente de
-verdad más limpia disponible para el verano de 2026.
+Comprobación del modelo contra los partes oficiales de MITECO, la fuente de
+verdad más limpia disponible para el verano de 2026. Es una comprobación
+complementaria de temporada; la validación del trabajo es el replay de
+2025-2026.
 
-=============================================================================
-POR QUÉ ESTA VALIDACIÓN AÑADE ALGO QUE NINGUNA OTRA DA
-=============================================================================
-Hasta ahora el modelo se ha validado contra:
-  · EGIF   — registro oficial, pero INCOMPLETO desde 2021 (bitácora §2).
-  · FIRMS  — detecciones VIIRS. Independientes y en tiempo real, pero: no ven
-             fuegos pequeños ni bajo nubes, y dan falsos positivos industriales
-             (papeleras, refinerías). Un incendio grande aporta cientos de
-             píxeles y domina el día (pseudo-replicación).
-  · EFFIS  — perímetros cartografiados: limpio, pero con latencia de días.
+=====
+Qué añade esta comprobación
 
-Los partes diarios de MITECO son una cuarta fuente, **independiente de las tres
-anteriores** y con una propiedad que ninguna tiene: registran los incendios en
-los que el Ministerio DESPLEGÓ MEDIOS. Es decir, no miden anomalía térmica ni
-superficie: miden **qué incendios fueron lo bastante graves como para movilizar
-recursos del Estado**. Eso es justamente lo que un sistema de alerta temprana
-debería anticipar.
+Hasta ahora el modelo se ha comparado contra:
+  · EGIF:   registro oficial, pero incompleto desde 2021 (bitácora §2).
+  · FIRMS:  detecciones VIIRS. Independientes y en tiempo real, pero no ven
+            fuegos pequeños ni bajo nubes, y dan falsos positivos industriales
+            (papeleras, refinerías). Un incendio grande aporta cientos de
+            píxeles y domina el día (pseudo-replicación).
+  · EFFIS:  perímetros cartografiados: limpio, pero con latencia de días.
+
+Los partes diarios de MITECO son una cuarta fuente, independiente de las tres
+anteriores, y con una propiedad que ninguna tiene: registran los incendios en
+los que el Ministerio desplegó medios. En vez de anomalía térmica o superficie
+miden qué incendios fueron lo bastante graves como para movilizar recursos del
+Estado, que es lo que un sistema de alerta temprana debería anticipar.
 
 Sesgos que hay que declarar (van en dirección contraria a los de FIRMS, y por
-eso las dos validaciones juntas son más informativas que cualquiera sola):
+eso las dos comprobaciones juntas informan más que cualquiera sola):
   + No tiene falsos positivos industriales: cada registro es un incendio real
     atendido por medios del MITECO.
   + Incluye incendios que VIIRS no ve (pequeños, nublados, nocturnos apagados
     rápido) si movilizaron medios.
   − Solo recoge incendios con despliegue del MITECO: sesgo fuerte a incendios
-    grandes o amenazantes. NO es un censo de igniciones.
-  − La localización es el MUNICIPIO, no una coordenada: hay que geocodificar,
+    grandes o amenazantes. No es un censo de igniciones.
+  − La localización es el municipio, no una coordenada: hay que geocodificar,
     con el error que eso implica (centro del municipio, no el punto de inicio).
   − El parte no siempre trae fecha de inicio: se usa la primera aparición del
     incidente como proxy de la ignición (modo por defecto).
 
-=============================================================================
-PROCEDENCIA DE LOS DATOS  (los dos repos se usan en SOLO LECTURA)
-=============================================================================
-  · Partes MITECO + parser  → repo TFM-RAG de Atomas9
+Procedencia de los datos (los dos repos se usan en solo lectura)
+
+  · Partes MITECO + parser: repo TFM-RAG de Atomas9
       https://github.com/Atomas9/TFM-RAG
       Se importa su `miteco_rag.parseo_y_chuncking` sin modificar ni escribir
       nada dentro de su repositorio. Todas las salidas van a TFM_fuego.
-  · Previsiones del modelo  → repo del colector (aemet_horario_verano2026)
-      `rankings/prevision_D{0,1}_<fecha>.csv`, SELLADAS por commit de GitHub
-      Actions ANTES del día evaluado → validación prospectiva pura.
-  · Maestro de municipios   → prototipo/cache/municipios.json (8.122 municipios
+  · Previsiones del modelo: repo del colector (aemet_horario_verano2026)
+      `rankings/prevision_D{0,1}_<fecha>.csv`, selladas por commit de GitHub
+      Actions antes del día evaluado, así que la comparación es prospectiva.
+  · Maestro de municipios: prototipo/cache/municipios.json (8.122 municipios
       con coordenadas, ya cacheado en este proyecto).
 
-=============================================================================
-METODOLOGÍA (idéntica a validar_modelo.py del colector, para que los números
+Metodología (idéntica a validar_modelo.py del colector, para que los números
 sean comparables entre etiquetas)
-=============================================================================
-Unidad de análisis: ESTACIÓN-DÍA (~684 estaciones × día).
+
+Unidad de análisis: estación-día (~684 estaciones × día).
 Etiqueta: y=1 si hay un incendio de MITECO a ≤ radio km de la estación ese día.
 Métricas: AUC-ROC, AUC-PR, lift del AUC-PR sobre la prevalencia, lift del decil
 superior, y el percentil del riesgo previsto donde ardió (comparable con las
 validaciones del TFM: 85,5 en 2021-24 y 84,9 en 2025-26).
 
 Modos de etiquetado:
-  --modo inicio  (por defecto) solo la PRIMERA aparición de cada incidente
-                 (`incident_key` del parser de Atomas9) → proxy del día de
+  --modo inicio  (por defecto) solo la primera aparición de cada incidente
+                 (`incident_key` del parser de Atomas9), proxy del día de
                  ignición. Es el test correcto para un modelo de riesgo de
                  ignición y evita que un incendio de 5 días cuente 5 veces.
   --modo todos   todos los incendio-día. Responde a otra pregunta: "¿acierta el
@@ -231,13 +230,13 @@ def geocodificar(fuegos: pd.DataFrame, muni: pd.DataFrame) -> pd.DataFrame:
 
 
 def filtrar_peninsula(g: pd.DataFrame) -> pd.DataFrame:
-    """Descarta incendios fuera de la España peninsular, DECLARÁNDOLO.
+    """Descarta incendios fuera de la España peninsular y lo declara.
 
     El modelo se entrenó y opera sobre la malla peninsular de IberFire: en
     Canarias, Baleares, Ceuta y Melilla no hay predicción. Un incendio ahí no
     tendría ninguna estación a ≤25 km, así que nunca contaría como positivo y
     desaparecería en silencio de la estadística. Se filtra de forma explícita
-    para que quede escrito qué se ha dejado fuera y por qué — un descarte
+    para que quede escrito qué se ha dejado fuera y por qué; un descarte
     silencioso se leería como "se ha evaluado todo" sin serlo.
     """
     dentro = g.lat.between(35.5, 44.5) & g.lon.between(-9.6, 4.6)
@@ -256,9 +255,9 @@ def filtrar_peninsula(g: pd.DataFrame) -> pd.DataFrame:
 def previsiones() -> list:
     """CSV de predicción del repo del colector, con su tipo y el día evaluado.
 
-    D0/D1 están SELLADOS por commit ANTES del día al que se refieren (D1 es
+    D0/D1 están sellados por commit antes del día al que se refieren (D1 es
     forecast puro: se emitió la víspera). `retro` es hindcast y `ranking` es el
-    día ya cerrado — se incluyen como contraste, no como validación prospectiva.
+    día ya cerrado; se incluyen como contraste, no como comparación prospectiva.
     """
     filas = []
     for ruta in sorted(RANKINGS.glob("*.csv")):

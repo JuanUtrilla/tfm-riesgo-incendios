@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Precisión de la punta: de las celdas que el modelo ordena más arriba cada
-día (top 0,5 / 1 / 2 / 5 %), cuántas ardieron ESE día (EFFIS, exactas) y cuántas
+día (top 0,5 / 1 / 2 / 5 %), cuántas ardieron ese mismo día (EFFIS, exactas) y cuántas
 están a ≤10 km de una celda quemada ese día. Días con y sin fuego (en un día sin
 fuego la precisión es 0 por definición y cuenta). Condición IFS.
 Escribe replay/replay_precision.{csv,md}."""

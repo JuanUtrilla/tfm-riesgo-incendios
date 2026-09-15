@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Motor de predicción en TIEMPO REAL del prototipo: estación AEMET → riesgo de hoy.
+Motor de predicción en tiempo real del prototipo: de la estación AEMET al riesgo de hoy.
 
 Flujo (diseño en MODELO_B_BITACORA §14):
 1. Serie diaria desde el 1-may: API AEMET climatologías diarias (lag 3-4 días,
    caché 6 h) + colector horario agregado a diario para el hueco final y hoy.
 2. FWI propio (fwi_canadiense) sobre esa serie → fwi del día + ventanas.
-3. Percentil/anomalía vs climatología FWI-propio 2008-14 de la celda (npz
-   precomputado — mismo algoritmo, el sesgo de implementación se cancela).
+3. Percentil/anomalía frente a la climatología del FWI propio 2008-14 de la
+   celda (npz precomputado; mismo algoritmo, el sesgo de implementación se cancela).
 4. Vegetación: climatología mensual 2020-24 de la celda. Estáticas: precomputadas.
-   Autorregresivas: congeladas a 2020 (las de 90 d → NaN, no observables).
-   FIRMS NRT para frp/n_detec 50 km (caché diaria; fallback NaN). Rayos → NaN.
+   Autorregresivas: congeladas a 2020 (las de 90 d quedan a NaN, no observables).
+   FIRMS NRT para frp/n_detec 50 km (caché diaria; fallback NaN). Rayos a NaN.
 5. Predicción con xgb_v1_tuned + SHAP local.
 
 Uso CLI de prueba: python3 tiempo_real.py <idema>   (p. ej. 3195 Madrid Retiro)
@@ -34,11 +34,11 @@ from fwi_canadiense import calcular_fwi_serie
 DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
 DB_COLECTOR = "/home/charredgem/Desktop/Master/aemet_horario_verano2026/data/aemet_horario_verano2026.db"
 DIR_CACHE = f"{DIR}/prototipo/cache"
-# El prototipo usa xgb_v2_prototipo: el modelo SIN las autorregresivas
+# El prototipo usa xgb_v2_prototipo: el modelo sin las autorregresivas
 # intra-celda (n_fuegos_1km_hist/90d, 10km_90d/365d), que en el dataset llevan
 # un artefacto del muestreo misma-celda (el positivo se suma al historial de
-# los negativos posteriores → el modelo aprende orden temporal, no física).
-# Coste medido: AUC-PR 0,843→0,828. Detalle: MODELO_B_BITACORA §16.
+# los negativos posteriores, así que el modelo aprende orden temporal y no
+# física). Coste medido: AUC-PR de 0,843 a 0,828. Detalle: MODELO_B_BITACORA §16.
 with open(f"/home/charredgem/Desktop/Master/TFM_fuego/modelos/"
           f"xgb_v2_prototipo_features.json") as _f:
     FULL = json.load(_f)
@@ -79,7 +79,7 @@ def _cache_json(ruta, max_edad_s, generador):
 
 
 def serie_diaria_aemet(idema):
-    """API climatologías diarias 1-may→hoy (caché 6 h). Devuelve DataFrame."""
+    """API de climatologías diarias del 1-may a hoy (caché 6 h). Devuelve DataFrame."""
     def descargar():
         key = os.environ["TOKEN_AEMET"]
         hoy = pd.Timestamp.utcnow().strftime("%Y-%m-%d")
@@ -99,8 +99,8 @@ def serie_diaria_aemet(idema):
     def num(s):
         return pd.to_numeric(s.astype(str).str.replace(",", "."), errors="coerce")
 
-    # viento_max del modelo = wind_speed_max del cubo (máx. de MEDIAS horarias),
-    # NO la racha (el FWI explota con rachas: ISI ~ exp(0.05·v)). Aproximación
+    # viento_max del modelo = wind_speed_max del cubo (máx. de medias horarias),
+    # no la racha (el FWI explota con rachas: ISI ~ exp(0.05·v)). Aproximación
     # para días de la API diaria (sin horarios): 1.5×velmedia, acotado por racha.
     velmedia = num(df.get("velmedia", pd.Series(dtype=float)))
     racha = num(df.get("racha", pd.Series(dtype=float)))
@@ -142,19 +142,19 @@ def serie_diaria(idema):
     a["n_horas"] = 24                       # días de la API = completos
     df = pd.concat([a, c], ignore_index=True).sort_values("fecha")
     df = df.drop_duplicates("fecha", keep="first").reset_index(drop=True)
-    # reindexar a calendario continuo (huecos → NaN, el FWI los salta)
+    # reindexar a calendario continuo (los huecos quedan a NaN y el FWI los salta)
     cal = pd.date_range(INICIO_SERIE, df["fecha"].max(), freq="D")
     return df.set_index("fecha").reindex(cal).rename_axis("fecha").reset_index()
 
 
 def firms_nrt_df():
-    """Detecciones FIRMS NRT [D-5, D-1] sobre Iberia → DataFrame (caché 6 h).
+    """Detecciones FIRMS NRT [D-5, D-1] sobre Iberia como DataFrame (caché 6 h).
     Excluye el día en curso (circularidad). Vacío si no hay key o falla."""
     def descargar():
         key = os.environ.get("FIRMS_MAP_KEY")
         if not key:
             return None
-        # el API NRT limita a 5 días → ventana [D-5, D-1] en vez de [D-7, D-1]
+        # la API NRT limita a 5 días, de ahí la ventana [D-5, D-1] en vez de [D-7, D-1]
         # (aprox. documentada; el FRP relevante es el más reciente)
         # VIIRS_NOAA20_NRT: Suomi-NPP ya no publica NRT en 2026 (devolvía 0)
         url = (f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{key}/"
@@ -175,8 +175,8 @@ def firms_nrt_frp(lat, lon):
     """FRP máx y nº detecciones a <50 km en los últimos 7 días (FIRMS NRT)."""
     df = firms_nrt_df()
     if df.empty:
-        # fallback 0 = "sin detección": las features frp/n_detec NUNCA fueron
-        # NaN en entrenamiento (0 era el valor sin fuego) — un NaN aquí manda
+        # fallback 0 = "sin detección": las features frp/n_detec nunca fueron
+        # NaN en entrenamiento (0 era el valor sin fuego); un NaN aquí manda
         # al árbol por ramas no aprendidas y corrompe la predicción
         return 0.0, 0.0
     from pyproj import Transformer
@@ -217,13 +217,13 @@ def _municipio_cercano(lat, lon):
 
 
 def _forecast_municipio(idema, e):
-    """Predicción AEMET del municipio de la estación → filas diarias futuras.
-    Precipitación prevista: la predicción da PROBABILIDAD, no cantidad →
+    """Predicción AEMET del municipio de la estación, como filas diarias futuras.
+    Precipitación prevista: la predicción da probabilidad y no cantidad, así que
     prec=0 si prob<60%, 2 mm si ≥60% (conservador hacia el riesgo; documentado)."""
     cod, capital = _municipio_cercano(e["lat"], e["lon"])
 
     def descargar():
-        # solo llega aquí sin caché → ritmo ~45 req/min (límite AEMET ~50/min,
+        # solo llega aquí sin caché; ritmo ~45 req/min (límite AEMET ~50/min,
         # y cada forecast son 2 peticiones) + reintento con espera si 429
         key = os.environ["TOKEN_AEMET"]
         for intento in range(4):
@@ -272,9 +272,9 @@ def construir_features(idema, horizonte=0):
     df = serie_diaria(idema)
     if df.empty or df["tmax"].notna().sum() < 45:
         raise ValueError(f"serie diaria insuficiente para {idema}")
-    # último día COMPLETO (≥18 h de observación): evaluar "hoy" con solo las
-    # horas de madrugada daba Tmax nocturnas y riesgo falso a la baja (bug
-    # detectado 15/07 — mediana nacional real 32,7°C vs 26°C evaluados).
+    # último día completo (≥18 h de observación): evaluar "hoy" con solo las
+    # horas de madrugada daba Tmax nocturnas y riesgo falso a la baja (fallo
+    # detectado el 15/07: mediana nacional real 32,7°C frente a 26°C evaluados).
     completos = df.index[(df["tmax"].notna()) & (df["n_horas"].fillna(24) >= 18)]
     i = int(completos[-1])
     if horizonte > 0:
@@ -331,9 +331,9 @@ def construir_features(idema, horizonte=0):
               "clc_artificial", "clc_abierto", "clc_agric_hetero"]:
         F[c] = e[c]
 
-    # REGLA (aprendida en la prueba del 15/07): una feature que NUNCA fue NaN
-    # en entrenamiento no puede ser NaN en inferencia — el árbol la manda por
-    # una rama arbitraria. Para las no observables se usa su MODA en train (0).
+    # Regla (aprendida en la prueba del 15/07): una feature que nunca fue NaN
+    # en entrenamiento no puede ser NaN en inferencia, porque el árbol la manda
+    # por una rama arbitraria. Para las no observables se usa su moda en train (0).
     F["n_fuegos_1km_90d"] = 0.0             # EGIF no disponible en tiempo real
     F["n_fuegos_10km_90d"] = 0.0            # (moda en train; caveat documentado)
     F["n_fuegos_10km_365d"] = e["n_fuegos_10km_365d"]      # congelada (2020)
@@ -374,10 +374,10 @@ def predecir(idema, horizonte=0):
 
 
 # ----------------------------------------------------------------------------
-# Evaluación MASIVA: ranking nacional de riesgo (todas las estaciones)
+# Evaluación masiva: ranking nacional de riesgo (todas las estaciones)
 # Usa el endpoint `todasestaciones` (serie diaria de las ~819 estaciones en
-# ~6 peticiones de 14 días) + colector horario en bloque → FWI y features por
-# estación → predicción batch. Caché diaria del ranking.
+# ~6 peticiones de 14 días) + colector horario en bloque; de ahí salen el FWI
+# y las features por estación y la predicción en batch. Caché diaria del ranking.
 # ----------------------------------------------------------------------------
 
 def _todas_chunk(f0, f1, max_edad_s):
@@ -394,7 +394,7 @@ def _todas_chunk(f0, f1, max_edad_s):
 
 
 def serie_diaria_todas():
-    """Serie diaria de TODAS las estaciones desde el 1-may (API + colector)."""
+    """Serie diaria de todas las estaciones desde el 1-may (API + colector)."""
     hoy = pd.Timestamp.utcnow().tz_localize(None).normalize()
     filas = []
     f0 = pd.Timestamp(INICIO_SERIE)

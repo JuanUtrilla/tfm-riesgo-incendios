@@ -346,11 +346,10 @@ en el repositorio (anexo~D).
 \setcounter{secnumdepth}{3}
 \newcommand{\repo}[2]{\href{https://github.com/JuanUtrilla/tfm-riesgo-incendios/#1}{\texttt{#2}}}
 
-Estos anexos amplían la sección con el detalle de los datos, de las
-alternativas evaluadas, de la escala del mapa y de la puesta en producción.
-Cada cifra procede de un fichero generado por un script del repositorio
-(anexo~D), y \repo{blob/main/docs/TRAZABILIDAD.md}{docs/TRAZABILIDAD.md} indica
-cuál.
+Los anexos amplían la sección en cuatro aspectos: los datos, las alternativas
+evaluadas, la escala del mapa y la puesta en producción. Cada cifra procede de
+un fichero generado por un script del repositorio (anexo~D); el documento
+\repo{blob/main/docs/TRAZABILIDAD.md}{docs/TRAZABILIDAD.md} indica cuál.
 
 % ---------------------------------------------------------------------------- A
 \subsection{Datos y variables}
@@ -359,9 +358,10 @@ cuál.
 \subsubsection{Fuentes}
 
 La tabla~\ref{tab:fuentes} recoge las fuentes empleadas y la fase del trabajo
-en la que se usó cada una. Las cinco primeras son las del apartado de datos.
-Las demás aportaron variables de entorno, la meteorología de la primera puesta
-en producción o una segunda referencia durante el desarrollo.
+en la que se usó cada una. Las cinco primeras son las que describe el apartado
+de datos de la sección. Las demás aportaron variables del territorio, la
+meteorología de la primera puesta en producción o una segunda referencia
+durante el desarrollo.
 
 \begin{table}[H]
   \centering
@@ -389,9 +389,9 @@ FIRMS es el \emph{Fire Information for Resource Management System}; VIIRS, el
 \emph{Visible Infrared Imaging Radiometer Suite}; CORINE (\emph{Coordination of
 Information on the Environment}), el inventario europeo de usos del suelo.
 
-Antes de construir ninguna variable se comprobó de dónde procede la
-meteorología del cubo. Es ERA5-Land remuestreado: las correlaciones con el
-reanálisis nativo están entre 0.987 y 0.998, sin sesgo. Hay dos excepciones que
+Antes de construir ninguna variable se comprobó el origen de la meteorología
+del cubo. Es ERA5-Land remuestreado: las correlaciones con el reanálisis nativo
+están entre 0.987 y 0.998, sin sesgo. Se encontraron dos excepciones que
 condicionan el servicio. La precipitación del cubo está dividida por un factor
 de 2.02, y su FWI solo se reproduce con las condiciones de las 13 UTC (tiempo
 universal coordinado). La cadena de servicio calcula el FWI a esa misma hora y
@@ -425,24 +425,25 @@ día anterior al que se predice, salvo las que se describen como «del día».
 El primer modelo se entrenó con 50 variables. Antes de ponerlo en producción se
 retiraron cuatro recuentos de incendios en la propia celda: a 1~km en 90 días y
 en toda la historia, y a 10~km en 90 y 365 días. El muestreo en la misma celda
-les filtraba el orden temporal: el incendio del positivo entraba en el
-historial de los negativos posteriores de su celda, y el modelo asociaba el
-historial vacío con el periodo anterior al fuego. Retirarlas costó 0.015 de
-AUC-PR (\emph{Area Under the Precision-Recall Curve}). En servicio hay otras
-dos diferencias con el entrenamiento, medidas y aceptadas: las variables de
-satélite del día se sustituyen por su climatología mensual y los rayos se fijan
-en cero. Juntas cuestan 0.0045 de AUC.
+introducía en ellas una fuga del orden temporal: el incendio del positivo
+entraba en el historial de los negativos posteriores de esa celda, y el modelo
+asociaba un historial vacío con el periodo anterior al fuego. Retirarlas costó
+0.015 de AUC-PR (\emph{Area Under the Precision-Recall Curve}). En servicio hay
+otras dos diferencias con el entrenamiento, medidas y aceptadas: las variables
+de satélite del día se sustituyen por su climatología mensual y los rayos se
+fijan en cero. Juntas cuestan 0.0045 de AUC.
 
 \subsubsection{Dos características de los datos}
 
 La figura~\ref{fig:an-prev} resume las dos propiedades del fenómeno que más
-condicionaron el diseño. La primera es la escasez: en verano arden entre 0.5 y
-38 celdas de cada 100,000 al día, según el año, frente al 25~\% de positivos
-del conjunto de la primera iteración. La segunda es la persistencia de la
-etiqueta de EFFIS. Una celda que arde un día sigue marcada al siguiente con
-probabilidad 0.51, porque la etiqueta señala días ardiendo y no igniciones. Por
-ello todas las evaluaciones cuentan solo el primer día de cada celda quemada:
-en los veranos evaluados quedan 7,301 de las 28,135 celdas-día marcadas.
+condicionaron el diseño. La primera es la escasez de positivos: en verano arden
+entre 0.5 y 38 celdas de cada 100,000 al día, según el año, frente al 25~\% de
+positivos del conjunto de la primera iteración. La segunda es la persistencia
+de la etiqueta de EFFIS. Una celda que arde un día sigue marcada al siguiente
+con probabilidad 0.51, porque la etiqueta señala días ardiendo y no igniciones.
+Por ello todas las evaluaciones cuentan solo el primer día de cada celda
+quemada: en los veranos evaluados quedan 7,301 de las 28,135 celdas-día
+marcadas.
 
 \begin{figure}[H]
   \centering
@@ -454,11 +455,12 @@ en los veranos evaluados quedan 7,301 de las 28,135 celdas-día marcadas.
 \end{figure}
 
 El análisis exploratorio motivó también el FWI en percentil local
-(figura~\ref{fig:an-norm}). En los días de incendio, el FWI mediano va de 3
-en Asturias y Cantabria a 41 en Andalucía, y ningún umbral absoluto sirve para
-toda la península. Expresado como percentil respecto a la historia de cada
-celda, el mismo dato se concentra entre 72 y 92 en las ocho comunidades con más
-incendios. Añadir el percentil al FWI absoluto aumentó el AUC-PR en 0.042.
+(figura~\ref{fig:an-norm}). En los días de incendio, el FWI mediano va de 3 en
+Asturias y Cantabria a 41 en Andalucía, de modo que ningún umbral absoluto
+sirve para toda la península. Expresado como percentil respecto a la historia
+de cada celda, el mismo dato se concentra entre 72 y 92 en las ocho comunidades
+con más incendios. Añadir el percentil al FWI absoluto aumentó el AUC-PR en
+0.042.
 
 Detalle en el repositorio: la descarga y el tratamiento de cada fuente en
 \repo{blob/main/01_datos/README.md}{01\_datos/README.md}, las 46 variables y su
@@ -522,13 +524,14 @@ ordenación y las operativas.
   \end{tabular}
 \end{table}
 
-La figura~\ref{fig:an-boxplot} muestra la distribución del AUC día a día
-detrás de esas medias. En 2025 la mediana del r10 es 0.844 y la de producción
-0.797, pero la diferencia está sobre todo en la mitad baja: el primer cuartil
-de producción es 0.621 frente a 0.736 del r10, y producción queda por debajo
-del azar 16 días frente a 7. En 2026 se repite con más margen: medianas de
-0.799 y 0.688, primer cuartil de 0.690 y 0.517, y 19 días bajo el azar frente
-a 3. El r10 no acierta más en los días fáciles; falla menos en los difíciles.
+La figura~\ref{fig:an-boxplot} muestra la distribución del AUC día a día que
+hay tras esas medias. En 2025 la mediana del r10 es 0.844 y la de producción
+0.797, pero la diferencia se concentra en la mitad baja: el primer cuartil de
+producción es 0.621 frente a 0.736 del r10, y producción queda por debajo del
+azar 16 días frente a 7. En 2026 se repite el patrón con más margen: medianas
+de 0.799 y 0.688, primer cuartil de 0.690 y 0.517, y 19 días bajo el azar
+frente a 3. La ventaja del r10 procede de los días en que producción ordena
+peor.
 
 \begin{figure}[H]
   \centering
@@ -536,7 +539,7 @@ a 3. El r10 no acierta más en los días fáciles; falla menos en los difíciles
   \caption{AUC dentro del día de los seis modelos en los días con fuego de
   cada temporada, con la previsión de la víspera. Caja: cuartiles y mediana;
   bigotes: 1.5 veces el rango intercuartílico; puntos: días fuera de ese
-  rango. La cifra sobre cada caja es la media, la de la
+  rango. La cifra sobre cada caja es la media, la misma de la
   tabla~\ref{tab:benchmark}. La línea de puntos es el azar.}
   \label{fig:an-boxplot}
 \end{figure}
@@ -544,8 +547,9 @@ a 3. El r10 no acierta más en los días fáciles; falla menos en los difíciles
 En ordenación, los dos modelos únicos encabezan las dos temporadas y empatan
 entre sí. La pareja supera a producción, pero queda por debajo del modelo
 único. El modelo de «dónde» por separado no se distingue de producción, y el
-de «cuándo» queda por debajo. Un solo modelo que ve territorio y meteorología
-a la vez supera a la combinación de dos modelos especializados.
+de «cuándo» queda por debajo. Un modelo único que recibe territorio y
+meteorología a la vez ordena mejor que la combinación de dos modelos
+especializados.
 
 Las métricas de superficie no siempre siguen al AUC. En 2025 la pareja situó
 más hectáreas que el r10 en el 2 y en el 10~\% de celdas de mayor riesgo. En
@@ -557,11 +561,11 @@ días: sin el 23 de julio, que sumó 21,348~ha, la captura de producción en el
 
 \subsubsection{Territorio vigilado y superficie cubierta}
 
-La métrica que interesa a un gestor es qué parte de la superficie quemada cae
-dentro de la zona señalada, según el tamaño de esa zona. La
-tabla~\ref{tab:captura-r10} la da para el r10. El lift es el cociente
-entre el porcentaje de hectáreas dentro y el porcentaje de territorio vigilado;
-un lift de 1 equivale a señalar celdas al azar.
+La métrica que más interesa a un gestor es la parte de la superficie quemada
+que cae dentro de la zona señalada, en función del tamaño de esa zona. La
+tabla~\ref{tab:captura-r10} la recoge para el r10. El lift es el cociente entre
+el porcentaje de hectáreas dentro de la zona y el porcentaje de territorio
+vigilado; un lift de 1 equivale a señalar celdas al azar.
 
 
 \begin{table}[H]
@@ -591,22 +595,23 @@ la superficie quemada, 13.2 veces lo esperable al azar. Ampliar la zona al
 10~\% habría cubierto el 63.0~\% de la superficie y el 69.6~\% de los incendios
 de al menos 100~ha. En 2026 la curva es más plana: el 10~\% del territorio
 cubrió el 37.0~\%, con un lift de 3.7 casi constante desde el 1~\%. Por encima
-del 10~\% cada punto de territorio añadido aporta cada vez menos. Estas
-hectáreas no son superficie evitada: miden cuánto fuego cayó dentro de la zona
-señalada, que es el máximo que una vigilancia reforzada allí podría haber
-anticipado.
+del 10~\%, cada punto de territorio añadido aporta cada vez menos. Estas
+hectáreas no deben leerse como superficie evitada. Miden cuánto fuego cayó
+dentro de la zona señalada, es decir, el máximo que una vigilancia reforzada en
+esa zona podría haber anticipado.
 
 \subsubsection{Alternativas al r10}
 
 La tabla~\ref{tab:an-descartes} resume las pruebas con resultado negativo. En
-la escalera de negativos, el AUC-PR de validación no sirve para elegir porque
+la escalera de negativos, el AUC-PR de validación no sirve para elegir, porque
 cada variante tiene una proporción de positivos distinta; la métrica que separa
 las variantes es el percentil ponderado por hectáreas, que mide dónde quedan los
-incendios grandes. Entrenar solo con verano quita al «dónde» información sobre
-qué territorio arde. Apagar las celdas quemadas penaliza porque EFFIS marca la
-celda mientras el incendio sigue activo. Reentrenar con todos los años no
-alcanzó el criterio fijado: el modelo está saturado de datos y la partición
-conserva un conjunto de prueba reservado sin coste.
+incendios grandes. Entrenar solo con verano quita al modelo de «dónde»
+información sobre qué territorio arde. Apagar las celdas quemadas penaliza
+porque EFFIS mantiene marcada la celda mientras el incendio sigue activo.
+Reentrenar con todos los años no alcanzó el criterio fijado: el modelo no
+mejora con más datos, y la partición original conserva un conjunto de prueba
+reservado sin coste.
 
 \begin{table}[H]
   \centering
@@ -646,15 +651,16 @@ niveles fijos; la cifra sitúa el día entre los de referencia.
 
 \subsubsection{Cortes calibrados sobre el servicio}
 
-Los cortes se calcularon primero con los diez años del cubo, como el 2~\% más
-alto de su historia. Aplicados a los mapas que produce la cadena de servicio,
-marcaron entre dos y diez veces más celdas en extremo que el cubo en el mismo
-mes, tanto con previsión como con reanálisis. La causa está en el cálculo de
-las variables de vecindad en servicio (anexo~E), no en la meteorología. Por
-ello los cortes publicados se obtuvieron de los propios mapas servidos: los 250
-días de 2025 y 2026 de la reproducción. La tabla~\ref{tab:an-niveles} da el
-significado de cada nivel. El corte de extremo apenas cambió respecto al cubo
-(0.4058 frente a 0.4066); los de moderado y alto subieron.
+Los cortes se calcularon primero con los diez años del cubo, de modo que el
+nivel extremo fuese el 2~\% más alto de su historia. Aplicados a los mapas que
+produce la cadena de servicio, marcaron entre dos y diez veces más celdas en
+extremo que el cubo en el mismo mes, tanto con previsión como con reanálisis.
+La causa es el cálculo de las variables de vecindad en servicio (anexo~E); la
+meteorología quedó descartada. Por ello los cortes publicados se obtuvieron de
+los propios mapas servidos, los 250 días de 2025 y 2026 de la reproducción. La
+tabla~\ref{tab:an-niveles} da el significado de cada nivel. El corte de extremo
+apenas cambió respecto al cubo (0.4058 frente a 0.4066); los de moderado y alto
+subieron.
 
 \begin{table}[H]
   \centering
@@ -684,37 +690,39 @@ de diciembre a abril, de los que no hay ninguno.
 
 \subsubsection{Cifra del día y semáforo descartado}
 
-La cifra es el porcentaje de España en nivel extremo, situado entre los 250
-días de referencia, cuya mediana es el 1.5~\%, el percentil 90 el 4.6~\% y el
-máximo el 7.2~\%. Para separar los días con incendio grande (al menos cinco
-celdas nuevas quemadas) obtuvo un AUC de 0.69 en 2025 y de 0.66 en 2026, frente
-a 0.74 y 0.44 del calendario. En el cubo, con años que la calibración no usó
-(2022--2024), obtuvo 0.87 de diciembre a abril y 0.77 de junio a septiembre,
-frente a 0.61 y 0.71 del calendario. Comparar cada día con su mismo mes empeoró el
-resultado, por lo que la referencia agrupa todos los días.
+La cifra del día es el porcentaje de España en nivel extremo, situado entre los
+250 días de referencia; en esa referencia la mediana es el 1.5~\%, el percentil
+90 el 4.6~\% y el máximo el 7.2~\%. Como separador de los días con incendio
+grande (al menos cinco celdas nuevas quemadas), la cifra obtuvo un AUC de 0.69
+en 2025 y de 0.66 en 2026, frente a 0.74 y 0.44 del calendario. En el cubo, con
+años que la calibración no usó (2022--2024), obtuvo 0.87 de diciembre a abril y
+0.77 de junio a septiembre, frente a 0.61 y 0.71 del calendario. Comparar cada
+día con los de su mismo mes empeoró el resultado, por lo que la referencia
+agrupa todos los días.
 
 
-Antes de la cifra se evaluó un semáforo nacional: una regla que retiraba el
-nivel extremo los días en que el p98 de la puntuación, convertido en
+Antes de la cifra se evaluó un semáforo nacional. La regla retiraba el nivel
+extremo los días en que el percentil 98 de la puntuación, convertido en
 probabilidad de día grande con una calibración ajustada en 2015--2021, no
 llegaba a 0.155. Aplicada a los diez años del cubo, de diciembre a abril dejó
 sin extremo el 44.0~\% de los días y perdió el 6.2~\% de los días grandes. En
 verano apagó el extremo en el 55.5~\% de los días y en el 31.7~\% de los días
-grandes, porque el p98 de verano se concentra justo por debajo del umbral. Fuera
-de calibración (2022--2024) perdió el 34.6~\% de los días grandes de verano, y
-en la reproducción de 2026 el 54.4~\%, que sumaban el 60.4~\% de la superficie
-quemada. Se compararon cuatro variantes (todo el año, fuera de verano, solo de
-diciembre a abril y con umbral por época) y ninguna se adoptó: el semáforo
-reduce a dos valores la misma señal que ya resume la cifra del día, y en verano
-el coste no se compensa. Un aviso limitado a los meses de invierno queda como
-línea futura, pendiente de calibrarlo con mapas servidos de esa época. El detalle
-está en \repo{blob/main/07_produccion/escala_y_cifra/README.md}{07\_produccion/escala\_y\_cifra/README.md}.
+grandes, porque en verano el percentil 98 se concentra justo por debajo del
+umbral. Fuera del periodo de calibración (2022--2024) perdió el 34.6~\% de los
+días grandes de verano. En la reproducción de 2026 perdió el 54.4~\%, que
+sumaban el 60.4~\% de la superficie quemada. Se compararon cuatro variantes
+(todo el año, fuera de verano, solo de diciembre a abril y con umbral por época)
+y ninguna se adoptó. El semáforo reduce a dos valores la misma señal que ya
+resume la cifra del día, y en verano su coste no se compensa. Un aviso limitado
+a los meses de invierno queda como línea futura, pendiente de calibrarlo con
+mapas servidos de esa época. El detalle está en
+\repo{blob/main/07_produccion/escala_y_cifra/README.md}{07\_produccion/escala\_y\_cifra/README.md}.
 
 La puntuación no es una probabilidad por celda. Calibrada con regresión
 isotónica sobre todas las celdas-día del cubo, la celda de mayor riesgo en diez
 años no supera el 1.6~\% de probabilidad de arder ese día, y esa probabilidad
 depende de la intensidad de la temporada (anexo~E). Por eso el mapa publica
-niveles.
+niveles y no probabilidades.
 
 Detalle en el repositorio: los cortes, la referencia y el semáforo evaluado en
 \repo{blob/main/07_produccion/escala_y_cifra/README.md}{07\_produccion/escala\_y\_cifra/README.md}
@@ -725,11 +733,11 @@ y la calibración en el cubo en
 \subsection{Repositorio, reproducibilidad y cadena diaria}
 \label{an:repositorio}
 
-El código y la documentación están en
-\href{https://github.com/JuanUtrilla/tfm-riesgo-incendios}{\texttt{github.com/JuanUtrilla/tfm-riesgo-incendios}},
-público. Las carpetas siguen el orden de esta memoria
-(tabla~\ref{tab:an-repo}) y cada una tiene un fichero \texttt{README.md} con lo
-que hace cada script y para qué se usó. Son 181 scripts de Python.
+El código y la documentación están en un repositorio público,
+\href{https://github.com/JuanUtrilla/tfm-riesgo-incendios}{\texttt{github.com/JuanUtrilla/tfm-riesgo-incendios}}.
+Las carpetas siguen el orden de esta memoria (tabla~\ref{tab:an-repo}) y cada
+una tiene un fichero \texttt{README.md} que indica qué hace cada script y para
+qué se usó. En total son 181 scripts de Python.
 
 \begin{table}[H]
   \centering
@@ -754,7 +762,7 @@ que hace cada script y para qué se usó. Son 181 scripts de Python.
   \end{tabular}
 \end{table}
 
-La tabla~\ref{tab:an-ampliar} da, para cada parte de la memoria, el fichero
+La tabla~\ref{tab:an-ampliar} indica, para cada parte de la memoria, el fichero
 del repositorio que la amplía. Las rutas son relativas a
 \texttt{https://github.com/JuanUtrilla/tfm-riesgo-incendios/blob/main/}.
 
@@ -783,25 +791,25 @@ del repositorio que la amplía. Las rutas son relativas a
 
 \subsubsection{Trazabilidad y reproducibilidad}
 
-Tres decisiones permiten comprobar las cifras. La primera: los scripts son
-copias literales de los que produjeron los resultados, y
-\texttt{docs/PROCEDENCIA.md} registra el origen y la huella MD5 de cada uno;
-solo se adaptaron las rutas de cuatro módulos comunes. La segunda:
-\texttt{docs/TRAZABILIDAD.md} enlaza cada cifra de la memoria con el script
-que la produjo, el fichero donde quedó escrita y los datos que necesita. La
-tercera: el entorno está fijado en \texttt{environment.yml} (conda, XGBoost
-3.2.0) y, para la cadena diaria, en \texttt{requirements\_gh.txt}.
+Tres decisiones permiten comprobar las cifras. En primer lugar, los scripts
+son copias literales de los que produjeron los resultados;
+\texttt{docs/PROCEDENCIA.md} registra el origen y la huella MD5 de cada uno, y
+solo se adaptaron las rutas de cuatro módulos comunes. En segundo lugar,
+\texttt{docs/TRAZABILIDAD.md} enlaza cada cifra de la memoria con el script que
+la produjo, el fichero donde quedó escrita y los datos que necesita. Por último,
+el entorno está fijado en \texttt{environment.yml} (conda, XGBoost 3.2.0) y,
+para la cadena diaria, en \texttt{requirements\_gh.txt}.
 
 Todos los entrenamientos citados se repitieron en una copia aislada el 2 de
-septiembre de 2026. Las métricas coincidieron sin discrepancia y los modelos
-resultantes fueron idénticos byte a byte a los originales. El modelo servido en
-2026, que se había reentrenado de forma interactiva, se reconstruyó árbol a
-árbol a partir de la receta documentada.
+septiembre de 2026. Las métricas coincidieron y los modelos resultantes fueron
+idénticos byte a byte a los originales. El modelo servido en 2026, que se había
+reentrenado de forma interactiva, se reconstruyó árbol a árbol a partir de la
+receta documentada.
 
 Los datos crudos no están en el repositorio: el cubo IberFire ocupa 29~GB y los
 entrenamientos lo necesitan. La carpeta \texttt{muestras/} contiene un recorte
 de julio de 2026 con el que la rama de servicio se ejecuta en un ordenador
-personal:
+personal con cuatro órdenes:
 \begin{center}
   \small\ttfamily
   \begin{tabular}{l}
@@ -816,26 +824,27 @@ personal:
 
 El mapa se publica cada madrugada desde GitHub Actions, el servicio de
 ejecución automática de GitHub, que no tiene acceso al cubo. La
-figura~\ref{fig:an-cadena} muestra los pasos. La corrida tarda alrededor de una
+figura~\ref{fig:an-cadena} muestra los pasos. La corrida dura alrededor de una
 hora y cuarto, casi toda en la descarga del reanálisis y de la previsión. El
-estado que se conserva entre corridas, el reanálisis acumulado y los mapas
-recientes, se guarda en una publicación del propio repositorio. Cada día se
-generan dos imágenes, para hoy y para mañana, y un fichero JSON con la cifra del
-día; las de hoy aparecen en la portada del repositorio y los diez últimos días
-quedan en la carpeta \texttt{publicado/}. Durante el verano de 2026 la misma
-cadena corrió en un repositorio previo y publicó, además, los mapas de los
-otros candidatos.
+estado que se conserva entre corridas (el reanálisis acumulado y los mapas
+recientes) se guarda en una publicación del propio repositorio. Cada día se
+generan dos imágenes, para hoy y para mañana, y un fichero JSON con la cifra
+del día. Las imágenes de hoy aparecen en la portada del repositorio y los diez
+últimos días quedan en la carpeta \texttt{publicado/}. Durante el verano de
+2026 la misma cadena corrió en un repositorio previo y publicó también los
+mapas de los otros candidatos.
 
-La verdad llega después del mapa: el parte del MITECO del día D se publica el
-D+1 y los perímetros de EFFIS tardan entre seis y nueve días. Por eso cada
-corrida redibuja también los mapas de los veinte días anteriores con lo que ya
-se conoce, sin tocar el original. De cada fecha quedan dos imágenes: la que se
-predijo y la misma con los perímetros de EFFIS y los incidentes del MITECO
-encima. El parte del MITECO solo da el municipio del incidente, así que se
-sitúa en su centroide, con un error de 5 a 15~km, y se juzga con un radio de
-10~km: el mejor nivel del mapa dentro de ese círculo. Es el mismo parte que
-alimenta el módulo de consulta del sistema, de modo que el documento que el
-asistente lee es el que verifica el mapa. En los trece primeros días de
+La referencia con la que se verifica el mapa se conoce después de publicarlo:
+el parte del MITECO del día D se publica el D+1 y los perímetros de EFFIS
+tardan entre seis y nueve días. Por eso cada corrida redibuja también los
+mapas de los veinte días anteriores con lo que ya se conoce, sin modificar el
+original. De cada fecha quedan dos imágenes: la que se predijo y la misma con
+los perímetros de EFFIS y los incidentes del MITECO superpuestos. El parte del
+MITECO solo da el municipio del incidente, así que cada incidente se sitúa en
+el centroide del municipio, con un error de 5 a 15~km. Se evalúa con un radio
+de 10~km, tomando el mejor nivel del mapa dentro de ese círculo. Es el mismo
+parte que alimenta el módulo de consulta del sistema, de modo que el documento
+que lee el asistente es el que verifica el mapa. En los trece primeros días de
 septiembre de 2026, con el nivel extremo entre el 0.2 y el 1.6~\% de España,
 cayó en él el 22~\% de las celdas quemadas del día y el 37~\% de los
 incidentes del MITECO; en alto o extremo, el 66 y el 78~\%.
@@ -871,8 +880,8 @@ incidentes del MITECO; en alto o extremo, el 66 y el 78~\%.
 \subsection{Limitaciones}
 \label{an:limitaciones}
 
-La tabla~\ref{tab:an-limitaciones} resume las limitaciones conocidas, su
-efecto medido y su consecuencia. La primera requiere explicación.
+La tabla~\ref{tab:an-limitaciones} resume las limitaciones conocidas, con su
+efecto medido y su consecuencia. La primera se comenta a continuación.
 
 \begin{table}[H]
   \centering
@@ -890,7 +899,7 @@ efecto medido y su consecuencia. La primera requiere explicación.
     Ruido del sorteo e intervalos & Sorteo: 0.004 de AUC; intervalos 1.35 veces más estrechos que con bloques de 14 días & Los IC son una cota inferior de la incertidumbre \\
     Probabilidad por celda & En julio, del 0.00~\% (2023) al 12.76~\% (2022) en la franja más alta & Se publica el nivel, no la probabilidad \\
     Escala absoluta en servicio & Cortes calibrados con 250 días de temporada & Sin datos de diciembre a abril; recalcular al acumular días \\
-    Etiquetas & EFFIS omite incendios pequeños y tarda unos 45 días & La verdad de 2026 aún puede cambiar \\
+    Etiquetas & EFFIS omite incendios pequeños y tarda unos 45 días & Las etiquetas de 2026 aún pueden cambiar \\
     Cobertura & Península y Baleares; 2026 hasta el 2 de septiembre & Sin Canarias, Ceuta ni Melilla \\
     \bottomrule
   \end{tabular}
@@ -901,8 +910,8 @@ previsión disponible la víspera de cada día, pero se generaron todos a la vez
 en septiembre de 2026, cuando los perímetros ya se conocían. Un modelo puntuado
 así no tiene el mismo valor que uno publicado antes del día, porque nada impide
 en principio elegir los modelos o las métricas a la vista del resultado. Tres
-hechos lo mitigan: el protocolo se registró por escrito antes de ejecutar nada,
-los seis modelos se reportan siempre, y la evaluación de 2026 con reanálisis,
+hechos lo mitigan. El protocolo se registró por escrito antes de ejecutar nada;
+los seis modelos se presentan siempre; y la evaluación de 2026 con reanálisis,
 hecha antes y por otra vía, apunta en la misma dirección ($+0.112$, IC95
 [$+0.074$, $+0.151$]).
 
