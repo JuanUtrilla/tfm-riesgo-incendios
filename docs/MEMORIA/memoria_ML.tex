@@ -331,6 +331,7 @@ Todo el código está disponible en el repositorio (anexo~\ref{an:b5}).
 \renewcommand{\theHsubsection}{anexoB.\arabic{subsection}}
 \renewcommand{\theHsubsubsection}{anexoB.\arabic{subsection}.\arabic{subsubsection}}
 \providecommand{\repo}[2]{\href{https://github.com/JuanUtrilla/tfm-riesgo-incendios/#1}{\texttt{#2}}}
+\newcommand{\enrepo}[1]{\par\smallskip\noindent{\small\textit{En el repositorio:} #1.}\par}
 
 Este anexo amplía la sección del módulo de predicción en cinco apartados: los
 datos y su análisis exploratorio (B.1), los modelos construidos y la elección
@@ -393,6 +394,9 @@ por 2.02, y el FWI del cubo corresponde a las 13 UTC. La cadena de servicio
 aplica el mismo factor y calcula el FWI a esa hora, de modo que el modelo
 recibe en servicio la misma escala con la que se entrenó.
 
+
+\enrepo{\repo{blob/main/01_datos/README.md}{01\_datos/README.md}, \repo{tree/main/01_datos/cubo}{01\_datos/cubo/}}
+
 \subsubsection{Malla y variables}
 \label{an:b1-malla}
 
@@ -440,6 +444,9 @@ en la misma celda filtraba en ellos el orden temporal: el incendio del positivo
 entraba en el historial de los negativos posteriores. Retirarlos costó 0.015 de
 AUC-PR (\emph{Area Under the Precision-Recall Curve}).
 
+
+\enrepo{\repo{blob/main/01_datos/era5land/malla_01_nodos.py}{01\_datos/era5land/malla\_01\_nodos.py}, \repo{blob/main/01_datos/comun/features.py}{01\_datos/comun/features.py}}
+
 \subsubsection{La escasez del fuego}
 \label{an:b1-escasez}
 
@@ -467,6 +474,9 @@ primer día de cada celda quemada: en los veranos evaluados quedan 7,301 de las
   \label{fig:prev}
 \end{figure}
 
+
+\enrepo{\repo{blob/main/02_eda/README.md}{02\_eda/README.md}, \repo{blob/main/02_eda/ANALISIS_CUBO.md}{02\_eda/ANALISIS\_CUBO.md}}
+
 \subsubsection{La agrupación espacial}
 \label{an:b1-agrupacion}
 
@@ -476,6 +486,9 @@ autocorrelación, una partición aleatoria pone en el conjunto de prueba celdas
 vecinas de las de entrenamiento y aumenta artificialmente el AUC (\emph{Area
 Under the ROC Curve}) en 0.036 frente a una partición por bloques de 100~km.
 Por ello todas las particiones del trabajo son espaciales o temporales.
+
+
+\enrepo{\repo{blob/main/02_eda/README.md}{02\_eda/README.md}}
 
 \subsubsection{El FWI según el lugar}
 \label{an:b1-fwi}
@@ -496,6 +509,9 @@ del modelo meteorológico de 0.668 a 0.710.
   de la propia celda.}
   \label{fig:norm}
 \end{figure}
+
+
+\enrepo{\repo{blob/main/02_eda/ANALISIS_CUBO.md}{02\_eda/ANALISIS\_CUBO.md}, \repo{blob/main/04_bisagra/README.md}{04\_bisagra/README.md}}
 
 \subsubsection{Qué separa los días con fuego}
 \label{an:b1-separacion}
@@ -518,6 +534,9 @@ B.2.3.
   \label{fig:separacion}
 \end{figure}
 
+
+\enrepo{\repo{blob/main/02_eda/eda_dataset.py}{02\_eda/eda\_dataset.py}, \repo{blob/main/docs/MEMORIA/figs/scripts/f3_separacion.py}{docs/MEMORIA/figs/scripts/f3\_separacion.py}}
+
 \subsubsection{Dos etiquetas que miden cosas distintas}
 \label{an:b1-etiquetas}
 
@@ -536,6 +555,9 @@ exploratorio completo en
 \repo{blob/main/02_eda/ANALISIS_CUBO.md}{02\_eda/ANALISIS\_CUBO.md}.
 
 % ---------------------------------------------------------------------------- B.2
+
+\enrepo{\repo{blob/main/02_eda/ANALISIS_CUBO.md}{02\_eda/ANALISIS\_CUBO.md}, \repo{tree/main/04_bisagra/44_es_la_especificacion}{04\_bisagra/44\_es\_la\_especificacion/}}
+
 \subsection{Modelos: qué se construyó y por qué}
 \label{an:b2}
 
@@ -595,6 +617,9 @@ sus valores SHAP calculados y su entrenamiento reproducido.
 
 \IfFileExists{tabla_algoritmos.tex}{\input{tabla_algoritmos.tex}}{\begin{center}\fbox{Tabla del experimento de algoritmos pendiente}\end{center}}
 
+
+\enrepo{\repo{blob/main/05_iteracion2/57_ablaciones/dos_35_algoritmos.py}{05\_iteracion2/57\_ablaciones/dos\_35\_algoritmos.py}, \repo{blob/main/05_iteracion2/57_ablaciones/dos_35_replay.py}{05\_iteracion2/57\_ablaciones/dos\_35\_replay.py}, \repo{blob/main/docs/TRAZABILIDAD.md}{docs/TRAZABILIDAD.md}}
+
 \subsubsection{Primera iteración: la escalera de modelos base}
 \label{an:b2-it1}
 
@@ -619,6 +644,9 @@ probada en 2022 obtuvo el AUC de 0.89 que cita la sección (0.8906, IC95
   \label{fig:escalera}
 \end{figure}
 
+
+\enrepo{\repo{blob/main/03_iteracion1/README.md}{03\_iteracion1/README.md}, \repo{blob/main/03_iteracion1/MODELO_B_BITACORA.md}{03\_iteracion1/MODELO\_B\_BITACORA.md}}
+
 \subsubsection{Por qué falló en operación}
 \label{an:b2-fallo}
 
@@ -640,6 +668,9 @@ diferencia de $-0.060$ con un IC95 [$-0.149$, $+0.020$] que incluye el cero.
   dentro del día, en el conjunto de prueba de 2020, los separa.}
   \label{fig:metrica}
 \end{figure}
+
+
+\enrepo{\repo{blob/main/04_bisagra/README.md}{04\_bisagra/README.md}}
 
 \subsubsection{Los modelos de la segunda iteración}
 \label{an:b2-modelos}
@@ -676,6 +707,9 @@ contienen a los del anterior. En 2026 el AUC medio apenas cambió, entre 0.745 y
 0.759, del orden del ruido del sorteo de celdas (0.004). El percentil de las
 celdas quemadas ponderado por hectáreas fue máximo con 1:10 (81.9 frente a 79.5
 con 1:3) y bajó a partir de 1:30. Por eso se eligió el r10.
+
+
+\enrepo{\repo{blob/main/05_iteracion2/README.md}{05\_iteracion2/README.md}}
 
 \subsubsection{Comparación de los seis modelos en dos temporadas}
 \label{an:b2-benchmark}
@@ -745,6 +779,9 @@ ordena peor.
   \label{fig:boxplot}
 \end{figure}
 
+
+\enrepo{\repo{blob/main/06_comparacion/README.md}{06\_comparacion/README.md}, \repo{blob/main/docs/REPLAY_VEREDICTO.md}{docs/REPLAY\_VEREDICTO.md}}
+
 \subsubsection{Territorio vigilado y superficie cubierta}
 \label{an:b2-captura}
 
@@ -783,6 +820,9 @@ casi constante hasta el 10~\%. Estas hectáreas no son superficie evitada: miden
 cuánto fuego cayó en la zona señalada, que es el máximo que una vigilancia
 reforzada allí podría haber anticipado.
 
+
+\enrepo{\repo{blob/main/docs/REPLAY_CAPTURA.md}{docs/REPLAY\_CAPTURA.md}, \repo{blob/main/06_comparacion/captura_lift.py}{06\_comparacion/captura\_lift.py}}
+
 \subsubsection{Alternativas descartadas}
 \label{an:b2-descartes}
 
@@ -816,6 +856,9 @@ completas de la reproducción en
 \repo{blob/main/docs/REPLAY_VEREDICTO.md}{docs/REPLAY\_VEREDICTO.md}.
 
 % ---------------------------------------------------------------------------- B.3
+
+\enrepo{\repo{blob/main/docs/R10_TODOS_LOS_ANIOS.md}{docs/R10\_TODOS\_LOS\_ANIOS.md}, \repo{tree/main/05_iteracion2/57_ablaciones}{05\_iteracion2/57\_ablaciones/}}
+
 \subsection{Escala absoluta y cifra del día}
 \label{an:b3}
 
@@ -870,6 +913,9 @@ Detalle en el repositorio:
 \repo{blob/main/07_produccion/escala_y_cifra/README.md}{07\_produccion/escala\_y\_cifra/README.md}.
 
 % ---------------------------------------------------------------------------- B.4
+
+\enrepo{\repo{blob/main/07_produccion/escala_y_cifra/README.md}{07\_produccion/escala\_y\_cifra/README.md}, \repo{blob/main/07_produccion/escala_servicio.json}{07\_produccion/escala\_servicio.json}}
+
 \subsection{Limitaciones}
 \label{an:b4}
 
@@ -904,6 +950,9 @@ dirección ($+0.112$, IC95 [$+0.074$, $+0.151$]).
 \end{table}
 
 % ---------------------------------------------------------------------------- B.5
+
+\enrepo{\repo{blob/main/docs/LIMITACIONES.md}{docs/LIMITACIONES.md}}
+
 \subsection{Repositorio, trazabilidad y reproducibilidad}
 \label{an:b5}
 
@@ -944,6 +993,9 @@ indica qué hace cada script y para qué se usó.
   \end{tabular}
 \end{table}
 
+
+\enrepo{\repo{blob/main/README.md}{README.md}, \repo{blob/main/docs/ESTRUCTURA.md}{docs/ESTRUCTURA.md}}
+
 \subsubsection{Trazabilidad}
 \label{an:b5-trazabilidad}
 
@@ -980,6 +1032,9 @@ septiembre de 2026, con el entorno fijado en \texttt{environment.yml} (XGBoost
 resultantes fueron idénticos a los originales según su huella MD5. El modelo
 servido en 2026, que se había reentrenado de forma interactiva, se reconstruyó
 árbol a árbol a partir de la receta documentada.
+
+
+\enrepo{\repo{blob/main/docs/TRAZABILIDAD.md}{docs/TRAZABILIDAD.md}}
 
 \subsubsection{Qué se puede repetir y cuánto tarda}
 \label{an:b5-reproducir}
@@ -1020,6 +1075,9 @@ scripts de la segunda iteración se ejecutan en este orden:
 El primer modelo sigue la misma lógica con \texttt{muestrear\_dataset.py},
 \texttt{extraer\_features\_cubo.py}, \texttt{extraer\_features\_historia.py},
 \texttt{ensamblar\_dataset.py} y \texttt{entrenar\_modelo.py}.
+
+
+\enrepo{\repo{blob/main/README.md}{README.md}, \repo{blob/main/environment.yml}{environment.yml}, \repo{blob/main/muestras/README.md}{muestras/README.md}}
 
 \subsubsection{Cadena diaria}
 \label{an:b5-cadena}
@@ -1064,6 +1122,9 @@ quemadas del día y el 37~\% de los incidentes del MITECO.
 \end{figure}
 
 % ---------------------------------------------------------------------------- Referencias
+
+\enrepo{\repo{blob/main/.github/workflows/mapa_diario.yml}{.github/workflows/mapa\_diario.yml}, \repo{blob/main/07_produccion/README.md}{07\_produccion/README.md}}
+
 \subsection*{Referencias}
 
 \begin{enumerate}[label={[\arabic*]}, leftmargin=2.2em, itemsep=2pt]
