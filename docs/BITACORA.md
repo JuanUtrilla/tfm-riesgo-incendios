@@ -534,3 +534,68 @@ septiembre hay que subir al Release `estado` un diario con `salida/miteco/`
 (los PDF de los partes vienen de la cadena anterior); `puntuar_effis` y `dos_15`
 importan `historico`, que no está en este repositorio, y el script les da un
 módulo vacío.
+
+## 15/09/2026 — Repositorio autocontenido, comparación de algoritmos y anexo B
+
+**Cadena diaria.** La corrida programada a las 03:03 salió a las 08:05 hora de
+Madrid, con unas cinco horas de retraso de GitHub, y terminó bien a las 09:19
+(`c7892c1`): mapas del 15 y del 16 de septiembre, 1.36 % de España en
+EXTREMO. Los README dicen ahora que los mapas suelen aparecer a media mañana.
+Se desactivaron los tres workflows del colector de AEMET, que ya no se usan.
+
+**Repositorio autocontenido.** Ni el código ni la documentación nombran otros
+repositorios ni rutas del equipo. Las rutas se leen de variables de entorno con
+valores por defecto dentro del repositorio: `TFM_DATOS` (datos externos,
+`datos/`), `TFM_COLECTOR` (colector de AEMET, base `aemet_horario.db`),
+`TFM_ARCHIVO` (archivo de previsiones IFS y replay), `TFM_ESTADO` (`muestras/`)
+y `salida/`. La carpeta del prototipo de la malla pasa a llamarse
+`prototipo_malla/`. Se borraron el documento que registraba la procedencia de cada
+fichero y el script `hacer_pdf.py`, que convertía un documento que ya no existe, y se quitaron 25 remisiones a
+documentos que no están en el repositorio. En los `.py` los números conservan
+su formato original; el punto decimal y la coma de millar se aplican solo a la
+memoria y a los `.md`. Todos los scripts compilan y los scripts de la cadena
+diaria solo cambiaron en comentarios.
+
+**Reproducibilidad.** En una copia limpia, sin variables de entorno, se
+comprobó qué funciona recién clonado. `verificar_v2.py` termina en un segundo.
+`riesgo_hoy.py` no termina: descarga la previsión IFS de los 5,605 nodos,
+alcanza el tope horario de Open-Meteo y queda a la espera 53 minutos. La
+promesa del README de que la rama de servicio corre con `muestras/` no era
+cierta; el apartado «Reproducibilidad» se reescribió por niveles (comprobar el
+modelo servido, rehacer cifras, entrenar, calcular un mapa, repetir las
+temporadas), con lo que necesita y cuánto tarda cada uno.
+
+**Comparación de algoritmos (`dos_35_algoritmos.py`, `dos_35_replay.py`).**
+Protocolo escrito en `TRAZABILIDAD.md` antes de ejecutar. XGBoost frente a
+LightGBM, Random Forest y regresión logística con los datos, las 46 variables y
+la evaluación del r10; configuración elegida con 2023 entre seis por algoritmo.
+La receta del r10 reprodujo 0.8045 en la prueba de 2024 y el replay publicado
+de 2025 y 2026 con diferencia cero. Diferencias frente al r10 en AUC medio
+dentro del día:
+
+| Algoritmo | 2024 | 2025 | 2026 |
+|---|---|---|---|
+| LightGBM | +0.024 [+0.007, +0.043] | −0.018 [−0.029, −0.008] | −0.014 [−0.030, +0.003] |
+| Random Forest | +0.028 [+0.008, +0.049] | +0.003 [−0.010, +0.017] | +0.014 [−0.003, +0.032] |
+| Regresión logística | −0.001 [−0.029, +0.025] | −0.043 [−0.065, −0.019] | −0.070 [−0.097, −0.044] |
+| XGBoost ajustado con 2023 | −0.019 [−0.037, −0.002] | −0.024 [−0.037, −0.013] | −0.012 [−0.033, +0.008] |
+
+La ventaja de 2024 no se mantiene en las temporadas y no se cambia de
+algoritmo. El 0.809 que cita la memoria en 3.4 corresponde al modelo único con
+tres negativos por positivo, no al r10 (0.8045); la diferencia entre ambos es el
+ruido del sorteo de negativos.
+
+**Memoria.** El cuerpo de cuatro páginas queda cerrado con la redacción del
+autor y cuatro correcciones de hecho: el modelo de producción no se distinguía
+del percentil local del FWI (no era peor), las tres fuentes de verdad llevaban a
+la misma conclusión (no a los mismos positivos), el r10 gana tres de cada cinco
+días en 2025 y dos de cada tres en 2026, y erratas. Los anexos A–E pasan a un
+único anexo B de once páginas: B.1 datos y análisis exploratorio, B.2 modelos
+y por qué XGBoost (con la comparación de algoritmos), B.3 escala absoluta y
+cifra del día, B.4 limitaciones y B.5 repositorio, trazabilidad y
+reproducibilidad. Cada subapartado enlaza a la parte del repositorio que lo
+amplía. Referencias numéricas provisionales: Chen y Guestrin (2016),
+Grinsztajn et al. (2022), Shwartz-Ziv y Armon (2022), McElfresh et al. (2023) y
+el artículo de IberFire (2025); la cita [1] del diseño caso-control sigue
+pendiente. Figuras nuevas: la malla de nodos (`f17`) y la escalera de modelos
+base de la primera iteración (`f18`).
