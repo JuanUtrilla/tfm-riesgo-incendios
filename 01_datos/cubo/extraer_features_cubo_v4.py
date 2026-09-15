@@ -20,12 +20,16 @@ La climatología local sigue siendo 2008-2014: son años previos a todo el datas
 Resumible: si se corta, se relanza y continúa por el primer bloque sin fichero.
 
 Uso:
-    /home/charredgem/miniconda3/envs/tfm_fuego/bin/python extraer_features_cubo_v4.py
+    python extraer_features_cubo_v4.py
 """
+
+import os
+from pathlib import Path
 
 import extraer_features_cubo as m
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 
 m.RUTA_MAESTRA = f"{DIR}/dataset/muestra_maestra_v4.parquet"
 m.DIR_PARTES = f"{DIR}/dataset/_features_parts_v4"

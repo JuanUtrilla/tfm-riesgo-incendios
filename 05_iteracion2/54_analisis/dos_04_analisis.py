@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Dos modelos, paso 4: las medidas de la fase 1 (`ANALISIS_DATOS.md`).
+Dos modelos, paso 4: las medidas de la fase 1 (`02_eda/ANALISIS_CUBO.md`).
 
 No toca producción. Lee las tablas de expansión; escribe salida/dos_04_analisis.json.
 

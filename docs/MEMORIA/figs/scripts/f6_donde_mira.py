@@ -10,7 +10,7 @@
 (b) Fracción de superficie quemada del día que cae en el 2 % de celdas de mayor
     riesgo, en función del desfase entre el mapa y el día del fuego
     (`salida/dos_23_vispera.json`, corrida limpia).
-Uso:  python f6_donde_mira.py   [TFM_MALLA=<ruta a TFM_fuego_malla>]
+Uso:  python f6_donde_mira.py   [TFM_SALIDA=<carpeta de resultados>]
 """
 import json
 import os
@@ -21,11 +21,11 @@ import xgboost as xgb
 
 import matplotlib.pyplot as plt
 
-from comun import (ANCHO, AZUL, BERMELLON, GRIS, NEGRO, VERDE, MALLA, REPO,
+from comun import (ANCHO, AZUL, BERMELLON, GRIS, NEGRO, VERDE, SALIDA_REPO, REPO,
                    SALIDA, guarda)
 
 MODELOS = REPO / "muestras" / "modelos"
-VISPERA = pathlib.Path(os.environ.get("TFM_MALLA", MALLA)) / "salida" / "dos_23_vispera.json"
+VISPERA = SALIDA_REPO / "dos_23_vispera.json"
 ETIQ = {
     "fwi_anom_sigma": "FWI, anomalía en σ",
     "n_fuegos_10km_mismomes_hist": "fuegos históricos a 10 km,\nmismo mes",

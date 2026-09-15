@@ -37,8 +37,8 @@ sólido que tiene el modelo: si aguanta ahí, aguanta.
 Las tres comparaciones que produce
 ----------------------------------
 1. Baselines obligatorios sobre el mismo test: FWI a secas y percentil local de
-   FWI. `PROXIMOS_PASOS.md` lo deja claro: si el XGBoost no supera al FWI
-   puro, no hay defensa posible. Se reporta salga como salga.
+   FWI. Si el XGBoost no supera al FWI puro, el modelo no tiene defensa
+   posible. Se reporta salga como salga.
 
 2. v3 sobre el mismo test 2022. v3 nunca vio 2021 ni 2022, así que puede
    puntuarse en las mismas filas. Es la comparación limpia de "¿mejora el EGIF
@@ -53,9 +53,10 @@ Las tres comparaciones que produce
 Salidas (todas nuevas):
   modelos/xgb_v4.ubj · modelos/xgb_v4_metadata.json · dataset/metricas_v4.json
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python entrenar_modelo_v4.py
+Uso: python entrenar_modelo_v4.py
 """
 
+import os
 import json
 from pathlib import Path
 
@@ -65,8 +66,9 @@ import xgboost as xgb
 from sklearn.metrics import (average_precision_score, brier_score_loss,
                              roc_auc_score, roc_curve)
 
-DIR = Path("/home/charredgem/Desktop/Master/TFM_fuego")
-REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", RAIZ / "datos"))
+REPO_OP = Path(os.environ.get("TFM_COLECTOR", DIR / "colector"))   # colector de AEMET
 SEED = 42
 N_BOOT = 2000
 

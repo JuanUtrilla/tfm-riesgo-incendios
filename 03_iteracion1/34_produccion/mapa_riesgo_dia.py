@@ -20,6 +20,7 @@ Adaptaciones documentadas respecto al extractor de entrenamiento:
 Salida: eda/mapa_riesgo_<fecha>.png + parquet con las probabilidades.
 """
 
+import os
 import sys
 
 import numpy as np
@@ -32,7 +33,8 @@ from scipy.ndimage import maximum_filter, uniform_filter
 from entrenar_modelo import (FEATS_METEO, FEATS_VEG, FEATS_ESTAT, FEATS_HIST,
                              FEATS_CAL)
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 FECHA = sys.argv[1] if len(sys.argv) > 1 else "2022-07-17"
 FULL = FEATS_METEO + FEATS_VEG + FEATS_ESTAT + FEATS_HIST + FEATS_CAL
 ANIOS_CLIM = (2008, 2014)

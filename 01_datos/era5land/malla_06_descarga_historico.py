@@ -8,15 +8,14 @@ Aparcado el 21/08/2026 a los 2 minutos de arrancar, sin bajar nada.
 Motivo: el cubo IberFire ya es ERA5-Land reprocesado (tmax/hr_min/viento con
 corr 0,987-0,998 y sesgo 0 contra los nodos, `malla_02_vs_cubo.json`; el FWI
 del cubo se reproduce con las 13 UTC, `verificar_hora_fwi.py`). Entrenar con
-el cubo y servir ERA5-Land directo es la alternativa de `PROMPT_DOS_MODELOS.md`
-§2, y se adopta: ahorra ~30 h de cola CDS. La única variable que difiere es
+el cubo y servir ERA5-Land directo era la alternativa prevista, y se adopta: ahorra ~30 h de cola CDS. La única variable que difiere es
 la precipitación (cubo = ERA5-Land / 2,02), que se trata al servir; ver
-`ANALISIS_DATOS.md` §5. Este script queda por si algún día se reentrena con
+`02_eda/ANALISIS_CUBO.md` §5. Este script queda por si algún día se reentrena con
 ERA5-Land nativo: funciona y es reanudable.
 
 Por qué existe
 --------------
-`PROMPT_DOS_MODELOS.md` §1 fija que toda la meteo, en entrenamiento y en
+El diseño fijaba que toda la meteo, en entrenamiento y en
 producción, sale de ERA5-Land sobre su malla nativa. Pero ERA5-Land horario
 solo estaba descargado para jun-sep 2024 y may-ago 2026 (`malla_data/_cds`):
 para entrenar sobre los años con EGIF fiable (2015-2020) hacen falta 72 meses
@@ -60,7 +59,7 @@ Salidas (en expansion, ver `config_expansion.py`):
     logs/descarga_historico.log
 
 Uso:
-    /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_06_descarga_historico.py
+    python malla_06_descarga_historico.py
     ... --anios 2020 2019            # solo esos años
     SIN_DESCARGA=1 ... --estado      # qué hay y qué falta
 """

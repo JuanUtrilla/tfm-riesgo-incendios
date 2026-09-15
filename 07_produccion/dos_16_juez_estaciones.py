@@ -7,12 +7,11 @@ cara a cara con lo que producción publicó realmente, y corre en GitHub.
 
 Seguimiento diario de la temporada 2026; la validación del trabajo es el
 replay de 2025-2026. No toca producción. Lee
-`rankings/prevision_D0_<fecha>.csv` del repo del proyecto hermano (clonado en
-solo lectura con una deploy key; en local, la carpeta del repo) y los mapas de
-salida/mapas_diarios/. Escribe salida/veredicto_estaciones.{csv,json}.
+`rankings/prevision_D0_<fecha>.csv` del colector de AEMET (TFM_COLECTOR, o la
+carpeta que indique RANKINGS_DIR) y los mapas de salida/mapas_diarios/. Escribe salida/veredicto_estaciones.{csv,json}.
 
 Criterio de etiqueta: estación positiva si hay celda quemada EFFIS (FIREDATE
-ese día) a ≤25 km, el mismo de la validación del proyecto hermano y de
+ese día) a ≤25 km, el mismo de la validación del colector de AEMET y de
 `comparar_rankings.py`. Métrica: AUC por día sobre las ~687 estaciones y
 percentil de la estación en su propio ranking. Producción es previsión
 (emitida esa mañana) y los mapas de este repo de ese día también (D0 de la
@@ -37,7 +36,7 @@ from comparar_julio2026 import auc, quemadas
 
 RANKINGS = os.environ.get(
     "RANKINGS_DIR",
-    "/home/charredgem/Desktop/Master/aemet_horario_verano2026/rankings")
+    f"{os.environ.get('TFM_COLECTOR', config.FUENTE + '/colector')}/rankings")
 GEOJSON = config.salida("effis_ba_season_ES.geojson")
 CSV = config.salida("veredicto_estaciones.csv")
 RADIO = 25

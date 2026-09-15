@@ -40,7 +40,7 @@ buffer 12,5 km / ±10 días, misma dedup por celda-fecha): los cambios de métri
 entre v3 y v4 tienen que ser atribuibles a los datos nuevos, no al muestreo.
 
 Uso:
-    /home/charredgem/miniconda3/envs/tfm_fuego/bin/python muestrear_dataset_v4.py
+    python muestrear_dataset_v4.py
 
 Ojo: el python3 del sistema no tiene xarray. Usar el del entorno `tfm_fuego`.
 """
@@ -64,7 +64,8 @@ ANIO_INCOMPLETO = 2022
 CCAA_FALTANTES = {6: "Cantabria", 15: "Navarra"}   # códigos de IberFire
 FRONTERA_KM = 15.0
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 RUTA_EGIF = f"{DIR}/egif_civio_2026-08.csv"
 RUTA_IBERFIRE = f"{DIR}/iberfire/IberFire.nc"
 RUTA_SALIDA = f"{DIR}/dataset/muestra_maestra_v4.parquet"

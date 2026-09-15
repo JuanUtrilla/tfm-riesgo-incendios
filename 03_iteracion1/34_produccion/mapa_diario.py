@@ -2,9 +2,9 @@
 """
 Mapa nacional de riesgo de hoy (D0) y mañana (D1), job de GitHub Actions (TFM).
 
-Port autocontenido de TFM_fuego/mapa_riesgo_hoy.py: no necesita el cubo
+Port autocontenido de `mapa_riesgo_hoy.py`: no necesita el cubo
 IberFire (29 GB). Las capas del cubo que el modelo usa por celda están
-congeladas en `modelo/malla/` (ver TFM_fuego/exportar_malla_gh.py):
+congeladas en `modelo/malla/` (ver `01_datos/cubo/exportar_malla_gh.py`):
 estáticas (elevación, CLC, población...), climatología mensual 2020-24 de
 vegetación/LST y densidad EGIF mismo-mes. Lo único que cambia cada día es la
 meteo, y esa sale de las estaciones AEMET:
@@ -40,7 +40,8 @@ import firms_api
 from fwi_canadiense import calcular_fwi_serie
 from ranking_diario import UMBRALES, serie_diaria_todas
 
-RAIZ = Path(__file__).parent
+_DATOS = Path(os.environ.get("TFM_DATOS", Path(__file__).resolve().parents[2] / "datos"))
+RAIZ = Path(os.environ.get("TFM_COLECTOR", _DATOS / "colector"))   # raíz del colector de AEMET
 MALLA = RAIZ / "modelo" / "malla"
 GAMMA = 0.0065                      # lapse rate °C/m para corrección de altitud
 CORTES = [-1, 0.25, 0.55, 0.80, 2]

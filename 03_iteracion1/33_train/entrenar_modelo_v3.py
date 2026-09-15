@@ -4,7 +4,7 @@ Modelo B v3: modelo de producción reajustado con 2015-2020 completo.
 
 No sobrescribe nada. Escribe solo ficheros con sufijo _v3.
 
-Qué cambia respecto a v1/v2 y por qué (justificación en EVALUACION_DETALLADA §10)
+Qué cambia respecto a v1/v2 y por qué
 
 1. Reajuste con todos los datos (§10.1)
    v1/v2 se entrenaron solo con train 2015-2018 (53.563 filas). Val 2019 (14.489)
@@ -61,7 +61,8 @@ from sklearn.metrics import (average_precision_score, brier_score_loss,
                              precision_score, recall_score, roc_auc_score,
                              roc_curve)
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 SEED = 42
 
 RUTA_DATASET = f"{DIR}/dataset/dataset_modelo_v1.parquet"
@@ -200,7 +201,7 @@ def main() -> None:
     # Los hiperparámetros de Optuna (max_depth 10, lr 0,017) ganan +0,0014 de
     # AUC-PR en val sobre los de base y multiplican por ~13 el tamaño del
     # fichero del modelo (11 MB frente a 840 KB). Eso no es gratis: el modelo viaja
-    # dentro del repo del colector para el job diario de GitHub Actions
+    # dentro del repositorio de publicación del colector de AEMET para el job diario de GitHub Actions
     # (bitácora §22), donde cada MB se paga en clonado y en cuota.
     # Se produce también la variante con params base y se documenta el
     # intercambio para que la decisión de despliegue sea explícita.
@@ -385,7 +386,7 @@ def producir(sufijo, feats, params, df, tr, va, te) -> dict:
              "razón de ser de v3 frente a la autorregresiva EGIF congelada en 2020."
              if any(f.startswith("firms_") for f in feats) else
              "n_fuegos_10km_mismomes_hist sigue congelada en 2020 (limitación "
-             "conocida, ver EVALUACION_DETALLADA §10.3.c)."),
+             "conocida)."),
         ],
     }
     with open(f"{DIR}/modelos/xgb_v3{sufijo}_metadata.json", "w") as f:

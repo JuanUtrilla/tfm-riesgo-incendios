@@ -10,7 +10,7 @@ diario acumulado desde el 1-may, los mapas de los últimos 45 días para
 contrastarlos cuando llegue EFFIS, los CSV de veredictos, el geojson de EFFIS,
 los partes de MITECO) tiene que vivir fuera. Commitearlo inflaría el repo
 unos 50 MB/día; un Release admite assets grandes y se reescriben con --clobber.
-Mismo patrón que el colector del proyecto hermano (`mapa_diario.yml`).
+Mismo patrón que el workflow del colector de AEMET (`mapa_diario.yml`).
 
 Dos assets en el release `estado`:
   estado_base.tar.gz    lo que no cambia: capas estáticas 2D del cubo, clim

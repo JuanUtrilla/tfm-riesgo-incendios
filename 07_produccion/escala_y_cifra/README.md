@@ -20,9 +20,8 @@ nivel EXTREMO y su posición entre los días de referencia.
 | `fig_benchmark_semaforo.py` | Figuras de captura y de variantes del semáforo | `docs/MEMORIA/figs/f13`, `f14` |
 | `fig3_dos_mapas.py` | La figura de los dos mapas | `docs/MEMORIA/figs/f12_dos_mapas.png` |
 
-Los scripts leen el replay (`archivo_ifs/replay/`) y las salidas de
-`56_calibracion` con rutas absolutas del equipo donde se ejecutaron, como los
-del replay (`docs/PROCEDENCIA.md`). Se ejecutaron el 14/09/2026 con el entorno
+Los scripts leen el replay (`replay/` dentro de `TFM_ARCHIVO`) y las salidas
+de `56_calibracion` en `salida/`. Se ejecutaron el 14/09/2026 con el entorno
 `tfm_fuego`.
 
 ## La escala absoluta se calibra sobre el servicio

@@ -65,12 +65,16 @@ Salida:   dataset/features_firms_hist_v3.parquet  (id_muestra + 4 columnas)
 No modifica ningún fichero existente.
 """
 
+import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from pyproj import Transformer
 from scipy.spatial import cKDTree
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 RUTA_DATASET = f"{DIR}/dataset/dataset_modelo_v1.parquet"
 RUTA_FIRMS = f"{DIR}/firms_iberia_2015_2024.parquet"
 RUTA_SALIDA = f"{DIR}/dataset/features_firms_hist_v3.parquet"

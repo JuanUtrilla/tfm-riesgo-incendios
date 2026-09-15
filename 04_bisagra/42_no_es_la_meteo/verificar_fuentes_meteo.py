@@ -50,9 +50,10 @@ Hay una asimetría que declarar: la previsión de AEMET es municipal
 (predicción para el municipio de la estación) y el IFS es una celda de malla
 interpolada al punto. No es exactamente el mismo objeto.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python verificar_fuentes_meteo.py
+Uso: python verificar_fuentes_meteo.py
 """
 
+import os
 import glob
 import json
 import re
@@ -63,8 +64,9 @@ import numpy as np
 import pandas as pd
 import requests
 
-DIR = Path(__file__).parent
-REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+COLECTOR = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector")))
 SAL_PARQUET = DIR / "dataset" / "verificacion_fuentes_meteo.parquet"
 SAL_JSON = DIR / "dataset" / "verificacion_fuentes_meteo.json"
 
@@ -122,7 +124,7 @@ def descargar(est):
 
 
 def main():
-    est = pd.read_parquet(REPO_OP / "modelo" / "estaciones_prototipo.parquet")
+    est = pd.read_parquet(COLECTOR / "modelo" / "estaciones_prototipo.parquet")
     obs = pd.read_parquet(DIR / "dataset" / "experimento_b_serie_aemet.parquet")
     obs["fecha"] = obs.fecha.dt.strftime("%Y-%m-%d")
     obs = obs.rename(columns={"tmax": "t2m_max_obs", "hr_min": "rh_min_obs",
@@ -142,7 +144,7 @@ def main():
     # previsión municipal de AEMET, tal y como se selló por commit
     filas = []
     for h in ["D0", "D1"]:
-        for r in sorted(glob.glob(str(REPO_OP / "rankings" /
+        for r in sorted(glob.glob(str(COLECTOR / "rankings" /
                                       f"prevision_{h}_2026-0[78]-*.csv"))):
             d = pd.read_csv(r)
             d["fecha"] = re.search(r"(\d{4}-\d{2}-\d{2})", r).group(1)

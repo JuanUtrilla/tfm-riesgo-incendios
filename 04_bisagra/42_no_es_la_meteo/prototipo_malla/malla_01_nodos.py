@@ -19,7 +19,7 @@ concreta reporte.
 
 Que esto no pierde nada está medido: la meteo del cubo nunca fue de 1 km
 (ERA5-Land es de ~9 km reescalado), y lo que sí es fino (terreno, usos del
-suelo) no se toca. Ver ENFOQUE_TRAIN_SERVE.md §5 y §6.
+suelo) no se toca.
 
 Decisiones
 ----------
@@ -36,16 +36,18 @@ Salida: malla_data/nodos.npz
     idx_nodo            (920, 1188)  índice de nodo por celda, −1 fuera
     n_celdas            (n_nodos,)   celdas peninsulares que cuelgan del nodo
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_01_nodos.py
+Uso: python malla_01_nodos.py
 """
 
+from pathlib import Path
 import os
 
 import numpy as np
 import xarray as xr
 from pyproj import Transformer
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[3]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 SALIDA = f"{DIR}/malla_data"
 PASO = 0.1                      # resolución nativa de ERA5-Land, en grados
 

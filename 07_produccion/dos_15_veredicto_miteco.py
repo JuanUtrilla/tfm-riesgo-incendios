@@ -4,15 +4,15 @@ Veredicto rápido: los mapas de cada día puntuados con el parte de MITECO del
 día siguiente. Cierra el bucle en 24 h (EFFIS tarda 6-9 días).
 
 Seguimiento diario de la temporada 2026; la validación del trabajo es el
-replay de 2025-2026. No toca producción ni TFM-RAG. Descarga el parte a
-salida/miteco/, lee los históricos de TFM-RAG en solo lectura, reutiliza su
-parser y el geocodificador de `validar_miteco.py` del repo original
-(importados, no copiados). Escribe salida/veredicto_miteco.csv y
+replay de 2025-2026. No toca producción. Descarga el parte a salida/miteco/,
+lee en solo lectura los partes históricos del módulo RAG del TFM y reutiliza
+su parser y el geocodificador de `validar_miteco.py` (importados de
+01_datos/miteco/, o de estado/vendor/ en GitHub Actions). Escribe salida/veredicto_miteco.csv y
 salida/veredicto_miteco.json. El CSV de incidentes recientes que deja en
 salida/ lo usa `capa_verdad` para pintar el mapa de mañana.
 
-Cómo (ver ESTUDIO_MITECO_DIARIO.md para las medidas que lo justifican)
-----------------------------------------------------------------------
+Cómo
+----
 · El "Parte Definitivo de Intervenciones (día previo)" del día D se publica
   el D+1 hacia las 13-15 h. Se descarga y, si su fecha es nueva, se guarda.
 · Incidente = primera aparición de su `incident_key` (el 97 % no trae fecha
@@ -45,10 +45,10 @@ import config
 import historico
 from comparar_julio2026 import auc
 
-RAG = "/home/charredgem/Desktop/Master/TFM-RAG"
-PDF_RAG = f"{RAG}/data/raw/miteco"
-# sin TFM-RAG / TFM_fuego (GitHub): copias vendorizadas en estado/vendor
+PDF_RAG = f"{config.FUENTE}/miteco_rag/partes"   # partes históricos del módulo RAG
+# en GitHub Actions el parser y el geocodificador van copiados en estado/vendor
 VENDOR = f"{config.ESTADO}/vendor"
+MITECO = VENDOR if os.path.isdir(VENDOR) else f"{config.BASE}/01_datos/miteco"
 PDF_MIO = config.salida("miteco")
 CSV = config.salida("veredicto_miteco.csv")
 RADIOS = (10, 25)
@@ -61,23 +61,20 @@ PAGINA = ("https://www.miteco.gob.es/es/biodiversidad/temas/"
 
 def descargar():
     """Descarga el parte de hoy (datos de ayer). Misma página y mismo criterio
-    de enlace que el descargador de TFM-RAG, pero con regex en vez de bs4 (el
+    de enlace que el descargador del módulo RAG, pero con regex en vez de bs4 (el
     entorno tfm_fuego no lo tiene); la fecha del parte la saca su parser."""
     import re
     import unicodedata
     from urllib.parse import urljoin
     import requests
     os.makedirs(PDF_MIO, exist_ok=True)
-    sys.path.insert(0, f"{RAG}/src" if os.path.isdir(RAG) else VENDOR)
+    sys.path.insert(0, MITECO)
     try:
-        # fecha del parte con el parser de TFM-RAG (su downloader importa bs4,
+        # fecha del parte con el parser del módulo RAG (su downloader importa bs4,
         # que este entorno no tiene)
         import io, tempfile, pathlib
-        if os.path.isdir(RAG):
-            from miteco_rag.parseo_y_chuncking import extract_pdf_lines, extract_report_date
-        else:
-            from parseo_y_chuncking import extract_pdf_lines, extract_report_date
-        html = requests.get(PAGINA, timeout=30, headers={"User-Agent": "TFM-fuego-malla/0.1"}).text
+        from parseo_y_chuncking import extract_pdf_lines, extract_report_date
+        html = requests.get(PAGINA, timeout=30, headers={"User-Agent": "TFM-riesgo-incendios/0.1"}).text
         url = None
         for href, txt in re.findall(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html, re.S | re.I):
             t = unicodedata.normalize("NFKD", re.sub("<[^>]+>", " ", txt))
@@ -107,12 +104,8 @@ def descargar():
 
 def incidentes():
     """Devuelve la primera aparición de cada incidente, geocodificada."""
-    if os.path.isdir(RAG):
-        sys.path.insert(0, f"{RAG}/src")
-        from miteco_rag.parseo_y_chuncking import parse_miteco_pdf
-    else:
-        sys.path.insert(0, VENDOR)
-        from parseo_y_chuncking import parse_miteco_pdf
+    sys.path.insert(0, MITECO)
+    from parseo_y_chuncking import parse_miteco_pdf
     import pathlib
     snaps = []
     for d in (PDF_RAG, PDF_MIO):
@@ -127,9 +120,7 @@ def incidentes():
         "estado": s.status, "n_medios": len(s.assigned_resources)} for s in snaps])
     df = df[df.pais == "ES"].sort_values("fecha") \
            .groupby("incident_key", as_index=False).first()
-    vm_ruta = f"{config.FUENTE}/validar_miteco.py"
-    if not os.path.exists(vm_ruta):
-        vm_ruta = f"{VENDOR}/validar_miteco.py"
+    vm_ruta = f"{MITECO}/validar_miteco.py"
     spec = importlib.util.spec_from_file_location("vm", vm_ruta)
     vm = importlib.util.module_from_spec(spec)
     argv, sys.argv = sys.argv, ["x"]

@@ -3,7 +3,7 @@
 Climatología de FWI calculada desde AEMET, para arreglar el cruce de fuentes.
 
 No sobrescribe nada. Escribe en un directorio nuevo,
-`aemet_horario_verano2026/modelo/clim_fwi_aemet/`, y deja intacto el
+`modelo/clim_fwi_aemet/` del colector de AEMET (TFM_COLECTOR), y deja intacto el
 `clim_fwi/` original. El cambio en producción es una línea de ruta y lo
 decide el usuario, no este script.
 
@@ -43,9 +43,10 @@ Reglas de calidad, para no emitir climatologías inservibles:
   rellenan con 0 en precipitación, que es lo que hace un día sin parte de
   lluvia. Los huecos largos parten el año y lo invalidan.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python construir_clim_fwi_aemet.py
+Uso: python construir_clim_fwi_aemet.py
 """
 
+import os
 import json
 import sys
 from pathlib import Path
@@ -53,13 +54,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-DIR = Path(__file__).parent
-REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
-sys.path.insert(0, str(REPO_OP))
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+COLECTOR = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector")))
+sys.path.insert(0, str(RAIZ / "01_datos" / "comun"))
 from fwi_canadiense import calcular_fwi_serie          # noqa: E402
 
 ENTRADA = DIR / "dataset" / "aemet_historico_2015_2025.parquet"
-SALIDA = REPO_OP / "modelo" / "clim_fwi_aemet"
+SALIDA = COLECTOR / "modelo" / "clim_fwi_aemet"
 INFORME = DIR / "dataset" / "clim_fwi_aemet_informe.json"
 
 MAX_HUECO = 3          # días consecutivos que se interpolan
@@ -91,7 +93,7 @@ def main():
     if not ENTRADA.exists():
         raise SystemExit(f"falta {ENTRADA}: ejecuta descargar_historico_aemet.py")
     hist = pd.read_parquet(ENTRADA)
-    est = pd.read_parquet(REPO_OP / "modelo" / "estaciones_prototipo.parquet")
+    est = pd.read_parquet(COLECTOR / "modelo" / "estaciones_prototipo.parquet")
     objetivo = set(est["idema"])
     print(f"histórico: {len(hist):,} estación-día · {hist.idema.nunique()} "
           f"estaciones · estaciones del modelo: {len(objetivo)}")

@@ -5,7 +5,7 @@
 # El árbol está ordenado por capítulos de la memoria, no por paquetes de
 # Python, y los scripts se importan entre sí con nombres planos
 # (`import config`, `from dos_05_modelos import FEATS_CUANDO`) exactamente
-# como en los repos originales. Eso es deliberado: tocar los imports sería
+# como cuando se escribieron. Eso es deliberado: tocar los imports sería
 # reescribir 124 ficheros y perder la garantía de que este código es el que
 # produjo los números de la memoria. El precio es una línea antes de ejecutar:
 #

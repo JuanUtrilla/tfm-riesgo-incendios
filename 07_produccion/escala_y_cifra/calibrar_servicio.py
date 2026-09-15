@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Escala absoluta y cifra del día calibradas sobre los mapas servidos (opción 1).
 
-Solo lectura. Entradas: archivo_ifs/replay/<año>/ifs/<fecha>.npz (prob_r10, float16,
+Solo lectura. Entradas: TFM_ARCHIVO/replay/<año>/ifs/<fecha>.npz (prob_r10, float16,
 el mismo camino de servicio que la cadena diaria), verdad_<año>/<fecha>.npz y
 replay_<año>_ifs.csv (celdas quemadas y ha por día).
 
@@ -23,14 +23,18 @@ Salidas junto al script: calibracion_servicio.json, calibracion_servicio_dias.cs
 """
 import glob
 import json
+import os
 import pathlib
 
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 
-M = pathlib.Path.home() / "Desktop/Master"
-R = M / "archivo_ifs/replay"
+RAIZ = pathlib.Path(__file__).resolve().parents[2]
+DATOS = pathlib.Path(os.environ.get("TFM_DATOS", RAIZ / "datos"))
+ARCH = pathlib.Path(os.environ.get("TFM_ARCHIVO", DATOS / "archivo"))
+SAL = pathlib.Path(os.environ.get("TFM_SALIDA", RAIZ / "salida"))
+R = ARCH / "replay"
 AQUI = pathlib.Path(__file__).resolve().parent
 CODIGOS = np.arange(65536, dtype=np.uint16).view(np.float16).astype(np.float64)
 NIVELES = ["BAJO", "MODERADO", "ALTO", "EXTREMO"]
@@ -118,7 +122,7 @@ def main():
                            ("cortes del cubo en las dos", dias, CUBO)):
         res["significado"][nom] = significado(conj, cor)
 
-    clim = pd.read_csv(M / "calibracion_si/sandbox/salida/dos_26_dias.csv")
+    clim = pd.read_csv(SAL / "dos_26_dias.csv")
     clim = clim.assign(g=(clim.primer_dia >= 5).astype(float)).groupby("doy").g.mean()
     clim = pd.Series(np.convolve(np.r_[clim.values[-15:], clim.values, clim.values[:15]],
                                  np.ones(31) / 31, "valid"), index=range(1, 367))

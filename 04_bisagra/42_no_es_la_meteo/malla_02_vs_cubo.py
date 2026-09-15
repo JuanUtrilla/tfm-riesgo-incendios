@@ -26,7 +26,7 @@ Desenlaces:
     entonces el mapeo de cuantiles del módulo 3, que es empírico y ya se midió
     que funciona (saturación 2,2 % → 0,5 %).
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_02_vs_cubo.py
+Uso: python malla_02_vs_cubo.py
 """
 
 import json

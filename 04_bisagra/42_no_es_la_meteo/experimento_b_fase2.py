@@ -19,7 +19,7 @@ meteo:
 
 La diferencia A−B es el desplazamiento de fuente con el mismo horizonte
 (observado contra observado). La diferencia B−C es el coste de predecir en vez
-de observar. Juntas descomponen el hueco que VALIDACION.md §4b dejó abierto.
+de observar. Juntas descomponen el hueco que la validación operativa dejó abierto.
 
 El control que hace creíble todo lo demás
 El brazo B se compara contra los `ranking_<fecha>.csv` que producción commiteó
@@ -34,7 +34,7 @@ calculan una vez y se usan idénticas en A y B, para que no contaminen la
 comparación. Se replica exactamente lo que hace ranking_diario.firms_frp:
 solo VIIRS_NOAA20_NRT, radio 50 km, ventana [D-5, D-1].
 
-Uso:  /home/charredgem/miniconda3/envs/tfm_fuego/bin/python experimento_b_fase2.py
+Uso:  python experimento_b_fase2.py
 """
 
 import json
@@ -48,10 +48,13 @@ import numpy as np
 import pandas as pd
 import requests
 
-DIR = Path(__file__).parent
-REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
-sys.path.insert(0, str(DIR))
-sys.path.insert(0, str(REPO_OP))
+AQUI = Path(__file__).parent
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+COLECTOR = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector")))
+sys.path.insert(0, str(AQUI))
+sys.path.insert(0, str(RAIZ / "01_datos" / "comun"))
+sys.path.insert(0, str(RAIZ / "03_iteracion1" / "34_produccion"))
 
 from experimento_b_era5 import (DIAS_SPINUP, UMBRALES, cargar_produccion,  # noqa: E402
                                 construir, serie_estaciones, SALIDA_SERIE)
@@ -67,7 +70,7 @@ N_BOOT = 2000
 
 
 def env(nombre, alias=()):
-    """Lee del entorno o del .env de TFM_fuego (mismo patrón que
+    """Lee del entorno o del .env de los datos externos (mismo patrón que
     descargar_verdad_operativa.py)."""
     for n in (nombre, *alias):
         if os.environ.get(n):
@@ -218,12 +221,12 @@ def auc_boot(df, col_prob, rng):
 
 def main():
     import xgboost as xgb
-    est = pd.read_parquet(REPO_OP / "modelo" / "estaciones_prototipo.parquet")
+    est = pd.read_parquet(COLECTOR / "modelo" / "estaciones_prototipo.parquet")
     est_i = est.set_index("idema")
-    FEATS = json.loads((REPO_OP / "modelo" /
+    FEATS = json.loads((COLECTOR / "modelo" /
                         "xgb_v2_prototipo_features.json").read_text())
     modelo = xgb.XGBClassifier()
-    modelo.load_model(str(REPO_OP / "modelo" / "xgb_v2_prototipo.ubj"))
+    modelo.load_model(str(COLECTOR / "modelo" / "xgb_v2_prototipo.ubj"))
 
     prod = cargar_produccion()
     dias = sorted(pd.to_datetime(prod["fecha"].unique()))

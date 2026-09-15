@@ -34,7 +34,8 @@ from scipy.spatial import cKDTree
 
 import tiempo_real as trm
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 FULL = trm.FULL
 GAMMA = 0.0065                      # lapse rate °C/m para corrección de altitud
 CORTES = [-1, 0.25, 0.55, 0.80, 2]

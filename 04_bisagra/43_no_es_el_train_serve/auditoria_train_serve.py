@@ -54,9 +54,10 @@ Control: la variante sin remapear nada debe reproducir el 0,9234 del gemelo de
 protocolo guardado en xgb_v3_metadata.json. Si no lo hace, nada de lo demás
 vale.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python auditoria_train_serve.py
+Uso: python auditoria_train_serve.py
 """
 
+import os
 import json
 from pathlib import Path
 
@@ -65,8 +66,9 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import roc_auc_score
 
-DIR = Path(__file__).parent
-REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+COLECTOR = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector")))
 SALIDA = DIR / "dataset" / "auditoria_train_serve.json"
 
 # features que en producción no se observan; se listan para poder separarlas
@@ -111,7 +113,7 @@ def mapa_cuantiles(tr, pr, x):
 
 
 def main():
-    FEATS = json.loads((REPO_OP / "modelo" /
+    FEATS = json.loads((COLECTOR / "modelo" /
                         "xgb_v2_prototipo_features.json").read_text())
     ent = pd.read_parquet(DIR / "dataset" / "dataset_modelo_v1.parquet")
     ent["ccaa"] = ent["ccaa"].fillna(-1).astype(int)
@@ -128,7 +130,7 @@ def main():
           f"de julio-agosto\n")
 
     modelo = xgb.XGBClassifier()
-    modelo.load_model(str(REPO_OP / "modelo" / "xgb_v2_prototipo.ubj"))
+    modelo.load_model(str(COLECTOR / "modelo" / "xgb_v2_prototipo.ubj"))
     gain = modelo.get_booster().get_score(importance_type="gain")
     tot = sum(gain.values()) or 1.0
 

@@ -26,7 +26,7 @@ Si el IFS puro ya sale aceptable, el híbrido lo será por construcción, porque
 el FWI es un integrador con memoria larga (DC ~52 días) y en el híbrido la
 mayor parte del estado viene del reanálisis, que es la rama buena.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python prueba_ifs_produccion.py
+Uso: python prueba_ifs_produccion.py
 """
 
 import json

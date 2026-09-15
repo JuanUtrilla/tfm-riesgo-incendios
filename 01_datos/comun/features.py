@@ -5,15 +5,15 @@ Las features del modelo, y su orden.
 =============================================================================
 POR QUÉ ESTÁN COPIADAS Y NO IMPORTADAS
 =============================================================================
-El original vive en `entrenar_modelo.py` del repo de entrenamiento. Importarlo
-desde aquí ataría este repo operativo al de entrenamiento entero (xgboost,
+El original vive en `03_iteracion1/33_train/entrenar_modelo.py`. Importarlo
+desde aquí ataría la cadena de servicio a todo el entrenamiento (xgboost,
 sklearn, los datasets), cuando lo único que necesita son cinco listas.
 
 El precio es que pueden DIVERGIR: si alguien reentrena con otras features y
 este fichero no se actualiza, el modelo recibiría las columnas en otro orden
 y predeciría basura sin dar ningún error. XGBoost no comprueba nombres.
 
-Por eso `verifica()` contrasta esta copia contra el original y lo llaman los
+Por eso `verifica()` contrasta esta copia con `entrenar_modelo.py` y lo llaman los
 módulos que predicen, antes de construir la matriz. Es barato y convierte un
 fallo silencioso en una excepción.
 
@@ -48,14 +48,14 @@ METEO_MALLA = [f for f in FEATS_METEO if f != "lst"]
 
 
 def verifica(estricto=True):
-    """¿Sigue coincidiendo esta copia con `entrenar_modelo.py` del original?"""
+    """¿Sigue coincidiendo esta copia con `entrenar_modelo.py`?"""
     ruta = f"{config.FUENTE}/entrenar_modelo.py"
     spec = importlib.util.spec_from_file_location("_entrenar_modelo", ruta)
     mod = importlib.util.module_from_spec(spec)
     sys.modules["_entrenar_modelo"] = mod
     try:
         spec.loader.exec_module(mod)
-    except Exception as e:                      # el original importa pesado
+    except Exception as e:                      # entrenar_modelo.py importa pesado
         if estricto:
             raise
         print(f"  aviso: no se pudo verificar features ({type(e).__name__})")
@@ -66,9 +66,9 @@ def verifica(estricto=True):
                 "FEATS_CAL"):
         aqui, alli = globals()[nom], getattr(mod, nom)
         if aqui != alli:
-            dif.append(f"{nom}: aquí {aqui}\n           original {alli}")
+            dif.append(f"{nom}: aquí {aqui}\n           entrenamiento {alli}")
     if dif:
-        msg = ("Las features han DIVERGIDO del repo de entrenamiento:\n  "
+        msg = ("Las features han DIVERGIDO de las de entrenar_modelo.py:\n  "
                + "\n  ".join(dif))
         if estricto:
             raise SystemExit(msg)
@@ -78,4 +78,4 @@ def verifica(estricto=True):
 
 if __name__ == "__main__":
     ok = verifica(estricto=False)
-    print(f"{len(FULL)} features · coinciden con el original: {ok}")
+    print(f"{len(FULL)} features · coinciden con entrenar_modelo.py: {ok}")

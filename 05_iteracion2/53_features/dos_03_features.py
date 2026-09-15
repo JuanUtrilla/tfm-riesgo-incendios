@@ -9,7 +9,7 @@ Por qué se reutiliza el extractor original en vez de reescribirlo
 Las features tienen que ser exactamente las del modelo en producción para que
 la comparación mida el diseño de muestreo y no la receta de features. Por eso
 `procesar_bloque` y `extraer_estaticas` se importan de
-`extraer_features_cubo.py` del repo original (solo lectura, con importlib: al
+`01_datos/cubo/extraer_features_cubo.py` (solo lectura, con importlib: al
 no copiar el código no puede divergir). La historia (EGIF/FIRMS/rayos) sí
 está copiada de `extraer_features_historia.py`, porque allí vive dentro de
 `main()` y no es importable; la lógica es la misma línea a línea.
@@ -54,7 +54,7 @@ R_CELDA, R_ZONA, R_FIRMS = 1500.0, 10_000.0, 50_000.0
 
 
 def carga_original():
-    ruta = f"{config.FUENTE}/extraer_features_cubo.py"
+    ruta = f"{config.BASE}/01_datos/cubo/extraer_features_cubo.py"
     spec = importlib.util.spec_from_file_location("_efc", ruta)
     mod = importlib.util.module_from_spec(spec)
     sys.modules["_efc"] = mod

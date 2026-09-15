@@ -8,7 +8,7 @@ Salidas:  modelos/xgb_v1.ubj              modelo final (UBJSON, conserva categó
           dataset/metricas_v1.json        todas las métricas de la escalera
           eda/pr_curves_test.png, eda/calibracion_test.png, eda/shap_summary.png
 
-Protocolo (ESTADO_ARTE §7 + PROXIMOS_PASOS §3.1):
+Protocolo, fijado antes de entrenar:
 - Split temporal congelado: train 2015-2018 / val 2019 (early stopping y
   calibración) / test 2020 (solo evaluación final).
 - Escalera de baselines (cada peldaño tiene que ganar al anterior):
@@ -40,7 +40,8 @@ from sklearn.metrics import (average_precision_score, brier_score_loss,
 from sklearn.isotonic import IsotonicRegression
 from sklearn.model_selection import GroupKFold
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 SEED = 42
 
 FEATS_METEO = ["fwi", "fwi_pctl_local", "fwi_anom_sigma", "t2m_max", "t2m_min",

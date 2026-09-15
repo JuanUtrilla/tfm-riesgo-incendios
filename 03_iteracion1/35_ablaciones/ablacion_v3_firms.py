@@ -41,6 +41,7 @@ que los AUC-PR de años distintos no son comparables entre sí en crudo.
 Salida: dataset/ablacion_v3_firms.json   (no sobrescribe nada)
 """
 
+import os
 import json
 
 import numpy as np
@@ -48,7 +49,8 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 SEED = 42
 FEAT_EGIF = "n_fuegos_10km_mismomes_hist"
 FEATS_FIRMS = ["firms_diasfuego_mismomes_tasa", "firms_diasfuego_tasa",

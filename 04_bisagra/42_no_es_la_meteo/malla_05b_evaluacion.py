@@ -28,7 +28,7 @@ Spin-up. La recursión del FWI arranca el 1-jun (§ módulo 5). Cuanto más
 temprano el día evaluado, menos spin-up. Por eso el más temprano aquí es de
 agosto (62 días) y el script mide e informa del sesgo real por día.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_05b_evaluacion.py
+Uso: python malla_05b_evaluacion.py
 """
 
 import json

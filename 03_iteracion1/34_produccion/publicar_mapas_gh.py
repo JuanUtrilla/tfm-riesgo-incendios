@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Publica los mapas nacionales de hoy y D+1 en el repo GitHub del colector para
+Publica los mapas nacionales de hoy y D+1 en el repositorio de publicación del colector de AEMET para
 verlos desde el móvil (el README los embebe con nombre fijo).
 
 Flujo (se lanza tras mapa_riesgo_hoy.py en el cron diario):
@@ -18,8 +18,10 @@ import subprocess
 import pandas as pd
 from PIL import Image
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
-REPO = "/home/charredgem/Desktop/Master/aemet_horario_verano2026"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
+# repositorio de publicación del colector de AEMET (clon local con permiso de push)
+REPO = os.environ.get("TFM_COLECTOR", f"{DIR}/colector")
 
 
 def main():

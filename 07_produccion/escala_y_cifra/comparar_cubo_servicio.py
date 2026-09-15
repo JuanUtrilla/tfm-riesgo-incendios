@@ -12,17 +12,20 @@ Resultado del 14/09/2026: con los mismos cortes, los mapas servidos marcan entre
 2 y 10 veces más EXTREMO que el cubo en el mismo mes. Por eso la cadena usa los
 cortes de calibrar_servicio.py.
 
-Entradas: ~/Desktop/Master/archivo_ifs/replay/<año>/<condición>/<fecha>.npz y
-~/Desktop/Master/calibracion_si/sandbox/salida/dos_27_dias.csv (rutas del equipo
-donde se ejecutó). Salida: comparar_cubo_servicio.txt junto a este script.
+Entradas: replay/<año>/<condición>/<fecha>.npz del archivo de previsiones IFS
+(TFM_ARCHIVO) y dos_27_dias.csv de la carpeta de resultados (TFM_SALIDA). Salida: comparar_cubo_servicio.txt junto a este script.
 """
 import glob
+import os
 import pathlib
 
 import numpy as np
 import pandas as pd
 
-M = pathlib.Path.home() / "Desktop/Master"
+RAIZ = pathlib.Path(__file__).resolve().parents[2]
+DATOS = pathlib.Path(os.environ.get("TFM_DATOS", RAIZ / "datos"))
+ARCH = pathlib.Path(os.environ.get("TFM_ARCHIVO", DATOS / "archivo"))
+SAL = pathlib.Path(os.environ.get("TFM_SALIDA", RAIZ / "salida"))
 AQUI = pathlib.Path(__file__).resolve().parent
 CORTE_EXT_CUBO = 0.40661572679295743
 N_CELDAS = 498530
@@ -32,7 +35,7 @@ def main():
     filas = []
     for anio in (2025, 2026):
         for cond in ("ifs", "reanalisis"):
-            for f in sorted(glob.glob(str(M / f"archivo_ifs/replay/{anio}/{cond}/*.npz"))):
+            for f in sorted(glob.glob(str(ARCH / f"replay/{anio}/{cond}/*.npz"))):
                 p = np.load(f)["prob_r10"].astype(float)
                 m = np.isfinite(p)
                 fecha = pathlib.Path(f).stem
@@ -41,7 +44,7 @@ def main():
     servicio = (pd.DataFrame(filas).groupby(["anio", "condicion", "mes"])
                 .agg(dias=("pct_ext", "size"), mediana_servicio=("pct_ext", "median"))
                 .reset_index())
-    h = pd.read_csv(M / "calibracion_si/sandbox/salida/dos_27_dias.csv")
+    h = pd.read_csv(SAL / "dos_27_dias.csv")
     h["pct_ext"] = 100 * h["ext_r10"] / N_CELDAS
     cubo = h.groupby("mes").agg(mediana_cubo=("pct_ext", "median"),
                                 p90_cubo=("pct_ext", lambda x: x.quantile(0.9)))

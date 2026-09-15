@@ -120,5 +120,5 @@ posteriori. No son los mapas que se publicaron cada día
 `dos_09`, `dos_11` y los `comparar_*` leen los mapas de la temporada del disco
 externo (`TFM_USB`). El replay necesita además el archivo de entradas (pasadas
 IFS de 2025 y 2026, ERA5-Land de 2025, FIRMS y EFFIS de 2025), que no está en
-el repo por tamaño; `docs/PROCEDENCIA.md` da sus md5. Nada de este capítulo
+el repo por tamaño y se indica con `TFM_ARCHIVO`. Nada de este capítulo
 corre con `muestras/`.

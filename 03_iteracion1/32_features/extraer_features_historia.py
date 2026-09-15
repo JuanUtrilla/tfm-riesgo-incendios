@@ -34,17 +34,21 @@ por vecino más cercano en lat/lon):
   rayos_7d            suma [D-7, D-1] (tormentas secas recientes)
 """
 
+import os
+
 import numpy as np
 import pandas as pd
 import xarray as xr
 from pyproj import Transformer
 from scipy.spatial import cKDTree
 
-RUTA_MAESTRA = "/home/charredgem/Desktop/Master/TFM_fuego/dataset/muestra_maestra_v1.parquet"
-RUTA_EGIF = "/home/charredgem/Desktop/Master/TFM_fuego/egif_civio.csv"
-RUTA_FIRMS = "/home/charredgem/Desktop/Master/TFM_fuego/firms_iberia_2015_2024.parquet"
-RUTA_WGLC = "/home/charredgem/Desktop/Master/TFM_fuego/rayos_data/wglc/wglc_timeseries_30m_daily.nc"
-RUTA_SALIDA = "/home/charredgem/Desktop/Master/TFM_fuego/dataset/features_historia_v1.parquet"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DATOS = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
+RUTA_MAESTRA = f"{DATOS}/dataset/muestra_maestra_v1.parquet"
+RUTA_EGIF = f"{DATOS}/egif_civio.csv"
+RUTA_FIRMS = f"{DATOS}/firms_iberia_2015_2024.parquet"
+RUTA_WGLC = f"{DATOS}/rayos_data/wglc/wglc_timeseries_30m_daily.nc"
+RUTA_SALIDA = f"{DATOS}/dataset/features_historia_v1.parquet"
 
 R_CELDA = 1500.0     # "misma celda" con tolerancia (m)
 R_ZONA = 10_000.0    # zona local (m)

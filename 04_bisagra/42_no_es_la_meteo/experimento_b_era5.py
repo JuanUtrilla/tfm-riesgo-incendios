@@ -27,7 +27,7 @@ Los CSV sellados de producción guardan 7 columnas meteo ya calculadas:
 `dias_sin_lluvia`, `precip_30d`. Comparar esas mismas features calculadas
 desde ERA5-Land contra las de producción, estación a estación y día a día,
 cuantifica el desplazamiento de fuente feature por feature sin tocar el
-modelo. Es el pendiente nº1 de VALIDACION.md §7.
+modelo. Era el primer pendiente de la validación operativa.
 
 Lo que exige claves (fase 2)
 Puntuar con el modelo pide las 46 features. 44 salen de aquí o del parquet de
@@ -48,7 +48,7 @@ Caveats que hay que declarar en la memoria
   máximo horario del viento a 10 m. La definición también cambia entre fuentes,
   y eso forma parte de lo que se está midiendo, no es un error.
 
-Uso:  /home/charredgem/miniconda3/envs/tfm_fuego/bin/python experimento_b_era5.py
+Uso:  python experimento_b_era5.py
 """
 
 import json
@@ -61,14 +61,15 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-DIR = Path(__file__).parent
-REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+COLECTOR = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector")))
 ERA5 = DIR / "dataset" / "era5_2026"
 SALIDA_SERIE = DIR / "dataset" / "experimento_b_serie_era5.parquet"
 SALIDA_FEATS = DIR / "dataset" / "experimento_b_features.parquet"
 SALIDA_JSON = DIR / "dataset" / "experimento_b_resultados.json"
 
-sys.path.insert(0, str(REPO_OP))
+sys.path.insert(0, str(RAIZ / "01_datos" / "comun"))
 from fwi_canadiense import calcular_fwi_serie          # noqa: E402
 
 DIAS_SPINUP = 80          # el mismo que ranking_diario.py
@@ -208,7 +209,7 @@ def features_dia(s, i, e, idema, fecha, festivos, clim_dir):
 def construir(diaria, est, dias_objetivo):
     import holidays
     festivos = holidays.Spain(years=[2026])
-    clim_dir = REPO_OP / "modelo" / "clim_fwi"
+    clim_dir = COLECTOR / "modelo" / "clim_fwi"
     filas = []
     for idema, s in diaria.groupby("idema"):
         if idema not in est.index:
@@ -247,7 +248,7 @@ COMPARABLES = ["fwi", "fwi_pctl_local", "fwi_anom_sigma", "t2m_max", "rh_min",
 def cargar_produccion():
     """Los CSV sellados/cerrados de producción, con su tipo y día."""
     filas = []
-    for ruta in sorted((REPO_OP / "rankings").glob("*.csv")):
+    for ruta in sorted((COLECTOR / "rankings").glob("*.csv")):
         m = re.match(r"(prevision_D0|prevision_D1|ranking)_"
                      r"(\d{4}-\d{2}-\d{2})\.csv$", ruta.name)
         if not m:
@@ -289,7 +290,7 @@ def comparar_features(era5, prod):
 
 
 def main():
-    est = pd.read_parquet(REPO_OP / "modelo" / "estaciones_prototipo.parquet")
+    est = pd.read_parquet(COLECTOR / "modelo" / "estaciones_prototipo.parquet")
     print(f"estaciones: {len(est)}")
 
     if SALIDA_SERIE.exists():

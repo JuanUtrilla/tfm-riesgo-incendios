@@ -28,8 +28,10 @@ from pyproj import Transformer
 
 from fwi_canadiense import calcular_fwi_serie
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
-DB_COLECTOR = "/home/charredgem/Desktop/Master/aemet_horario_verano2026/data/aemet_horario_verano2026.db"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
+COLECTOR = os.environ.get("TFM_COLECTOR", f"{DIR}/colector")   # colector de AEMET
+DB_COLECTOR = f"{COLECTOR}/data/aemet_horario.db"
 DIR_OUT = f"{DIR}/prototipo"
 
 

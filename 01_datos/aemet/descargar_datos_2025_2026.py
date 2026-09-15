@@ -17,13 +17,15 @@ Idempotente y resumible (cachés por trozo). Reintenta con espera ante 429/fallo
 
 import os
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import requests
 from dotenv import load_dotenv
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 load_dotenv(f"{DIR}/.env")
 
 import tiempo_real as trm  # reutiliza _todas_chunk y su caché

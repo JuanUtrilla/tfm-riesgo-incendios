@@ -25,7 +25,7 @@ dos features del percentil: usar como denominador la climatología construida
 con ERA5-Land en vez de la del cubo. Aquí se aproxima con los propios datos
 2024 (muestra corta; es indicativo, no definitivo).
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_03c_aceptacion.py
+Uso: python malla_03c_aceptacion.py
 """
 
 import json

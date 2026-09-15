@@ -1,5 +1,5 @@
 {
- "descripcion": "Escala absoluta del r10 y referencia de la cifra del día, calibradas sobre los mapas servidos del replay 2025-2026 (condición IFS, 250 días). Generado por calibracion_si/semaforo_2026-09-14/calibrar_servicio.py el 14/09/2026.",
+ "descripcion": "Escala absoluta del r10 y referencia de la cifra del día, calibradas sobre los mapas servidos del replay 2025-2026 (condición IFS, 250 días). Generado por 07_produccion/escala_y_cifra/calibrar_servicio.py el 14/09/2026.",
  "cortes": {
   "MODERADO": 0.00595855712890625,
   "ALTO": 0.11248779296875,

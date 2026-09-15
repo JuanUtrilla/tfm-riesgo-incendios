@@ -13,7 +13,7 @@ Capas útiles (ver GetCapabilities): modis.ba.poly.season (temporada en curso),
 modis.ba.poly.<año> (2016…2025), effis.nrt.ba.poly (NRT).
 
 Latencia: cartografiar un perímetro lleva días. Los 2-3 últimos días están
-sistemáticamente incompletos; no conviene puntuar sobre ellos (ver VALIDACION.md).
+sistemáticamente incompletos; no conviene puntuar sobre ellos.
 
 Licencia: datos EFFIS/Copernicus EMS, reutilizables citando la fuente
 (© European Union, Copernicus Emergency Management Service, EFFIS).

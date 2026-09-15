@@ -6,7 +6,7 @@ Lee `salida/dos_05_metricas.json` (iteración 2, paso 5). No recalcula nada.
     (`auc_global_test_caso_control`).
   · AUC dentro del día: media por día en el banco `eval_dia`, test 2020,
     verdad EGIF (`2020_egif`).
-Uso:  python f4_metrica_ciega.py   [TFM_MALLA=<ruta a TFM_fuego_malla>]
+Uso:  python f4_metrica_ciega.py   [TFM_SALIDA=<carpeta de resultados>]
 """
 import json
 import os
@@ -16,9 +16,9 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-from comun import ANCHO, AZUL, BERMELLON, GRIS, NEGRO, MALLA, guarda
+from comun import ANCHO, AZUL, BERMELLON, GRIS, NEGRO, SALIDA_REPO, guarda
 
-RUTA = pathlib.Path(os.environ.get("TFM_MALLA", MALLA)) / "salida" / "dos_05_metricas.json"
+RUTA = SALIDA_REPO / "dos_05_metricas.json"
 
 
 def main():

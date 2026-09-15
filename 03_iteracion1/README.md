@@ -64,7 +64,7 @@ los rayos de WGLC (*WWLLN Global Lightning Climatology*).
 | `mapa_riesgo_hoy.py` | Mapa nacional en tiempo real interpolando las estaciones a la malla (IDW, *inverse distance weighting*) | Primera versión del mapa |
 | `mapa_riesgo_dia.py` | Mapa de un día pasado desde el cubo | Demostración y comprobación visual (por defecto, 17-jul-2022) |
 | `predecir_punto.py` | Riesgo en un (lat, lon, fecha) con explicación local SHAP (*SHapley Additive exPlanations*) | Consulta puntual |
-| `publicar_mapas_gh.py` | Publica los PNG del día en el repositorio del colector | Consultar los mapas desde el móvil |
+| `publicar_mapas_gh.py` | Publica los PNG del día en GitHub junto a los datos del colector de AEMET | Consultar los mapas desde el móvil |
 | `retro_julio.py` | Mapas de julio de 2026 con meteorología observada, comprobados contra FIRMS | Primera medida sobre un mes entero |
 | `validar_modelo.py` | Validación por estación y día de la serie de producción, con baselines (FWI, percentil local, persistencia) | Los números del capítulo 4 |
 
@@ -90,6 +90,10 @@ AUC-PR (área bajo la curva precisión-exhaustividad).
 | AUC-PR de v1 con las etiquetas barajadas | 0.231, igual que la prevalencia |
 | Ajuste de hiperparámetros (Optuna, 40 pruebas) | +0.007 de AUC-PR |
 
+![Escalera de baselines de la iteración 1](../docs/MEMORIA/figs/f18_escalera_it1.png)
+
+*AUC-PR en test 2020 de cada peldaño, del FWI sin modelo al XGBoost completo. La línea discontinua es el azar, que en esta métrica coincide con la prevalencia del conjunto.*
+
 El 0.89 es la cifra con la que abre la memoria. El diagnóstico posterior
 explica por qué no medía lo que hacía falta en operación.
 
@@ -97,8 +101,8 @@ explica por qué no medía lo que hacía falta en operación.
 
 `34_produccion/` es lo que se sirvió desde el 22 de julio de 2026 y sigue
 sirviéndose: un ranking nacional por estación (`ranking_diario.py`) y los mapas
-de hoy y mañana (`mapa_diario.py`), publicados por GitHub Actions desde el
-repositorio del colector de AEMET. El modelo que corre ahí es
+de hoy y mañana (`mapa_diario.py`), publicados por GitHub Actions junto al
+colector de AEMET. El modelo que corre ahí es
 `xgb_v2_prototipo`: la receta de v1 sin cuatro variables autorregresivas de la
 propia celda (`n_fuegos_1km_hist`, `n_fuegos_1km_90d`, `n_fuegos_10km_90d`,
 `n_fuegos_10km_365d`). Se retiraron porque, con negativos de la misma celda en

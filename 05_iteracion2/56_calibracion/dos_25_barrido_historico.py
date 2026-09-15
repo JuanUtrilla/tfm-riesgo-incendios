@@ -317,7 +317,7 @@ def main():
         return
 
     def carga(fich):
-        """Los modelos EFFIS viven en la expansión; producción, en el original."""
+        """Los modelos EFFIS viven en la expansión; producción, en los datos externos."""
         for d in (ce.MODELOS, config.MODELOS, f"{config.ESTADO}/modelos"):
             r = f"{d}/{fich}.ubj"
             if os.path.exists(r):

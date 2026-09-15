@@ -17,7 +17,7 @@ from pathlib import Path
 
 API_KEY  = os.environ["AEMET_API_KEY"]
 BASE_URL = "https://opendata.aemet.es/opendata/api"
-DB_PATH  = Path(__file__).parent / "data" / "aemet_horario_verano2026.db"
+DB_PATH  = Path(__file__).parent / "data" / "aemet_horario.db"
 
 logging.basicConfig(
     level=logging.INFO,

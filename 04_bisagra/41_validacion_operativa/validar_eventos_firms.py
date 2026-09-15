@@ -24,6 +24,8 @@ Salidas: dataset/eventos_firms_2021_2024.parquet (1 fila/evento)
          stdout: estadística agregada (histograma de percentiles)
 """
 
+from pathlib import Path
+import os
 import json
 
 import numpy as np
@@ -33,7 +35,8 @@ from pyproj import Transformer
 from scipy.spatial import cKDTree
 from sklearn.cluster import DBSCAN
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 ESCALA_TIEMPO_KM_DIA = 2.5
 EPS_KM = 6.0
 MIN_DETECCIONES = 3          # eventos con menos, fuera (ruido/quemas mínimas)

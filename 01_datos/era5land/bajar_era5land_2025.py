@@ -1,15 +1,18 @@
 """ERA5-Land horario de mayo a noviembre de 2025 desde el CDS, misma petición
 que malla_02_descarga.pide_mes (área, variables, 24 horas, netcdf), pero con
-salida fuera de los repos: archivo_ifs/era5land_cds/era5land_YYYYMM.nc.
+salida en el archivo de previsiones IFS (TFM_ARCHIVO): era5land_cds/era5land_YYYYMM.nc.
 Reanudable: salta los meses ya bajados. Tres peticiones en paralelo (el CDS
 las encola)."""
 import os, sys, calendar, time
 from concurrent.futures import ThreadPoolExecutor
-sys.path.insert(0, "/home/charredgem/Desktop/Master/TFM_fuego_malla")
+from pathlib import Path
+RAIZ = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(RAIZ / "01_datos" / "comun"))
 import config
 import cdsapi
 
-SAL = "/home/charredgem/Desktop/Master/archivo_ifs/era5land_cds"
+DATOS = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
+SAL = f'{os.environ.get("TFM_ARCHIVO", os.path.join(DATOS, "archivo"))}/era5land_cds'
 MESES = [(2025, m) for m in range(5, 12)]
 
 def mes(am):

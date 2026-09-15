@@ -26,7 +26,7 @@ Ventanas hacia atrás excluyendo el día D (t-w .. t-1), anti-leakage N6/V4:
   dias_sin_lluvia (días consecutivos con precip<1 mm contando hacia atrás desde
   D incluido, tope 120).
 
-Normalización local (ESTADO_ARTE §7.1-N5, contribución del TFM):
+Normalización local (contribución del TFM):
   fwi_pctl_local  = percentil del FWI del día vs la climatología 2008-2014 del
                     mismo mes en la misma celda (años previos al dataset, sin fuga).
   fwi_anom_sigma  = (fwi − media_clim) / std_clim (misma climatología).
@@ -43,15 +43,18 @@ ambiguos en el ensamblado), is_fire_dia.
 
 import os
 import time as _t
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-RUTA_MAESTRA = "/home/charredgem/Desktop/Master/TFM_fuego/dataset/muestra_maestra_v1.parquet"
-RUTA_IBERFIRE = "/home/charredgem/Desktop/Master/TFM_fuego/iberfire/IberFire.nc"
-DIR_PARTES = "/home/charredgem/Desktop/Master/TFM_fuego/dataset/_features_parts"
-RUTA_SALIDA = "/home/charredgem/Desktop/Master/TFM_fuego/dataset/features_cubo_v1.parquet"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
+RUTA_MAESTRA = f"{DIR}/dataset/muestra_maestra_v1.parquet"
+RUTA_IBERFIRE = f"{DIR}/iberfire/IberFire.nc"
+DIR_PARTES = f"{DIR}/dataset/_features_parts"
+RUTA_SALIDA = f"{DIR}/dataset/features_cubo_v1.parquet"
 
 CHUNK_Y, CHUNK_X = 77, 99          # chunking interno del NetCDF
 ANIOS_CLIM = (2008, 2014)          # climatología local (previa al dataset 2015-2020)

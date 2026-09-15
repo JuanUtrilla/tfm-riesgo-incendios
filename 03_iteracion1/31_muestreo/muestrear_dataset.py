@@ -5,7 +5,7 @@ Muestreador del dataset del modelo de riesgo (Modelo B).
 Produce la tabla maestra (celda IberFire, fecha, label, split) que después se
 rellena con features extraídas del datacubo IberFire y de las fuentes propias.
 
-Diseño congelado (PROXIMOS_PASOS.md §⭐ Fase 2 + ESTADO_ARTE_ML_INCENDIOS.md §7.3):
+Diseño congelado antes de muestrear:
 - Positivos: incendios EGIF con coordenadas, asignados a su celda 1 km de
   IberFire (EPSG:3035), deduplicados por (celda, fecha).
 - Solo años 2015-2020: el EGIF de Civio está incompleto a partir de 2021 por
@@ -27,6 +27,8 @@ Salida: dataset/muestra_maestra_v1.parquet + resumen por stdout.
 Determinista (SEED fija). No descarga nada: todo local.
 """
 
+import os
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -39,9 +41,11 @@ BUFFER_KM = 12.5         # radio de exclusión espacial (= caja 25x25 celdas Ibe
 BUFFER_DIAS = 10         # exclusión temporal alrededor de un incendio
 MAX_INTENTOS = 200       # intentos de sorteo de fecha por negativo
 
-RUTA_EGIF = "/home/charredgem/Desktop/Master/TFM_fuego/egif_civio.csv"
-RUTA_IBERFIRE = "/home/charredgem/Desktop/Master/TFM_fuego/iberfire/IberFire.nc"
-RUTA_SALIDA = "/home/charredgem/Desktop/Master/TFM_fuego/dataset/muestra_maestra_v1.parquet"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DATOS = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
+RUTA_EGIF = f"{DATOS}/egif_civio.csv"
+RUTA_IBERFIRE = f"{DATOS}/iberfire/IberFire.nc"
+RUTA_SALIDA = f"{DATOS}/dataset/muestra_maestra_v1.parquet"
 
 SPLITS = {"train": (2015, 2018), "val": (2019, 2019), "test": (2020, 2020)}
 

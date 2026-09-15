@@ -9,7 +9,7 @@ el argumento de `fwi_pctl_local`, y el mismo que justifica `fwi_anom_sigma`.
 
 Solo train, para que ninguna decisión de diseño mire a val/test.
 
-Entrada: TFM_fuego/dataset/dataset_modelo_v1.parquet (fijable con TFM_ORIG).
+Entrada: dataset/dataset_modelo_v1.parquet de los datos externos (TFM_DATOS).
 """
 import os
 import pathlib
@@ -17,9 +17,9 @@ import pathlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from comun import ANCHO, AZUL, BERMELLON, guarda, ORIG
+from comun import ANCHO, AZUL, BERMELLON, guarda, DATOS
 
-DATOS = pathlib.Path(os.environ.get("TFM_ORIG", ORIG)) / "dataset" / \
+DATOS = DATOS / "dataset" / \
     "dataset_modelo_v1.parquet"
 
 # códigos INE de comunidad autónoma, verificados contra el centroide de las

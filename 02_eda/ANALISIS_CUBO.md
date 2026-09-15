@@ -1,12 +1,11 @@
-<!-- COPIA de ANALISIS_DATOS.md de TFM_fuego_malla (25/08/2026).
+<!-- Redactado el 25/08/2026.
      Es el documento de resultados de la fase 1 del encargo de los dos
      modelos: lo producen dos_00_cubo_etiquetas.py, dos_01_celdas.py y
      dos_04_analisis.py, que viven en 04_bisagra/44 y 05_iteracion2/. -->
 
 # Análisis de datos — fase 1 del encargo de los dos modelos
 
-Entregable de `PROMPT_DOS_MODELOS.md` §3. Todo está medido la noche del
-21/08/2026; los scripts que producen cada número son `dos_00` … `dos_06` de
+Todo está medido la noche del 21/08/2026; los scripts que producen cada número son `dos_00` … `dos_06` de
 este repo y los JSON de `salida/`. Los datos pesados viven en el disco de
 expansión (`config_expansion.py`).
 
@@ -169,7 +168,7 @@ Conclusiones:
 1. **Temperatura, humedad y viento no tienen deriva**: es el mismo dato.
 2. **El FWI de nivel se sirve a las 13 UTC** y queda en PSI ≈0.03. El proxy
    tmax/hr_min (lo que sirve producción hoy) está en 0.24 y sube el p95 de
-   58 a 70: inflaría las alertas. Confirma `ENFOQUE_ERA5_EN_PRODUCCION.md`.
+   58 a 70: inflaría las alertas.
 3. **El percentil tiene que tener numerador y denominador de la misma
    receta.** Proxy/clim-proxy: PSI 0.01. Meter el FWI de las 13 UTC sobre la
    climatología del proxy (lo que pasaría si se cambia el numerador sin
@@ -218,5 +217,5 @@ distinto de como se entrenó.
   construyó para eso y no lo ve ningún entrenamiento.
 - La línea base obligatoria (`xgb_v2_prototipo`) se mide con ese protocolo
   en `dos_05`, junto con el «mapa tonto» de densidad a 10 km y el percentil
-  del FWI, que en el proyecto hermano ganaba al modelo. Resultados en
-  `RESULTADOS_DOS_MODELOS.md`.
+  del FWI, que en la iteración 1 ganaba al modelo. Los resultados están en
+  `05_iteracion2/README.md`.

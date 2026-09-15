@@ -6,7 +6,7 @@ No toca producción. Lee expansión; escribe salida/dos_08_verano.json.
 
 Por qué
 -------
-`ANALISIS_DATOS.md` §1: el 38 % de las igniciones EGIF son de febrero-abril
+`02_eda/ANALISIS_CUBO.md` §1: el 38 % de las igniciones EGIF son de febrero-abril
 (Cantábrico), con otra geografía y otra meteo que las de julio-agosto. El
 dónde de `dos_05` aprendió «dónde arde en todo el año» y el cuándo «cuándo
 arde, con negativos de todo el año». El mapa se sirve en verano. Aquí se

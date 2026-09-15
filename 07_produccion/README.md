@@ -1,16 +1,18 @@
 # 7 · Producción: el mapa de cada mañana
 
 La cadena corre en GitHub Actions desde este repositorio
-(`.github/workflows/mapa_diario.yml`), una vez al día, hacia las 03:03 en verano
-y las 02:02 en invierno (hora de Madrid). Publica en `publicado/` el mapa de
+(`.github/workflows/mapa_diario.yml`), una vez al día. Está programada a las
+03:03 en verano y a las 02:02 en invierno (hora de Madrid), pero GitHub Actions
+retrasa las tareas programadas: en septiembre de 2026 la corrida arrancó entre
+las 08:00 y las 12:00 y tardó algo más de una hora. Publica en `publicado/` el mapa de
 hoy y el de mañana con el modelo elegido, el r10, de dos formas: en escala
 absoluta, con la cifra del día, y por percentil del día. El estado que hace
 falta entre corridas (el reanálisis acumulado y los mapas de los últimos días)
 se guarda en el Release `estado` del repositorio, porque no cabe en git.
 
-Durante la temporada de 2026 la misma cadena corrió en un repositorio aparte
-(`tfm-fuego-malla`) y publicaba también los mapas de los otros candidatos. Aquí
-queda su código completo, incluidos los scripts que ya no se ejecutan.
+Durante la temporada de 2026 la cadena publicaba también los mapas de los otros
+candidatos. Aquí queda su código completo, incluidos los scripts que ya no se
+ejecutan.
 
 ![Los mapas publicados hoy](../publicado/mapas_hoy.png)
 

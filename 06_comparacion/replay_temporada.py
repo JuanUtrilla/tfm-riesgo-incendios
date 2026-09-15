@@ -5,7 +5,7 @@ en replay/<año>/<condicion>/), sin PNG, 8 hilos. Uso:
 import argparse, os, subprocess, sys, time
 import pandas as pd
 AQUI = os.path.dirname(os.path.abspath(__file__))
-P = "/home/charredgem/miniconda3/envs/tfm_fuego/bin/python"
+P = sys.executable
 RANGO = {2025: ("2025-05-25", "2025-11-01"), 2026: ("2026-05-25", "2026-09-02")}
 a = argparse.ArgumentParser(); a.add_argument("--anio", type=int, required=True)
 a.add_argument("--condicion", choices=["ifs", "reanalisis"], required=True)
@@ -14,7 +14,9 @@ ini, fin = a.ini or RANGO[a.anio][0], a.fin or RANGO[a.anio][1]
 if a.condicion == "reanalisis" and a.anio == 2026:
     fin = min(fin, "2026-08-27")            # el reanálisis del Release llega al 27-ago
 env = dict(os.environ, OMP_NUM_THREADS="8", MKL_NUM_THREADS="8", OPENBLAS_NUM_THREADS="8")
-dest = f"{AQUI}/replay/{a.anio}/{a.condicion}"
+RAIZ = os.path.dirname(AQUI)
+ARCH = os.environ.get("TFM_ARCHIVO", os.path.join(os.environ.get("TFM_DATOS", f"{RAIZ}/datos"), "archivo"))
+dest = f"{ARCH}/replay/{a.anio}/{a.condicion}"
 t0 = time.time(); hechos = fallos = 0
 for d in pd.date_range(ini, fin, freq="D"):
     f = str(d.date())
@@ -24,7 +26,7 @@ for d in pd.date_range(ini, fin, freq="D"):
                        env=env, capture_output=True, text=True)
     if r.returncode != 0:
         fallos += 1
-        open(f"{AQUI}/replay/fallos_{a.anio}_{a.condicion}.log", "a").write(f"=== {f}\n{r.stdout[-1500:]}\n{r.stderr[-3000:]}\n")
+        open(f"{ARCH}/replay/fallos_{a.anio}_{a.condicion}.log", "a").write(f"=== {f}\n{r.stdout[-1500:]}\n{r.stderr[-3000:]}\n")
         print(f"  {f}: FALLO (ver fallos_{a.anio}_{a.condicion}.log)", flush=True)
         continue
     hechos += 1

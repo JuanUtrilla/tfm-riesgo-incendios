@@ -7,7 +7,7 @@ No toca producción. Escribe salida/prueba_denominador_ifs.json.
 La pregunta
 El mapa de hoy y mañana no puede salir del reanálisis: ERA5-Land llega con
 ~6 días de retraso. Tiene que venir del IFS (previsión). Y el IFS ya se midió
-en el repo original contra el denominador del cubo:
+en la primera versión del proyecto contra el denominador del cubo:
 
     saturación de fwi_pctl_local (% en pctl >= 99,9), 120 estaciones
         cubo (referencia)      0,22 %
@@ -49,7 +49,7 @@ devuelve 429. De ahí el freno de PAUSA segundos entre lotes y el reintento
 con retroceso. La descarga se cachea por lotes, así que un corte no tira lo
 ya bajado.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_02b_prueba.py
+Uso: python malla_02b_prueba.py
 """
 
 import json

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verificación de punta a punta del replay (PENDIENTE.md §1, 01/09/2026).
+"""Verificación de punta a punta del replay (01/09/2026).
 
 Reproduce el mapa del 21-ago-2026 (día con pasada IFS real en local,
 salida/ifs_malla_2026-08-21.parquet, mapa servido en mapas_diarios/
@@ -14,10 +14,10 @@ Tres diferencias inevitables respecto a la corrida real, que se parchean:
      sustituye por `comparar_rankings.firms_dia` con ventana 5 ([D−5, D−1] de
      la fecha pasada, cacheado en _firms5/), que devuelve las mismas dos rejillas.
   3. Las salidas pisarían las servidas: se respaldan antes y se restauran
-     al final pase lo que pase; las del replay quedan en archivo_ifs/replay_21ago/.
+     al final pase lo que pase; las del replay quedan en replay_21ago/ del
+     archivo de previsiones IFS (TFM_ARCHIVO).
 
-No toca ningún .py de los repos (los md5 de PROCEDENCIA.md siguen valiendo):
-todo es monkeypatch desde fuera. No escribe en ningún veredicto.
+No modifica ningún .py: todo es monkeypatch desde fuera. No escribe en ningún veredicto.
 """
 import hashlib
 import json
@@ -25,15 +25,15 @@ import os
 import shutil
 import sys
 
-REPO = "/home/charredgem/Desktop/Master/TFM_fuego_malla"
-AQUI = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+AQUI = os.environ.get("TFM_ARCHIVO", os.path.join(os.environ.get("TFM_DATOS", f"{REPO}/datos"), "archivo"))
 DEST = f"{AQUI}/replay_21ago"
 F = "2026-08-21"
 CORTE_RE = "2026-08-13"
 
 os.environ["TFM_FIRMS_DIAS"] = "5"     # la ventana con la que se sirvió agosto
 os.chdir(REPO)
-sys.path.insert(0, REPO)
+sys.path.insert(0, f"{REPO}/01_datos/comun")
 
 import numpy as np
 import pandas as pd

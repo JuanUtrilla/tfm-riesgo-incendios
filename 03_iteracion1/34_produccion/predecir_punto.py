@@ -8,11 +8,12 @@ Ej.:  python3 predecir_punto.py 40.545 -4.786 2021-08-14   (incendio de Sotalvo,
       año fuera del entrenamiento 2015-2018)
 
 Reconstruye las features desde el cubo IberFire + EGIF + FIRMS + WGLC con las
-mismas definiciones del pipeline (ver dataset/DATASET_CARD.md) para una sola
+mismas definiciones del pipeline de entrenamiento para una sola
 celda, predice con el modelo afinado y muestra las 10 contribuciones SHAP locales.
 Rango de fechas servible: de 2011 (ventanas) a 2024-12-31 (fin del cubo).
 """
 
+import os
 import sys
 
 import numpy as np
@@ -25,7 +26,8 @@ from scipy.spatial import cKDTree
 from entrenar_modelo import (FEATS_METEO, FEATS_VEG, FEATS_ESTAT, FEATS_HIST,
                              FEATS_CAL)
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 FULL = FEATS_METEO + FEATS_VEG + FEATS_ESTAT + FEATS_HIST + FEATS_CAL
 
 

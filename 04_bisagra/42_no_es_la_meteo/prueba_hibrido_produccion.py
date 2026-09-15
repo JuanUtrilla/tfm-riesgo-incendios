@@ -28,7 +28,7 @@ Se barre L = 0 (ERA5 puro), 2, 4, 6, 8 días para ver cuánta cola de previsión
 aguanta el esquema antes de degradarse. L=6 es el retraso real de ERA5-Land
 medido el 19/08/2026; los demás sirven de sensibilidad.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python prueba_hibrido_produccion.py
+Uso: python prueba_hibrido_produccion.py
 """
 
 import json

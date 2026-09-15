@@ -58,9 +58,10 @@ La resolución espacial. Una estación representa su entorno, no una celda de
 estaciones. El mapa seguiría necesitando interpolación. Se declara y no se
 disimula.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python modelo_nativo_estacion.py
+Uso: python modelo_nativo_estacion.py
 """
 
+import os
 import json
 from pathlib import Path
 
@@ -70,9 +71,10 @@ import xgboost as xgb
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 DIR = Path(__file__).parent
-REPO_OP = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
+DATOS = Path(os.environ.get("TFM_DATOS", Path(__file__).resolve().parents[2] / "datos"))
+REPO_OP = Path(os.environ.get("TFM_COLECTOR", DATOS / "colector"))   # colector de AEMET
 import sys
-sys.path.insert(0, str(REPO_OP))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "01_datos" / "comun"))
 from fwi_canadiense import calcular_fwi_serie          # noqa: E402
 
 HIST = DIR / "dataset" / "aemet_historico_2015_2025.parquet"

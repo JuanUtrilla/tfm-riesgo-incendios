@@ -9,7 +9,8 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 # Necesita entrenar_modelo.py (misma carpeta) en el PYTHONPATH: source entorno.sh
 import entrenar_modelo as em   # DIR ya apunta a la copia aislada
 
-T = os.environ.get("TFM_FUENTE", "/home/charredgem/Desktop/Master/TFM_fuego")
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+T = os.environ.get("TFM_DATOS", os.environ.get("TFM_FUENTE", f"{RAIZ}/datos"))
 QUITAR = {"n_fuegos_1km_hist", "n_fuegos_1km_90d", "n_fuegos_10km_90d", "n_fuegos_10km_365d"}
 feats_serv = json.load(open(f"{T}/modelos/xgb_v2_prototipo_features.json"))
 feats_v1 = em.FEATS_METEO + em.FEATS_VEG + em.FEATS_ESTAT + em.FEATS_HIST + em.FEATS_CAL

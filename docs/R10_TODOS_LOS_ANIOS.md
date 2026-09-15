@@ -19,8 +19,8 @@ que se puede entrenar con **todo 2015-2024** y medir fuera. Son dos años más y
 
 ## El prerregistro
 
-Escrito a las **11:30 UTC**, antes de ejecutar nada
-(`calibracion_si/PRERREGISTRO_r10_todo.md`). Métrica primaria: **AUC medio por
+Escrito a las **11:30 UTC**, antes de ejecutar nada, y resumido en
+[`TRAZABILIDAD.md`](TRAZABILIDAD.md). Métrica primaria: **AUC medio por
 día** sobre los días del replay con IFS, con IC bootstrap al 95 % de la
 diferencia pareada. Criterio de éxito: **que el IC no toque el cero**.
 
@@ -94,7 +94,7 @@ reentrenar con todo (+0.0033). La señal está ahí, no en más años.
 ```bash
 source entorno.sh
 python 05_iteracion2/57_ablaciones/dos_30_r10_todo.py     # entrena los dos
-# y después, editando las rutas absolutas del cabecero:
+# después, con el archivo de previsiones IFS en TFM_ARCHIVO:
 python 06_comparacion/replay_temporada_todo.py --anio 2025 --condicion ifs
 python 06_comparacion/replay_temporada_todo.py --anio 2026 --condicion ifs
 ```

@@ -11,7 +11,7 @@ España: sin referencias, «¿esto es Zamora o León?» no se contesta a ojo, y 
 mapa diario se mira precisamente para eso. Se añaden los límites de provincia
 y las ciudades para poder situar el riesgo sin abrir otro mapa al lado.
 
-Los polígonos son los mismos del proyecto hermano (`exportar_limites.py`,
+Los polígonos son los mismos del colector de AEMET (`exportar_limites.py`,
 Natural Earth 10 m admin-1, dominio público, simplificados a 800 m y ya
 proyectados a píxeles de la malla). Se comprobó que la rejilla es idéntica
 (1188 × 920, EPSG:3035, origen 2674734,3466 / 2492195,9911, paso 1 km), así

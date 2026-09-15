@@ -13,8 +13,10 @@ el mapa del día.
 
 ![Mapas de mañana](publicado/mapas_manana.png)
 
-Se generan cada madrugada en GitHub Actions (`.github/workflows/mapa_diario.yml`,
-hacia las 03:03 en verano y las 02:02 en invierno, hora de Madrid). Hay una
+Se generan cada día en GitHub Actions (`.github/workflows/mapa_diario.yml`). La
+corrida está programada a las 03:03 en verano y a las 02:02 en invierno, hora de
+Madrid, pero GitHub la lanza con varias horas de retraso y los mapas del día
+suelen aparecer a media mañana; hasta entonces se ven los del día anterior. Hay una
 imagen para hoy y otra para mañana. En cada una, a la izquierda, está el modelo
 elegido (r10) en escala absoluta, que indica cuánto riesgo hay. Lleva la cifra
 del día: el porcentaje de España en nivel EXTREMO y su posición entre los días
@@ -61,7 +63,7 @@ para qué se usó.
 | `05_iteracion2/` | Rediseño con etiqueta EFFIS, ablaciones y calibración en el cubo |
 | `06_comparacion/` | Los dos sistemas sobre los mismos días, y el replay de 2025 y 2026 |
 | `07_produccion/` | La cadena diaria: código, workflow y el producto final |
-| `docs/` | [Trazabilidad número → script](docs/TRAZABILIDAD.md), [resultado del replay](docs/REPLAY_VEREDICTO.md), [procedencia de cada fichero](docs/PROCEDENCIA.md), [cómo está montado el repo](docs/ESTRUCTURA.md), [alcance y limitaciones](docs/LIMITACIONES.md), [bitácora](docs/BITACORA.md) y [la memoria](docs/MEMORIA/README.md) |
+| `docs/` | [Trazabilidad número → script](docs/TRAZABILIDAD.md), [resultado del replay](docs/REPLAY_VEREDICTO.md), [cómo está montado el repo](docs/ESTRUCTURA.md), [alcance y limitaciones](docs/LIMITACIONES.md), [bitácora](docs/BITACORA.md) y [la memoria](docs/MEMORIA/README.md) |
 | `muestras/` | Recorte de julio de 2026 para ejecutar la rama de servicio sin descargar 44 GB |
 
 Por dónde empezar: `00_marco/README.md` para el hilo, `04_bisagra/README.md`
@@ -72,24 +74,32 @@ iteración.
 
 ## Reproducibilidad
 
-Los datos crudos (el cubo IberFire de 29 GB, el reanálisis, los históricos de
-AEMET, la Agencia Estatal de Meteorología) no están en el repositorio; se
-descargan con los scripts de `01_datos/`. Para trabajar sin esperar a las
-descargas, `muestras/` lleva un recorte de julio de 2026 con el que la rama de
-servicio corre en un portátil:
+El trabajo se puede reproducir, pero no en unos minutos: los datos pesan
+decenas de gigas y dos de las fuentes se sirven por cola o con cuota. Por eso
+la comprobación se ofrece por niveles.
+
+| Qué se quiere comprobar | Qué hace falta | Tiempo |
+|---|---|---|
+| Que el modelo servido es el que se describe | Clonar el repositorio | Minutos |
+| De dónde sale cada cifra de la memoria | Leer [`docs/TRAZABILIDAD.md`](docs/TRAZABILIDAD.md): cifra, script, fichero y datos necesarios | Horas de lectura |
+| Entrenar los modelos | El cubo IberFire (29 GB) y los conjuntos de entrenamiento, ejecutando los scripts por orden | Días de descarga y cómputo |
+| Calcular un mapa diario | El reanálisis ERA5-Land, que Copernicus sirve por cola, y la previsión IFS de Open-Meteo, con cuota diaria y por hora | Más de una hora por día calculado |
+| Repetir las temporadas 2025 y 2026 | El archivo de previsiones de cada víspera; EFFIS corrige sus perímetros durante semanas | Días |
+
+La comprobación rápida:
 
 ```bash
-source entorno.sh                 # PYTHONPATH y rutas de datos
-python 07_produccion/riesgo_hoy.py
-python 07_produccion/dos_riesgo_hoy.py
-python 07_produccion/mapas_hoy_manana.py
+source entorno.sh
+python 03_iteracion1/33_train/verificar_v2.py
 ```
 
-Los entrenamientos y las ablaciones necesitan el cubo y los datasets del disco
-externo (`TFM_DATOS`, `TFM_USB`). `environment.yml` fija el entorno conda
-(`tfm_fuego`, xgboost 3.2.0). Todos los modelos citados se reentrenaron en una
-copia aislada y coinciden con los artefactos originales métrica a métrica y por
-md5 del `.ubj` (`docs/TRAZABILIDAD.md`, apartado «Reproducción verificada»).
+La reproducción completa ya se hizo: todos los modelos citados se
+reentrenaron en una copia aislada con `environment.yml` (entorno conda
+`tfm_fuego`, xgboost 3.2.0) y coinciden con los originales en todas las
+métricas y en la huella MD5 de cada `.ubj` (`docs/TRAZABILIDAD.md`, apartado
+«Reproducción verificada»). Además, la cadena de producción se ejecuta cada día
+desde cero en GitHub Actions, en una máquina que no tiene nada del equipo; su
+historial y los commits diarios de `publicado/` lo muestran.
 
 ## Autoría
 

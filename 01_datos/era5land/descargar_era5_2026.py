@@ -41,7 +41,7 @@ Decisiones que no son obvias
 · Sobre el mar ERA5-Land es NaN. Las estaciones costeras se resuelven en el
   script de features, no aquí.
 
-Uso:  /home/charredgem/miniconda3/envs/tfm_fuego/bin/python descargar_era5_2026.py
+Uso:  python descargar_era5_2026.py
 Idempotente: si el .nc del mes existe y pesa >1 MB, se salta. Relanzable.
 """
 

@@ -19,7 +19,7 @@ mapas nuevos en vez del modelo de producción:
            producción; 0,744 sin FIRMS.
   pareja   `donde_effis_c` (susceptibilidad por celda, etiqueta EFFIS) ×
            `cuando` (solo dinámicas, etiqueta EGIF: el cuándo con EFFIS salió
-           peor, `RESULTADOS_DOS_MODELOS.md`). 0,754 en 2026. Interpretable:
+           peor). 0,754 en 2026. Interpretable:
            el mapa estático va aparte.
   r10      `donde_dia_effis_r10`: el mismo modelo que `unico` cambiando solo
            cuántos negativos del mismo día ve en entrenamiento, 10 por

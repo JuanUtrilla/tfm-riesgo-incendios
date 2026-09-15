@@ -24,7 +24,7 @@ Los dos controles importan: si T y HR no coinciden entre cubo y Open-Meteo,
 el problema no está en el viento sino en el regrillado del cubo a 1 km, y la
 conclusión cambia por completo.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python prueba_era5_atribucion.py
+Uso: python prueba_era5_atribucion.py
 """
 
 import json

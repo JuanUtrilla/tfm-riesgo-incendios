@@ -1,0 +1,38 @@
+\begin{table}[H]
+\centering
+\small
+\caption{Comparación de algoritmos con los datos, las 46 variables y la evaluación del r10. AUC medio dentro del día en la prueba de 2024 (72 días con fuego), con su intervalo de confianza al 95~\% por remuestreo de días. La diferencia es la media pareada día a día frente a XGBoost con la receta del r10, y los días ganados, el porcentaje de días en que cada algoritmo lo supera. Cada algoritmo, salvo la referencia, usa la mejor de seis configuraciones según el AUC de 2023.}
+\label{tab:algoritmos}
+\begin{tabular}{lcccr}
+\toprule
+Algoritmo & AUC 2024 [IC 95~\%] & Diferencia [IC 95~\%] & Días ganados & Entrenamiento \\
+\midrule
+XGBoost, receta del r10 & 0.805 [0.769, 0.839] & --- & --- & 2.7~s \\
+XGBoost ajustado & 0.786 [0.747, 0.822] & $-0.019$ [$-0.037$, $-0.002$] & 44~\% & 3.2~s \\
+LightGBM & 0.829 [0.798, 0.859] & $+0.024$ [$+0.007$, $+0.043$] & 64~\% & 4.4~s \\
+Random Forest & 0.833 [0.800, 0.864] & $+0.028$ [$+0.008$, $+0.049$] & 62~\% & 23.8~s \\
+Regresión logística & 0.803 [0.766, 0.838] & $-0.001$ [$-0.029$, $+0.025$] & 47~\% & 2.2~s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Los mismos algoritmos en la reproducción de las temporadas de 2025 (138 días con fuego) y 2026 (86 días), con la previsión de la víspera y los perímetros de EFFIS. AUC medio dentro del día sobre todas las celdas de España. La diferencia es la media pareada día a día frente al r10 servido, con su intervalo de confianza al 95~\% por remuestreo de días, y los días ganados, el porcentaje de días en que cada algoritmo lo supera.}
+\label{tab:algoritmos-temporadas}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{2025} & \multicolumn{3}{c}{2026} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Algoritmo & AUC & Diferencia [IC 95~\%] & Días & AUC & Diferencia [IC 95~\%] & Días \\
+\midrule
+XGBoost, r10 servido & 0.807 & --- & --- & 0.762 & --- & --- \\
+XGBoost ajustado & 0.783 & $-0.024$ [$-0.037$, $-0.013$] & 33~\% & 0.749 & $-0.012$ [$-0.033$, $+0.008$] & 41~\% \\
+LightGBM & 0.789 & $-0.018$ [$-0.029$, $-0.008$] & 41~\% & 0.748 & $-0.014$ [$-0.030$, $+0.003$] & 40~\% \\
+Random Forest & 0.811 & $+0.003$ [$-0.010$, $+0.017$] & 54~\% & 0.775 & $+0.014$ [$-0.003$, $+0.032$] & 52~\% \\
+Regresión logística & 0.765 & $-0.043$ [$-0.065$, $-0.019$] & 39~\% & 0.692 & $-0.070$ [$-0.097$, $-0.044$] & 26~\% \\
+\bottomrule
+\end{tabular}
+\end{table}

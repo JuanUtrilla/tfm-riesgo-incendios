@@ -10,9 +10,10 @@ Métrica: AUC por época con IC95 por bootstrap de días (1,000, semilla 42), y 
 días grandes perdidos si se apagan tantos días como apagaba el semáforo V0.
 Día grande: al menos 5 celdas nuevas quemadas.
 
-Entradas: calibracion_si/sandbox/salida/dos_27_dias.csv y dos_26_dias.csv
+Entradas: dos_27_dias.csv y dos_26_dias.csv de la carpeta de resultados (TFM_SALIDA)
 Salida:   comparar_senales.txt (junto a este script)
 """
+import os
 import pathlib
 import sys
 
@@ -20,7 +21,8 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 
-S = pathlib.Path.home() / "Desktop/Master/calibracion_si/sandbox/salida"
+S = pathlib.Path(os.environ.get(
+    "TFM_SALIDA", pathlib.Path(__file__).resolve().parents[2] / "salida"))
 AQUI = pathlib.Path(__file__).resolve().parent
 
 

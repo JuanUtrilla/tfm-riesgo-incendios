@@ -11,16 +11,16 @@ evidencia de cada afirmación; la mala es la que se explica en el punto 3.
 
 ## 2. El código no se ha reescrito
 
-Los 120 scripts son copias literales de los repositorios donde se ejecutaron,
-con su procedencia y su hash en [`PROCEDENCIA.md`](PROCEDENCIA.md). Se valoró
+Los 120 scripts son los que se ejecutaron para obtener los resultados. Se valoró
 reescribirlos para que el repo luciera mejor y se descartó: una reescritura
 obliga o a reejecutar el pipeline entero para volver a generar los resultados
 —semanas de cómputo sobre 29 GB de datos, a semanas de entregar— o a publicar
 código que no produjo los números que documenta. Sin tests que fijen las
 cifras, un refactor que convierta un 0.773 en un 0.771 no se detectaría.
 
-Lo único adaptado son las **rutas**, y solo en los cuatro módulos de
-`01_datos/comun/`:
+Lo único adaptado son las **rutas**. Las de lectura y escritura de cada script
+se declaran ahora con variables de entorno (apartado 4), y en los cuatro módulos
+de `01_datos/comun/` el cambio fue este:
 
 | Módulo | Qué es | Qué se cambió |
 |---|---|---|
@@ -55,13 +55,16 @@ que el código es idéntico al que generó los resultados.
 
 ## 4. Dónde están los datos
 
-Ninguna ruta personal vive ya en el código. Tres variables de entorno, todas
-con valor por defecto:
+Ninguna ruta personal vive ya en el código. Estas variables de entorno, todas
+con valor por defecto, dicen dónde están los datos:
 
 | Variable | Para qué | Por defecto |
 |---|---|---|
 | `TFM_DATOS` | fuentes crudas: cubo IberFire (29 GB), EGIF, FIRMS, rayos WGLC | `./datos` (ignorado por git) |
 | `TFM_USB` | disco con los datasets de entrenamiento de la iteración 2 | se busca el USB montado |
+| `TFM_COLECTOR` | datos del colector de AEMET, con la base `aemet_horario.db` | `$TFM_DATOS/colector` |
+| `TFM_ARCHIVO` | archivo de previsiones IFS y salidas del replay (`replay/`, `era5land_cds/`) | `$TFM_DATOS/archivo` |
+| `TFM_ESTADO` | estado de la cadena diaria | `./muestras` |
 | `TFM_SALIDA` | dónde escribir | `./salida` |
 
 La cadena de resolución de `config.entrada()` es: `salida/` propio →
@@ -95,6 +98,5 @@ cifra del día y el r10 por percentil, además del mapa de referencia. El
 estado entre corridas (reanálisis acumulado, mapas de los últimos días) vive
 en el Release `estado` del repositorio, que `07_produccion/gh_estado.py` baja
 al empezar y sube al terminar. Hacen falta dos secretos: `CDSAPI_KEY` y
-`FIRMS_MAP_KEY`. Durante la temporada de 2026 la misma cadena corrió en el
-repositorio `tfm-fuego-malla`, con más pasos; su código está íntegro en
-`07_produccion/`.
+`FIRMS_MAP_KEY`. Durante la temporada de 2026 la cadena tuvo más pasos, y el
+código de todos ellos sigue en `07_produccion/`.

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Figuras nuevas de los anexos B y C (14/09/2026, tarde).
+"""Figuras nuevas del anexo B (14/09/2026, tarde).
 
   anexo_b_captura.png   curva de captura de hectáreas frente al % de celdas
                         vigiladas, seis modelos, 2025 y 2026 (captura_lift.csv)
   anexo_c_variantes.png variantes del semáforo: % de días sin EXTREMO frente a
                         % de días grandes perdidos, cubo 2022-2024 y replay
                         (semaforo_variantes.csv)
-Decimales con punto. Escribe en ~/Downloads/figs/ sin pisar nada anterior.
+Decimales con punto. Escribe en docs/MEMORIA/figs/.
 """
 import pathlib
 
@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 AQUI = pathlib.Path(__file__).resolve().parent
-OUT = pathlib.Path.home() / "Downloads/figs"
+OUT = AQUI.parents[1] / "docs/MEMORIA/figs"
 ANCHO = 6.3
 plt.rcParams.update({
     "figure.dpi": 300, "savefig.dpi": 300, "savefig.bbox": "tight",

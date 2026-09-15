@@ -62,7 +62,7 @@ import config
 DIR = config.FUENTE
 DATA = config.SALIDA
 CRUDO = config.CRUDO_PROPIO       # las descargas nuevas caen en este repo
-CRUDO_LECTURA = config.CRUDO      # los meses ya bajados en el original
+CRUDO_LECTURA = config.CRUDO      # los meses ya bajados en los datos externos
 AREA = config.AREA
 VARIABLES = config.VARIABLES
 
@@ -91,7 +91,7 @@ def cobertura(ruta):
     try:
         open(side, "w").write(str(ult))
     except OSError:
-        pass                                   # el original es de solo lectura
+        pass                                   # los datos externos son de solo lectura
     return ult
 
 
@@ -102,8 +102,8 @@ def pide_mes(anio, mes, dias):
     y como el mes en curso se guarda con el mismo nombre, el reanálisis se
     quedaba congelado en el día en que se bajó por primera vez, sin error y
     sin aviso. Con el cron, el mapa habría ido envejeciendo en silencio.
-    (El fichero de agosto del repo original se llama `era5land_202608.nc` y
-    solo tiene hasta el día 13.)
+    (En los datos externos, el fichero de agosto se llama `era5land_202608.nc`
+    y solo tiene hasta el día 13.)
 
     Ahora se comprueba la cobertura real, no la existencia del nombre, y un
     mes incompleto se guarda con sufijo del último día para no pisar nada.
@@ -111,7 +111,7 @@ def pide_mes(anio, mes, dias):
     import cdsapi
     ultimo = max(dias)
     plano = f"era5land_{anio}{mes:02d}.nc"
-    # se reutiliza lo del repo original, pero solo si de verdad llega
+    # se reutiliza lo de los datos externos, pero solo si de verdad llega
     for base in (CRUDO, CRUDO_LECTURA):
         for nombre in (plano, f"era5land_{anio}{mes:02d}_h{ultimo:02d}.nc"):
             r = f"{base}/{nombre}"

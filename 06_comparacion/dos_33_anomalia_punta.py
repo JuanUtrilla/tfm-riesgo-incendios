@@ -39,12 +39,14 @@ Uso:
     python dos_33_anomalia_punta.py
 """
 
+import os
+
 import numpy as np
 import pandas as pd
 
 import config
 
-REPLAY = "/home/charredgem/Desktop/Master/archivo_ifs/replay"
+REPLAY = os.path.join(os.environ.get("TFM_ARCHIVO", os.path.join(config.FUENTE, "archivo")), "replay")
 MODELOS = ("prod", "unico", "r10", "pareja")
 N_BOOT = 2000
 SEED = 42

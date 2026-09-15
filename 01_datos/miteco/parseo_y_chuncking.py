@@ -1,5 +1,5 @@
-# COPIA LITERAL de /home/charredgem/Desktop/Master/TFM-RAG/src/miteco_rag/parseo_y_chuncking.py
-# (exportada por gh_exportar_estado.py el 21/08/2026 para correr sin ese repo; no editar aquí: editar allí y reexportar)
+# Copia literal del parser de partes del MITECO del módulo RAG del TFM
+# (copiada el 21/08/2026 por gh_exportar_estado.py). Se usa sin modificar.
 
 
 # ------------------

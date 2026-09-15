@@ -9,7 +9,7 @@ escribe salida/dos_17_capa_quemado.json.
 
 Qué se prueba
 -------------
-`ESTUDIO_COMBUSTIBLE_CONSUMIDO.md` midió que los modelos siguen dando
+Se midió que los modelos siguen dando
 percentil ~72 a una celda dos semanas después de quemarse. Aquí se aplica una
 capa "ya quemado" como postproceso del mapa (las celdas marcadas bajan al
 fondo del ranking) y se mide si el mapa mejora o empeora. Variantes:

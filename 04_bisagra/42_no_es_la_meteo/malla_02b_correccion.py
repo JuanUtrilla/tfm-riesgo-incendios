@@ -8,7 +8,7 @@ De dónde viene
     paso 1  IFS puro    / clim ERA5-Land → 2,18 %   (referencia: 0,23 %)
     paso 2  híbrido L=6 / clim ERA5-Land → 2,05 %
 
-El paso 2 refutó el supuesto del repo original de que la memoria larga del FWI
+El paso 2 refutó el supuesto de la primera versión del proyecto de que la memoria larga del FWI
 absorbería la rama de previsión: con solo 3 días de IFS ya se llega a 1,91 %.
 La memoria está en DC y DMC, pero el valor diario lo manda el FFMC, cuya
 constante de tiempo son horas. La rama de previsión domina.
@@ -38,7 +38,7 @@ Aquí se ajusta con junio-julio y se evalúa con agosto-septiembre, que es lo
 que haría producción: mapeo fijo, días nuevos. Los tres brazos se evalúan
 sobre los mismos días de ago-sep para que las cifras sean comparables.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_02b_correccion.py
+Uso: python malla_02b_correccion.py
 """
 
 import json

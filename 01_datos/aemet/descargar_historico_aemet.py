@@ -39,7 +39,7 @@ estaciones de una vez, así que 11 años son ~270 peticiones, no 270×858.
 Idempotente por tramos: los parquet parciales van a dataset/_hist_aemet/ y si
 un tramo ya está, se salta. Se puede relanzar las veces que haga falta.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python descargar_historico_aemet.py
+Uso: python descargar_historico_aemet.py
 """
 
 import sys

@@ -4,9 +4,9 @@ Dos modelos, paso 11: los mismos mapas diarios de 2026, evaluados con los
 partes de MITECO en vez de con EFFIS.
 
 No toca producción. Lee los mapas que guarda `dos_09` (expansión) y los 52
-incidentes geocodificados de `TFM_fuego/dataset/dashboard_miteco.json` (solo
-lectura; geocodificación al centro del municipio, hecha por `validar_miteco.py`
-del repo original). Escribe salida/dos_11_miteco.{json,csv}.
+incidentes geocodificados de `dataset/dashboard_miteco.json` en los datos
+externos (TFM_DATOS; solo lectura; geocodificación al centro del municipio,
+hecha por `validar_miteco.py`). Escribe salida/dos_11_miteco.{json,csv}.
 
 Por qué: EFFIS es MODIS (perímetros, >=5 ha, latencia) y favorece a quien
 acierta los megaincendios. MITECO registra los incendios en los que el Estado

@@ -16,13 +16,17 @@ bajo, Andalucía necesita FWI alto) pero el percentil local de los días de
 incendio es alto en todas → justifica la feature fwi_pctl_local (§7.1-N5).
 """
 
+import os
+from pathlib import Path
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[1]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 
 FEATS_DIST = ["fwi", "fwi_pctl_local", "rh_min", "vpd_max", "t2m_max",
               "dias_sin_lluvia", "precip_30d", "viento_max", "ndvi",

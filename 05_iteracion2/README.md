@@ -41,6 +41,7 @@ Las temporadas 2025 y 2026 quedan como prueba externa (`06_comparacion/`).
 | `57_ablaciones/dos_24_auditoria_fugas.py` | Para cada variable, comprueba si su valor en el día D lleva información del propio fuego, comparando con un anillo de control | Las variables de satélite del día D pesan un 4 % del r10; en servicio van por climatología |
 | `57_ablaciones/dos_30_r10_todo.py` | El r10 reentrenado con 2015-2024, con el protocolo escrito antes de ejecutar | Más años no cambian el orden (`docs/R10_TODOS_LOS_ANIOS.md`) |
 | `57_ablaciones/dos_34_auditoria_geometria.py` | El filtro de vecinos es una caja en entrenamiento y un círculo en servicio | Diferencia de escala (1.39×), no de orden (`docs/LIMITACIONES.md` §8) |
+| `57_ablaciones/dos_35_algoritmos.py`, `dos_35_replay.py` | Compara XGBoost con LightGBM, Random Forest y regresión logística con los datos y la evaluación del r10, en la prueba de 2024 y en las temporadas 2025 y 2026, con el protocolo escrito antes de ejecutar | Justificar el algoritmo (`docs/TRAZABILIDAD.md`, «Prerregistro: comparación de algoritmos») |
 
 ![Variables en las que se apoya el r10, por valores SHAP](../docs/MEMORIA/figs/f11_shap_r10.png)
 

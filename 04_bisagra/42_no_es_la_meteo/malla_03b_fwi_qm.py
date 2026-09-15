@@ -33,7 +33,7 @@ También se mide la alternativa de diseño: si en vez de corregir se reconstruye
 `fwi_pctl_local` y no hay nada que mapear. Aquí se cuantifica cuánto queda sin
 resolver por esa vía (la feature `fwi` cruda seguiría desplazada).
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_03b_fwi_qm.py
+Uso: python malla_03b_fwi_qm.py
 """
 
 import json

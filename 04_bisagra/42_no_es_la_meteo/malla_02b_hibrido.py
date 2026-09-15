@@ -7,7 +7,7 @@ No toca producción. Escribe salida/prueba_hibrido.json.
 Por qué hace falta este paso
 El paso 1 (`malla_02b_prueba.py`) midió el IFS puro contra la climatología de
 ERA5-Land y salió 2,18 % de saturación, contra 0,23 % del reanálisis. El
-argumento del repo original era: "si el IFS puro sale aceptable, el híbrido lo
+argumento de la primera versión del proyecto era: "si el IFS puro sale aceptable, el híbrido lo
 será por construcción". Pero el IFS puro no sale aceptable, así que ese
 argumento no cierra y hay que medir el híbrido de verdad.
 
@@ -22,7 +22,7 @@ todo el estado viene del reanálisis y el IFS solo empuja los últimos días. La
 pregunta es cuánto de los 2,18 % sobrevive a eso.
 
 Cómo se mide sin rehacerlo todo cada día
-Reconstruir el híbrido día a día parecía caro y por eso el repo original midió
+Reconstruir el híbrido día a día parecía caro y por eso la primera versión del proyecto midió
 las dos cotas en vez del híbrido. No hace falta: el estado del FWI en D−L−1 es
 el mismo para todos los días objetivo, porque esa rama es siempre reanálisis.
 
@@ -33,7 +33,7 @@ avanzan solo los L+1 días de previsión. De O(días²) a O(días·L).
 Se miden varios L porque el retraso real de ERA5-Land varía (~5-6 días) y
 conviene saber si el resultado es sensible a eso.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_02b_hibrido.py
+Uso: python malla_02b_hibrido.py
 """
 
 import json

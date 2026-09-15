@@ -73,7 +73,7 @@ particiones del trabajo son espaciales o temporales.
 | `dos_00_cubo_etiquetas.py` | Prevalencia por año, persistencia, EGIF frente a EFFIS | `04_bisagra/44_es_la_especificacion/` |
 | `dos_01_celdas.py` | La tabla por celda: censo de las 498,530 | `05_iteracion2/51_celdas/` |
 | `dos_04_analisis.py` | Autocorrelación, coste de la partición aleatoria, susceptibilidad estática | `05_iteracion2/54_analisis/` |
-| `malla_02_vs_cubo.py` | El cubo frente a ERA5-Land nativo | `04_bisagra/42_no_es_la_meteo/prototipo_TFM_fuego/` |
+| `malla_02_vs_cubo.py` | El cubo frente a ERA5-Land nativo | `04_bisagra/42_no_es_la_meteo/prototipo_malla/` |
 
 Cada script está en la carpeta del capítulo donde se ejecuta; aquí se reúnen
 sus resultados.
@@ -129,5 +129,5 @@ al FWI absoluto aporta +0.042 de AUC-PR (de 0.668 a 0.710).
 ## Lo que se dejó fuera
 
 El bloque de visión por satélite (Sentinel-2, D-Fire, timelapses y los casos de
-Sotalvo, Luna y Ponteareas) se desarrolló, pero no entra en la memoria. Se
-conserva en el repositorio original.
+Sotalvo, Luna y Ponteareas) se desarrolló, pero no entra en la memoria ni en
+este repositorio.

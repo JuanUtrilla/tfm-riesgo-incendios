@@ -6,7 +6,7 @@ PNG, 8 hilos. Uso:
 import argparse, os, subprocess, sys, time
 import pandas as pd
 AQUI = os.path.dirname(os.path.abspath(__file__))
-P = "/home/charredgem/miniconda3/envs/tfm_fuego/bin/python"
+P = sys.executable
 RANGO = {2025: ("2025-05-25", "2025-11-01"), 2026: ("2026-05-25", "2026-09-02")}
 a = argparse.ArgumentParser(); a.add_argument("--anio", type=int, required=True)
 a.add_argument("--condicion", choices=["ifs", "reanalisis"], required=True)

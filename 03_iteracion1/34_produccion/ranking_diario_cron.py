@@ -12,7 +12,7 @@ Cada ejecución:
 3. Escribe un resumen (y las estaciones en EXTREMO) en el log.
 
 Instalación (crontab -e):
-  30 9 * * * /home/charredgem/Desktop/Master/TFM_fuego/prototipo/cron_ranking.sh
+  30 9 * * * <TFM_DATOS>/prototipo/cron_ranking.sh
 """
 
 import os
@@ -20,7 +20,8 @@ import shutil
 
 import pandas as pd
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 DIR_HIST = f"{DIR}/prototipo/historico_predicciones"
 
 

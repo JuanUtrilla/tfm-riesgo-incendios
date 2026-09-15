@@ -9,12 +9,12 @@ Dos condiciones:
   ifs         reanálisis ERA5-Land hasta D−7, IFS archivado de D−6 a D  (servicio)
   reanalisis  reanálisis hasta el propio D                                (cota superior)
 
-No toca ningún .py de los repos: corre sobre una copia en sandbox_replay/
+No modifica ningún .py: corre sobre una copia en sandbox_replay/
 (salida propia) y parchea desde fuera: reanálisis truncado, `descarga` del IFS
 sustituida por el archivo, `firms_nrt` por `comparar_rankings.firms_dia`
 (ventana 7, cacheada desde los parquets de focos) y la fecha «hoy» de
-riesgo_hoy.main. Las entradas vienen de archivo_ifs/ (ver PENDIENTE.md del
-repo definitivo, «Replay de las temporadas 2025 y 2026»).
+riesgo_hoy.main. Las entradas vienen del archivo de previsiones IFS
+(TFM_ARCHIVO).
 
 Uso:  python replay_dia.py --fecha 2025-08-13 --condicion ifs
 Salida: replay/<temporada>/<condicion>/<fecha>.npz (prob_* de los 6 mapas),
@@ -23,7 +23,8 @@ Salida: replay/<temporada>/<condicion>/<fecha>.npz (prob_* de los 6 mapas),
 """
 import argparse, json, os, shutil, sys, time
 
-AQUI = os.path.dirname(os.path.abspath(__file__))
+RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+AQUI = os.environ.get("TFM_ARCHIVO", os.path.join(os.environ.get("TFM_DATOS", f"{RAIZ}/datos"), "archivo"))
 SANDBOX = f"{AQUI}/sandbox_replay"
 os.environ["TFM_FIRMS_DIAS"] = "7"          # la ventana del entrenamiento (oficial)
 os.chdir(SANDBOX)

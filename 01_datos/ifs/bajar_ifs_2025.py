@@ -15,12 +15,14 @@ script espera a que la corrida del día haya terminado antes de pedir nada, y
 vuelve a esperar cada vez que cruza la medianoche UTC.
 """
 import os, subprocess, sys, time
+from pathlib import Path
 import numpy as np, pandas as pd, requests
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 CACHE = f"{DIR}/ifs_archivo_2025.parquet"
-NODOS = "/home/charredgem/Desktop/Master/TFM_fuego_malla/estado/nodos.npz"
-REPO = "JuanUtrilla/tfm-fuego-malla"
+RAIZ = Path(__file__).resolve().parents[2]
+NODOS = f'{os.environ.get("TFM_ESTADO", str(RAIZ / "muestras"))}/nodos.npz'
+REPO = "JuanUtrilla/tfm-riesgo-incendios"
 INI, FIN = "2025-05-25", "2025-11-01"     # D-7 del 1-jun .. D+1 del 31-oct 2025
 VARS = ("temperature_2m_max,relative_humidity_2m_min,"
         "wind_speed_10m_max,precipitation_sum")
@@ -31,7 +33,7 @@ def cadena_del_dia_hecha():
     """True si ya hay una corrida completa y terminada del día UTC en curso."""
     try:
         out = subprocess.run(
-            ["gh", "run", "list", "-R", REPO, "--workflow", "malla_diaria.yml",
+            ["gh", "run", "list", "-R", REPO, "--workflow", "mapa_diario.yml",
              "--limit", "20", "--json", "status,conclusion,createdAt"],
             capture_output=True, text=True, timeout=120).stdout
         import json

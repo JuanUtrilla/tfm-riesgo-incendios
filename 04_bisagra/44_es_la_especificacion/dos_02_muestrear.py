@@ -6,8 +6,8 @@ No toca producción. Lee EGIF y cubo; escribe en expansión.
 
 Por qué otro muestreador
 
-`muestrear_dataset.py` (repo original) empareja cada incendio con tres días
-aleatorios de la misma celda. `CUANDO_Y_DONDE.md` midió la consecuencia: el
+`muestrear_dataset.py` (iteración 1) empareja cada incendio con tres días
+aleatorios de la misma celda. Se midió la consecuencia: el
 98,8 % de las celdas tiene exactamente un 25 % de positivos, así que el modelo
 no puede aprender el dónde. Este script produce, en una sola tabla y con un
 campo `disenio`, todo lo que hace falta para comparar diseños con el mismo
@@ -26,7 +26,7 @@ pipeline de features:
            récord, fuera del EGIF: solo verdad-terreno EFFIS). Por día:
            1.000 celdas al azar + todos los positivos EGIF del día + hasta 40
            celdas con `is_fire` (EFFIS ≥5 ha) del día. Es el banco de pruebas
-           del AUC dentro del día (`PROMPT_DOS_MODELOS.md` §6), y no entra en
+           del AUC dentro del día, y no entra en
            ningún entrenamiento.
 
 El diseño mixto (mitad cuándo / mitad dónde) no necesita filas propias: se

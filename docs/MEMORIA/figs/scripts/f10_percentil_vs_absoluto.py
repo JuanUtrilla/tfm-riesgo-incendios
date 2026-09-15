@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """F10 - Percentil del día frente a escala absoluta: verano y fuera de temporada.
 
-Dos días del replay de 2025 con el r10 (`archivo_ifs/replay/2025/ifs/`): el
+Dos días del replay de 2025 con el r10 (`replay/2025/ifs/` del archivo de previsiones IFS): el
 13 de agosto (pleno verano) y el 29 de octubre (fuera de temporada). Columna
 izquierda: niveles por percentil del día (p30/p90/p98, el mapa «dónde mirar»
 de la cadena). Columna derecha: los
@@ -12,7 +12,7 @@ p98 de la pareja supera 0,076 (umbral de invierno-primavera de dos_26 en
 escala cruda; el de verano es 0,064). Es la versión con semáforo; el semáforo
 se retiró el 14/09/2026 y la versión sin él, con los cortes calibrados sobre
 los mapas servidos, es `07_produccion/escala_y_cifra/fig3_dos_mapas.py`.
-Uso:  python f10_percentil_vs_absoluto.py   [TFM_ARCHIVO=<ruta a archivo_ifs>]
+Uso:  python f10_percentil_vs_absoluto.py   [TFM_ARCHIVO=<ruta al archivo de previsiones IFS>]
 """
 import os
 import pathlib
@@ -21,10 +21,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm, ListedColormap
 
-from comun import ANCHO, RAIZ, guarda
+from comun import ANCHO, ARCHIVO, RAIZ, guarda
 
-ARCHIVO = pathlib.Path(os.environ.get("TFM_ARCHIVO", RAIZ / "archivo_ifs"))
-LIMITES = RAIZ / "tfm-riesgo-incendios" / "muestras" / "limites.npz"
+LIMITES = RAIZ / "muestras" / "limites.npz"
 DIAS = ["2025-08-13", "2025-10-29"]
 CORTES_ABS = [0.0018, 0.0736, 0.4066]          # r10, dos_27_bandas.csv
 UMBRAL_SI = 0.076                               # pareja, p98 del dia

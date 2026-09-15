@@ -68,9 +68,10 @@ IC95 por bootstrap agrupado por bloque de 100 km, no por fila: dentro de un
 bloque las celdas comparten meteo, vegetación e historial de fuego, y
 remuestrear filas independientes fingiría una precisión que no hay.
 
-Uso:  /home/charredgem/miniconda3/envs/tfm_fuego/bin/python ablacion_proxies_operativos.py
+Uso:  python ablacion_proxies_operativos.py
 """
 
+import os
 import json
 from pathlib import Path
 
@@ -80,7 +81,8 @@ import xgboost as xgb
 from sklearn.metrics import (average_precision_score, brier_score_loss,
                              roc_auc_score)
 
-DIR = Path("/home/charredgem/Desktop/Master/TFM_fuego")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
 SEED = 42
 N_BOOT = 1000
 

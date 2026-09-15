@@ -16,7 +16,7 @@ Flujo:
    de la predicción, de modo que queda constancia de que se emitió antes del
    día (la validación del trabajo es el replay de 2025-2026).
 
-Diseño y racional: TFM_fuego/MODELO_B_BITACORA.md §14-§19.
+Diseño y razonamiento: 03_iteracion1/MODELO_B_BITACORA.md §14-§19.
 """
 
 import json
@@ -32,7 +32,8 @@ import requests
 import firms_api
 from fwi_canadiense import calcular_fwi_serie
 
-RAIZ = Path(__file__).parent
+_DATOS = Path(os.environ.get("TFM_DATOS", Path(__file__).resolve().parents[2] / "datos"))
+RAIZ = Path(os.environ.get("TFM_COLECTOR", _DATOS / "colector"))   # raíz del colector de AEMET
 DIAS_SPINUP = 80
 UMBRALES = [(0.80, "EXTREMO"), (0.55, "ALTO"), (0.25, "MODERADO"), (-1, "BAJO")]
 
@@ -85,7 +86,7 @@ def serie_diaria_todas():
         "prec": num(df["prec"].replace("Ip", "0")), "n_horas": 24})
 
     ult = api["fecha"].max()
-    con = sqlite3.connect(RAIZ / "data" / "aemet_horario_verano2026.db")
+    con = sqlite3.connect(RAIZ / "data" / "aemet_horario.db")
     c = pd.read_sql("SELECT idema, fint, ta, tamax, tamin, hr, vv, prec "
                     "FROM observacion_horaria WHERE fint >= ?", con,
                     params=(str((ult + pd.Timedelta(days=1)).date()),))

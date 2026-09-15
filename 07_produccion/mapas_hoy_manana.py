@@ -23,7 +23,7 @@ media de las dos temporadas).
 Hasta el 14/09/2026 este script aplicaba además un semáforo nacional que
 retiraba el nivel EXTREMO los días de p98 bajo. Se quitó: en verano ocultaba el
 EXTREMO en uno de cada tres días con incendio grande sin mejorar al calendario
-(calibracion_si/semaforo_2026-09-14/README.md).
+(escala_y_cifra/semaforo_variantes.py).
 
 Uso:
     python 07_produccion/mapas_hoy_manana.py                 # hoy y mañana

@@ -20,9 +20,9 @@ import xgboost as xgb
 import shap
 import matplotlib.pyplot as plt
 
-from comun import ANCHO, AZUL, BERMELLON, REPO, guarda
+from comun import ANCHO, AZUL, BERMELLON, DATOS, REPO, guarda
 
-USB = pathlib.Path(os.environ.get("TFM_USB", "/run/media/charredgem/3D97-F226/TFM_fuego_expansion"))
+USB = pathlib.Path(os.environ.get("TFM_USB", DATOS / "expansion"))
 FULL = json.load(open(REPO / "muestras" / "modelos" / "xgb_v2_prototipo_features.json"))
 N, SEED, TOP = 6000, 42, 15
 

@@ -15,7 +15,7 @@
 
 El primer modelo (Modelo B, XGBoost sobre 46 features del cubo IberFire,
 etiqueta EGIF, muestreo caso-control) llevaba desde mediados de julio sirviendo
-a diario en el repositorio del colector de AEMET: ranking nacional por estación
+a diario desde el colector de AEMET: ranking nacional por estación
 y mapas D0/D1, publicados por GitHub Actions.
 
 Su primera validación operativa, con **2-3 días de previsiones selladas por
@@ -39,7 +39,7 @@ tres semanas después hubo que retirarla.
 
 Hasta entonces la verdad-terreno eran detecciones FIRMS y perímetros EFFIS. Se
 añadieron los **partes diarios oficiales de MITECO**, archivados a diario por
-un repositorio hermano. Su virtud no es la precisión, es la **latencia**: se
+el módulo RAG del TFM. Su virtud no es la precisión, es la **latencia**: se
 publican al día siguiente, frente a los ~45 días que tarda EFFIS en cartografiar
 un incendio. Eso convierte a MITECO en la referencia *rápida* de todo lo que vino después.
 
@@ -219,8 +219,8 @@ Ese mismo día se montó la infraestructura para juzgarlo en operación sin
 depender de que el portátil esté encendido: la cadena diaria en **GitHub
 Actions**, los candidatos sirviendo en paralelo a producción, y el
 **seguimiento diario** de los mapas contra EFFIS (45 días de desfase), MITECO
-(parte del día siguiente) y el ranking por estación del hermano, por deploy key
-de lectura.
+(parte del día siguiente) y el ranking por estación del colector de AEMET, con
+acceso de solo lectura.
 
 ---
 
@@ -305,7 +305,7 @@ confirmación: los 33 incendios de ≥500 ha tenían un foco FIRMS a menos de 5 
 en su ventana «pasada» (control aleatorio: 1.2 %). Tras el arreglo, 9.1 %.
 
 **Alcance.** Producción en vivo **nunca** estuvo afectada: `riesgo_hoy.py` y el
-`firms_api.py` del repo hermano llaman sin fecha de inicio, que son los cinco
+`firms_api.py` del colector de AEMET llaman sin fecha de inicio, que son los cinco
 últimos días hasta hoy, y en operación el futuro no existe. El entrenamiento
 tampoco: `extraer_features_historia.py:117` usa `(vf_d >= d-7) & (vf_d < d)`,
 estrictamente anterior a D. La fuga solo se materializó en la evaluación
@@ -363,8 +363,8 @@ fuera ese día. Faltaba únicamente el fichero.
 **Lo hecho.** El paso de respaldo del workflow copia ahora también
 `ifs_malla_<fecha>.parquet` y `_firms/nrt_<fecha>.csv` al artefacto que ya
 existía, con 60 días de retención: unos 270 KB al día. Se hizo ahí y no en
-`DIARIO` para no tocar `gh_estado.py`, que va sellado por md5 en
-`PROCEDENCIA.md`. Y se pincharon las versiones de `requirements_gh.txt`, que no
+`DIARIO` para no tocar `gh_estado.py`, que se mantiene idéntico a la versión
+que produjo los resultados. Y se pincharon las versiones de `requirements_gh.txt`, que no
 fijaba ninguna: archivar la entrada no sirve de nada si dentro de seis meses el
 mismo dato pasa por otro XGBoost y no se puede atribuir el cambio.
 
@@ -372,8 +372,8 @@ mismo dato pasa por otro XGBoost y no se puede atribuir el cambio.
 de lo que parecía: `historical-forecast-api.open-meteo.com` sirve las pasadas
 archivadas tal y como se emitieron, y es de donde salió `ifs_historico.parquet`
 del retro justo. Se descargó el rango 08-ago → 02-sep en los 5,605 nodos —26
-días, 145,730 filas, 477 KB, sin un solo 429— y vive fuera de los repositorios,
-en `archivo_ifs/`.
+días, 145,730 filas, 477 KB, sin un solo 429— y se guarda en el archivo de
+previsiones IFS (`$TFM_ARCHIVO`).
 
 **Qué vale y qué no.** La API histórica devuelve una serie continua por nodo, no
 la pasada de un día: los ficheros por fecha salen de cortar `[F-7, F+1]`, con
@@ -393,8 +393,8 @@ lugar de limitarse a medirlo en retro.
 
 ## 05/09/2026 — Calibración incorporada
 
-Jornada entera en un banco aislado (`~/Desktop/Master/calibracion_si/`), fuera de
-todo repositorio, a petición explícita: ningún fichero de `TFM_fuego_malla` ni de
+Jornada entera en un entorno de pruebas aparte, sin tocar el código de
+producción, a petición explícita: ningún fichero de la cadena anterior ni de
 este repo se modificó mientras se producían los resultados.
 
 Lo que salió: los dos regímenes de incendio de España; el aviso de día calibrado
@@ -419,7 +419,7 @@ defendible por tres cosas: 250 días contra 15, dos temporadas contra una, y el
 prerregistro escrito antes de correrlo. Su límite —a posteriori, no sellado—
 va escrito en la memoria. Se descarta la Fase 4 del «si» (modelo día-nacional
 directo): hay material de sobra y no aporta al argumento. Nada se tocó en
-ningún repositorio.
+el código de producción.
 
 ## 07/09/2026 — Poner el repositorio en orden para la memoria
 
@@ -433,8 +433,8 @@ la procedencia del CSV de Civio, que se bajó a mano); `06_comparacion/README`
 no mencionaba el replay, que es el veredicto; `05_iteracion2/README` no
 mencionaba la calibración; el README raíz y `LIMITACIONES.md` §3 todavía daban
 como titular el retrospectivo de 74 días; el 21-ago y los cinco días perdidos
-no estaban en `LIMITACIONES.md` (§11 nuevo); `PENDIENTE.md` era un diario de
-529 líneas (ahora estado actual + histórico compacto); `docs/MEMORIA/` no
+no estaban en `LIMITACIONES.md` (§11 nuevo); la lista de pendientes era un diario de
+529 líneas (se dejó en estado actual + histórico compacto); `docs/MEMORIA/` no
 decía cuál de sus cinco documentos era cuál (README nuevo). Y se escribió el
 primer borrador divulgativo de la sección de la memoria conjunta
 (un borrador de 5 páginas, sustituido después por `docs/MEMORIA/memoria_ML.pdf`): titular = replay, r10
@@ -459,7 +459,7 @@ La cadena diaria pasó a este repositorio: `.github/workflows/mapa_diario.yml`
 (escala absoluta de `dos_27` y semáforo de `dos_26`, r10|TODO; la regla
 reproduce exactamente el 44.0 % / 6.2 % de la calibración). Primer run
 completo con éxito (34774925437, 1 h 13 min): 13/09 sin aviso, p98 del r10
-0.221, probabilidad calibrada 0.06. La cadena de `tfm-fuego-malla` sigue
+0.221, probabilidad calibrada 0.06. La cadena anterior sigue
 corriendo un día más para comparar.
 
 Los READMEs de todos los capítulos se reescribieron con las skills
@@ -485,8 +485,8 @@ celda-día de cada 760.
 **Producto nuevo** (`2b48d97`). Cada madrugada, una imagen para hoy y otra para
 mañana, cada una con el r10 en escala absoluta y por percentil del día, y la
 cifra del día (% de España en EXTREMO frente a los 250 días de referencia). Cron
-a las 03:03 en verano y 02:02 en invierno, hora de Madrid. El cron de
-`tfm-fuego-malla` se paró (`132fa98` en aquel repositorio).
+a las 03:03 en verano y 02:02 en invierno, hora de Madrid. El cron de la
+cadena anterior se paró.
 
 **Memoria.** Seis páginas: cuatro de memoria y dos de anexos que enlazan aquí
 (`docs/MEMORIA/memoria_ML.pdf`). Para que los enlaces lleven a algo entraron
@@ -525,12 +525,12 @@ veinte días anteriores con la verdad que ya se conoce: perímetros EFFIS del d�
 del municipio y juzgados a 10 km (`07_produccion/verificar_mapas.py`, paso
 nuevo del workflow con `continue-on-error`). El original no se toca: por fecha
 hay `mapas_<fecha>.png` y `verificado_<fecha>.png`, veinte días de cada uno en
-`publicado/`. Se probó antes en un banco aislado con los 13 primeros días de
-septiembre (`calibracion_si/verificacion_2026-09-14/`): el 22 % de las celdas
+`publicado/`. Se probó antes en un entorno de pruebas aparte con los 13 primeros días de
+septiembre: el 22 % de las celdas
 quemadas del día y el 37 % de los incidentes MITECO cayeron en EXTREMO, que
 ocupaba entre el 0.2 y el 1.6 % de España; en ALTO o EXTREMO, el 66 y el 78 %.
 Esas 13 imágenes entran en `publicado/`. Para que la cadena tenga los partes de
 septiembre hay que subir al Release `estado` un diario con `salida/miteco/`
-(los PDF están en el Release de `tfm-fuego-malla`); `puntuar_effis` y `dos_15`
+(los PDF de los partes vienen de la cadena anterior); `puntuar_effis` y `dos_15`
 importan `historico`, que no está en este repositorio, y el script les da un
 módulo vacío.

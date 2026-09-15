@@ -30,7 +30,7 @@ Escenarios, todos con L=6 (el retraso real de ERA5-Land):
     IFS crudo · viento corregido · viento+precip · las cuatro variables
 más IFS puro con las cuatro corregidas, como cota.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python prueba_hibrido_corregido.py
+Uso: python prueba_hibrido_corregido.py
 """
 
 import json

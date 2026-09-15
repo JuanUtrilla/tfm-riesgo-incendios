@@ -14,8 +14,8 @@ correlacionadas con una entrada que ambos comparten.
 
 Aquí se mejoran tres cosas:
 
- 1. Varios días. El colector horario de AEMET (proyecto hermano
-    `aemet_horario_verano2026`) cubre 2026-07-01 a 07-27, 864 estaciones. Eso
+ 1. Varios días. El colector horario de AEMET cubre 2026-07-01 a 07-27, con
+    864 estaciones. Eso
     permite reconstruir el camino de producción sin llamar a su API, que es
     lo que hizo tardar 2h30 la corrida del 20-ago.
 
@@ -67,14 +67,16 @@ import xgboost as xgb
 from pyproj import Transformer
 from scipy.spatial import cKDTree
 
+import os
+
 import config
 from fwi_canadiense import calcular_fwi_serie
 from malla_05_riesgo import ventanas
 from riesgo_hoy import firms_nrt, mensual
 
-DB = ("/home/charredgem/Desktop/Master/aemet_horario_verano2026/data/"
-      "aemet_horario_verano2026.db")
-EFFIS = ("/home/charredgem/Desktop/Master/aemet_horario_verano2026/data/"
+COLECTOR = os.environ.get("TFM_COLECTOR", f"{config.FUENTE}/colector")
+DB = f"{COLECTOR}/data/aemet_horario.db"
+EFFIS = (f"{COLECTOR}/data/"
          "effis_ba_season_ES.geojson")
 INI = "2026-07-01"
 GAMMA = 0.0065
@@ -90,7 +92,7 @@ def estaciones():
     """La misma tabla que usa producción (`tiempo_real._estaciones`).
 
     Se lee el parquet directamente en vez de importar `tiempo_real`: ese
-    módulo arrastra el repo de entrenamiento entero, y de él solo hace falta
+    módulo arrastra todas las dependencias del entrenamiento, y de él solo hace falta
     esta tabla."""
     return pd.read_parquet(
         f"{config.FUENTE}/prototipo/estaciones_prototipo.parquet") \

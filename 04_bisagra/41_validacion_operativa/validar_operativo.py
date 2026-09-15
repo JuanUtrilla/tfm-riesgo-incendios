@@ -61,6 +61,7 @@ Uso:
 Salidas: dataset/validacion_operativa.{csv,json}  (no sobrescribe nada previo)
 """
 
+import os
 import argparse
 import json
 import re
@@ -69,8 +70,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-DIR = Path("/home/charredgem/Desktop/Master/TFM_fuego")
-RANKINGS = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026/rankings")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+RANKINGS = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector"))) / "rankings"
 EFFIS = DIR / "dataset" / "effis_ba_season_2026.geojson"
 FIRMS = DIR / "dataset" / "firms_ventana_2026.parquet"
 EGIF = DIR / "egif_civio.csv"

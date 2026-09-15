@@ -6,8 +6,8 @@ No toca producción. Lee `IberFire.nc` en solo lectura; escribe en expansión.
 
 Por qué
 
-La fase 1 del encargo (`PROMPT_DOS_MODELOS.md` §3) pide tres números que nadie
-ha medido todavía sobre la malla completa:
+La fase 1 pedía tres números que nadie
+había medido todavía sobre la malla completa:
 
   · prevalencia real de celda-día con fuego (frente al 25 % del diseño);
   · autocorrelación espacial (cuánto se parecen celdas vecinas) y temporal

@@ -8,10 +8,11 @@ EXTREMO; cortes calibrados sobre los mapas servidos, escala_servicio.json) con l
 cifra del día: % de España en EXTREMO y su percentil entre los 250 días servidos
 del replay 2025-2026. Sin puerta: nada se apaga.
 
-Entradas (solo lectura): archivo_ifs/replay/2025/ifs/<fecha>.npz,
-tfm-riesgo-incendios/muestras/limites.npz, calibracion_si/sandbox/salida/dos_27_dias.csv
-Salida: ~/Downloads/figs/fig3_dos_mapas.png
+Entradas (solo lectura): replay/2025/ifs/<fecha>.npz del archivo de previsiones
+IFS (TFM_ARCHIVO), muestras/limites.npz y dos_27_dias.csv (TFM_SALIDA).
+Salida: docs/MEMORIA/figs/fig3_dos_mapas.png
 """
+import os
 import pathlib
 
 import matplotlib
@@ -21,8 +22,11 @@ import numpy as np
 import pandas as pd
 from matplotlib.colors import BoundaryNorm, ListedColormap
 
-M = pathlib.Path.home() / "Desktop/Master"
-OUT = pathlib.Path.home() / "Downloads/figs/fig3_dos_mapas.png"
+RAIZ = pathlib.Path(__file__).resolve().parents[2]
+DATOS = pathlib.Path(os.environ.get("TFM_DATOS", RAIZ / "datos"))
+ARCH = pathlib.Path(os.environ.get("TFM_ARCHIVO", DATOS / "archivo"))
+SAL = pathlib.Path(os.environ.get("TFM_SALIDA", RAIZ / "salida"))
+OUT = RAIZ / "docs/MEMORIA/figs/fig3_dos_mapas.png"
 DIAS = ["2025-08-13", "2025-10-29"]
 import json as _json
 _ESC = _json.load(open(pathlib.Path(__file__).resolve().parent / "escala_servicio.json"))
@@ -52,7 +56,7 @@ def nivel_abs(p):
 
 
 def limites(ax, lw=0.5):
-    L = np.load(M / "tfm-riesgo-incendios/muestras/limites.npz")
+    L = np.load(RAIZ / "muestras/limites.npz")
     ax.plot(L["prov_x"], L["prov_y"], lw=0.3 * lw, color="0.35", alpha=0.55)
     ax.plot(L["ccaa_x"], L["ccaa_y"], lw=lw, color="0.15", alpha=0.85)
 
@@ -65,7 +69,7 @@ def main():
     norm = BoundaryNorm([0, 1, 2, 3, 4], cmap.N)
     im_ref = None
     for fila, fecha in zip(axs, DIAS):
-        r10 = np.load(M / f"archivo_ifs/replay/2025/ifs/{fecha}.npz")["prob_r10"].astype(float)
+        r10 = np.load(ARCH / f"replay/2025/ifs/{fecha}.npz")["prob_r10"].astype(float)
         m = ~np.isnan(r10)
         dia = f"{int(fecha[8:10])} de {MESES[fecha[5:7]]} de {fecha[:4]}"
         ext = float(np.mean(nivel_abs(r10)[m] == 3) * 100)

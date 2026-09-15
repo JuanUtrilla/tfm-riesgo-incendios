@@ -2,8 +2,7 @@
 """
 Descarga las verdades-terreno para la evaluación operativa del modelo.
 
-Trae dos fuentes; ninguna toca el repo del colector (se guardan en dataset/ de
-este proyecto):
+Trae dos fuentes y las guarda en dataset/ de los datos externos (TFM_DATOS):
 
 1. EFFIS: perímetros de área quemada cartografiados (Copernicus EMS).
    WFS abierto, sin clave. Es la mejor etiqueta disponible hoy: geometría real
@@ -35,7 +34,8 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-DIR = Path("/home/charredgem/Desktop/Master/TFM_fuego")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
 WFS = "https://maps.effis.emergency.copernicus.eu/effis"
 BBOX = "-10,35,5,44"
 SATS = ["VIIRS_NOAA20_NRT", "VIIRS_NOAA21_NRT"]

@@ -22,6 +22,8 @@ Salidas: dataset/eventos_firms_2025_2026.parquet
          stdout: agregados + eventos grandes
 """
 
+from pathlib import Path
+import os
 import json
 
 import numpy as np
@@ -32,7 +34,8 @@ from sklearn.cluster import DBSCAN
 
 from fwi_canadiense import calcular_fwi_serie
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 INICIO_EVAL = pd.Timestamp("2025-01-01")
 
 

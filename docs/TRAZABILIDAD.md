@@ -17,7 +17,7 @@ datos hace falta ejecutarlo.
 - **muestra** — corre con `muestras/` recién clonado el repo.
 - **cubo** — necesita IberFire (29 GB) en `TFM_DATOS`.
 - **disco** — necesita además los datasets de entrenamiento en `TFM_USB`.
-- **sellado** — el número lo produjo la cadena diaria en su repositorio; aquí
+- **sellado** — el número lo produjo la cadena diaria en su fecha; aquí
   está el código, pero la serie no se puede regenerar sin romper el sellado.
 
 ---
@@ -45,7 +45,7 @@ diseño: la temporada 2026 (`dos_09`), cuya verdad EFFIS se reescribe a diario.
 
 **Temporadas y condiciones:** 2025 (25-may→01-nov) y 2026 (25-may→ último día con
 reanálisis D−7 disponible), cada una con IFS (servicio) y reanálisis del día
-(cota superior). Entradas: `archivo_ifs/` (md5 en `MD5_archivo_replay.txt`).
+(cota superior). Entradas: el archivo de previsiones IFS (`TFM_ARCHIVO`).
 
 **Métrica principal:** AUC medio por día (días con ≥1 celda EFFIS quemada, EFFIS
 = perímetros con FIREDATE ese día), IC95 por bootstrap de días (2,000, semilla
@@ -65,9 +65,8 @@ evalúa con TODOS los días, también los de cero fuego (tabla aviso × fuego). 
 
 **Resultado del replay (02/09/2026 20:10, tras el prerregistro):** ver
 [`REPLAY_VEREDICTO.md`](REPLAY_VEREDICTO.md) y [`REPLAY_SI.md`](REPLAY_SI.md).
-Scripts: `06_comparacion/replay_*.py` (copiados con md5 el 05/09/2026, origen
-`archivo_ifs/`); salidas `archivo_ifs/replay/` y copia en el USB
-`TFM_fuego_expansion/archivo_replay/` (md5 en `MD5_replay.txt`).
+Scripts: `06_comparacion/replay_*.py`; salidas en `replay/` dentro de
+`TFM_ARCHIVO`, con copia en el disco externo (`TFM_USB`).
 **Desde el 06/09/2026 es el veredicto de la memoria** (`LIMITACIONES.md` §3).
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
@@ -87,7 +86,7 @@ Scripts: `06_comparacion/replay_*.py` (copiados con md5 el 05/09/2026, origen
 | P(t+1\|t) = **0.51** | `is_fire` persiste: marca días ardiendo, no igniciones → se evalúa con `primer_dia` | ídem | ídem | cubo |
 | Moran **0.81** (EFFIS, 1 km) | Autocorrelación espacial: casi todo es perímetro del mismo fuego | `05_iteracion2/54_analisis/dos_04_analisis.py` | `dos_04_analisis.json` | disco |
 | **+0.036** | Lo que infla el AUC partir al azar en vez de por bloques de 100 km | ídem | ídem | disco |
-| corr 0.987-0.998, sesgo 0 | El cubo *es* ERA5-Land reprocesado (salvo precipitación, /2.02) | `04_bisagra/42_no_es_la_meteo/prototipo_TFM_fuego/malla_02_vs_cubo.py` | `malla_02_vs_cubo.json` | cubo |
+| corr 0.987-0.998, sesgo 0 | El cubo *es* ERA5-Land reprocesado (salvo precipitación, /2.02) | `04_bisagra/42_no_es_la_meteo/prototipo_malla/malla_02_vs_cubo.py` | `malla_02_vs_cubo.json` | cubo |
 | fwi_pctl_local 84.3 vs 47.0 | Lo que separa positivos de negativos en train (medianas) | `02_eda/eda_dataset.py` | [`02_eda/figuras/eda_resumen.log`](../02_eda/figuras/eda_resumen.log) | disco |
 | popdens y dist_carreteras: **misma mediana** | Las estáticas no discriminan en el diseño caso-control — el aviso temprano del capítulo 4 | ídem | ídem | disco |
 
@@ -238,7 +237,7 @@ memoria.
 |---|---|---|---|
 | Fig. 1 diseños de muestreo | `docs/MEMORIA/figs/scripts/f2_disenios.py` | — (esquema) | muestra |
 | Fig. 2 SHAP del r10 (top: `n_fuegos_10km_mismomes_hist` 0.70, `ndvi_med_30d` 0.45, `clc_matorral` 0.37) | `docs/MEMORIA/figs/scripts/f11_shap_r10.py` → `figs/f11_shap.json` | `donde_dia_effis_r10.ubj`, banco `eval_dia` de `dataset_effis.parquet` (6,000 filas, semilla 42) | disco |
-| Fig. 3 los dos mapas del 13-ago y 29-oct-2025 | `07_produccion/escala_y_cifra/fig3_dos_mapas.py` → `figs/f12_dos_mapas.png` | `archivo_ifs/replay/2025/ifs/`, `07_produccion/escala_servicio.json` | archivo IFS |
+| Fig. 3 los dos mapas del 13-ago y 29-oct-2025 | `07_produccion/escala_y_cifra/fig3_dos_mapas.py` → `figs/f12_dos_mapas.png` | `replay/2025/ifs/` de `TFM_ARCHIVO`, `07_produccion/escala_servicio.json` | archivo IFS |
 
 ## Prerregistro: r10 con todos los años (escrito el 05/09/2026 a las 11:30 UTC, ANTES de correr nada)
 
@@ -246,8 +245,7 @@ Hipótesis: entrenar `donde_dia_effis_r10` con 2015-**2024** en vez de
 2015-**2022** (+32 % de positivos) mejora en 2025-2026, que son externos al cubo.
 Métrica primaria fijada de antemano: **AUC medio por día** en los días del
 replay con IFS, con IC bootstrap de la diferencia pareada. Criterio de éxito:
-que el IC no toque el cero. Prerregistro íntegro en
-`calibracion_si/PRERREGISTRO_r10_todo.md`.
+que el IC no toque el cero.
 
 | Número | Qué es | Script | Salida | Se ejecuta con |
 |---|---|---|---|---|
@@ -265,6 +263,125 @@ rendimiento**, conservando un test honesto reservado.
 
 | Número | Por qué |
 |---|---|
-| Todo lo marcado **sellado** | Lo produjo la cadena diaria contra APIs en vivo (IFS, FIRMS, EFFIS) en una fecha concreta. Reejecutarlo hoy da otra cosa: el reanálisis se corrige, EFFIS cartografía tarde. Los resultados están congelados en el Release `estado` de `tfm-fuego-malla` |
+| Todo lo marcado **sellado** | Lo produjo la cadena diaria contra APIs en vivo (IFS, FIRMS, EFFIS) en una fecha concreta. Reejecutarlo hoy da otra cosa: el reanálisis se corrige, EFFIS cartografía tarde. Los resultados quedaron guardados en el estado de la cadena del día en que se produjeron |
 | La comparación de AUC entre brazos del Experimento B | El control falló. Ver [`LIMITACIONES.md`](LIMITACIONES.md) |
-| El resultado con etiqueta FIRMS de julio | Requiere `FIRMS_MAP_KEY`, que solo existe como secreto del repositorio de producción |
+| El resultado con etiqueta FIRMS de julio | Requiere `FIRMS_MAP_KEY`, que solo existe como secreto de GitHub Actions |
+
+## Prerregistro: comparación de algoritmos (escrito el 15/09/2026 a las 21:25 CEST, antes de ejecutar nada)
+
+Pregunta: con los mismos datos, las mismas 46 variables y la misma evaluación
+que el r10, ¿ordena mejor las celdas de cada día otro algoritmo distinto de
+XGBoost?
+
+Datos y partición: los del r10 (`dos_18_ratio.py`). Entrenamiento con
+`dataset_ratio.parquet`, 2015-2022, los positivos EFFIS de primer día y los
+diez primeros negativos vivos del mismo día por positivo. Ajuste con el mismo
+prefijo en 2023. Evaluación con el banco `eval_dia` de `dataset_effis.parquet`
+(1,000 celdas al azar por día más las celdas EFFIS de primer día, verano):
+2023 para elegir la configuración y 2024 como prueba. La prueba de 2024 no se
+mira hasta haber fijado la configuración de cada algoritmo.
+
+Algoritmos:
+
+| Algoritmo | Preprocesado | Rejilla (6 configuraciones) |
+|---|---|---|
+| XGBoost, receta del r10 | Ninguno | Ninguna: parámetros del r10 y 441 árboles. Fila de referencia; debe reproducir 0.8045 en 2024 (±0.005) |
+| XGBoost ajustado | Ninguno | `max_depth` {4, 6, 8} × `learning_rate` {0.05, 0.1}, 441 árboles |
+| LightGBM | Ninguno | `num_leaves` {31, 63, 127} × `learning_rate` {0.05, 0.1}, 441 árboles |
+| Random Forest | Ninguno (admite valores ausentes) | `min_samples_leaf` {1, 5, 20} × `max_features` {raíz cuadrada, 0.3}, 400 árboles |
+| Regresión logística | Imputación por mediana, estandarización, `ccaa` y `mes` en one-hot | `C` {0.001, 0.01, 0.1, 1, 10, 100} |
+
+Ningún algoritmo pondera clases, igual que el r10. Semilla 42 y como mucho 16
+hilos en todos.
+
+Métrica primaria: AUC medio dentro del día en la prueba de 2024, sobre los
+días con fuego (`metricas_dia` de `dos_05_modelos.py`).
+
+Métricas secundarias: intervalo de confianza al 95 % del AUC medio por
+remuestreo de días (2,000 réplicas); diferencia pareada día a día frente a
+XGBoost con la receta del r10, con su intervalo; porcentaje de días en que
+cada algoritmo supera a esa referencia; tiempo de entrenamiento y de
+predicción del banco.
+
+Criterio de lectura: una diferencia cuyo intervalo incluye el cero se lee
+como empate. El resultado se publica salga como salga, en la tabla del anexo
+y en esta sección.
+
+### Ampliación del prerregistro: temporadas 2025 y 2026 (escrita el 15/09/2026 a las 21:30 CEST, antes de ejecutar el replay)
+
+Pregunta añadida: ¿se mantiene en las temporadas 2025 y 2026 la ordenación
+de los algoritmos medida en la prueba de 2024?
+
+Protocolo: el del «Prerregistro del replay 2025/2026» y
+[`REPLAY_VEREDICTO.md`](REPLAY_VEREDICTO.md), sin cambios. Condición de
+servicio: reanálisis ERA5-Land hasta D−7 e IFS archivado de D−6 a D (la
+previsión de la víspera), del 25 de mayo al 1 de noviembre de 2025 y del 25
+de mayo al 2 de septiembre de 2026. Verdad: celdas EFFIS con `FIREDATE` ese
+día (`replay/verdad_<año>/`). Métrica: AUC por día sobre todas las celdas de
+España (celdas quemadas frente al resto), media sobre los días con fuego,
+intervalo al 95 % por remuestreo de días (2,000 réplicas, semilla 42),
+diferencia pareada frente al r10 servido y porcentaje de días en que cada
+algoritmo lo supera.
+
+Modelos: el r10 servido (`donde_dia_effis_r10.ubj`) como referencia y, para
+cada algoritmo, el modelo final con la configuración elegida en 2023,
+reentrenado con los mismos datos que el r10. Todos puntúan la misma matriz
+de 46 variables que construye `dos_riesgo_hoy.py` cada día del replay.
+
+Control: el r10 servido debe reproducir las cifras publicadas (0.807 en 2025
+y 0.762 en 2026, días con fuego, condición IFS). Si no las reproduce, se para.
+
+Criterio de lectura: el mismo que en 2024. Se publica salga como salga; 2024
+sigue siendo la prueba y las temporadas son la comprobación externa.
+
+### Resultado: prueba de 2024 (15/09/2026)
+
+La receta del r10 reproduce la cifra documentada: AUC 0.8045 en 2024 y
+diferencia máxima 0 frente a las predicciones de `donde_dia_effis_r10.ubj`.
+Los cuatro modelos finales, reentrenados para el replay, repiten su AUC de
+2024 con diferencia 0.
+
+| Algoritmo | Configuración elegida (2023) | AUC 2023 | AUC 2024 [IC 95 %] | Diferencia frente al r10 [IC 95 %] | Días que gana | Entrenamiento |
+|---|---|---|---|---|---|---|
+| XGBoost, receta del r10 | 441 árboles, profundidad 6, tasa 0.05 | 0.838 | 0.805 [0.769, 0.839] | — | — | 2.7 s |
+| XGBoost ajustado | profundidad 8, tasa 0.1 | 0.845 | 0.786 [0.747, 0.822] | −0.019 [−0.037, −0.002] | 44 % | 3.2 s |
+| LightGBM | 127 hojas, tasa 0.05 | 0.847 | 0.829 [0.798, 0.859] | +0.024 [+0.007, +0.043] | 64 % | 4.4 s |
+| Random Forest | hoja mínima 20, raíz cuadrada | 0.814 | 0.833 [0.800, 0.864] | +0.028 [+0.008, +0.049] | 62 % | 23.8 s |
+| Regresión logística | C = 1 | 0.813 | 0.803 [0.766, 0.838] | −0.001 [−0.029, +0.025] | 47 % | 2.2 s |
+
+Lectura, con el criterio prerregistrado: en la prueba de 2024, LightGBM y
+Random Forest superan a XGBoost con la receta del r10 (intervalos sin el
+cero), la regresión logística empata y la variante de XGBoost elegida en 2023
+queda por debajo. La elección en 2023 no anticipa el orden de 2024: el
+XGBoost ajustado es el segundo mejor en 2023 y el peor en 2024. La
+comprobación en las temporadas 2025 y 2026 está en la ampliación.
+
+| Número | Qué es | Script | Salida | Se ejecuta con |
+|---|---|---|---|---|
+| 0.829 · 0.833 · 0.803 · 0.786 frente a 0.805 (2024) | AUC dentro del día de LightGBM, Random Forest, regresión logística y XGBoost ajustado frente a la receta del r10 | `05_iteracion2/57_ablaciones/dos_35_algoritmos.py` | `dos_35_algoritmos.json`, `dos_35_algoritmos.csv` | disco |
+
+### Resultado: temporadas 2025 y 2026 (15/09/2026)
+
+Control: el r10 servido reproduce el replay publicado con diferencia 0 en las
+predicciones y en el AUC de cada día (155 días en 2025 y 95 en 2026, las mismas
+fechas; 0.807 y 0.762 sobre los días con fuego).
+
+| Algoritmo | AUC 2025 | Diferencia 2025 [IC 95 %] | Días que gana 2025 | AUC 2026 | Diferencia 2026 [IC 95 %] | Días que gana 2026 |
+|---|---|---|---|---|---|---|
+| XGBoost, r10 servido | 0.807 | — | — | 0.762 | — | — |
+| XGBoost ajustado | 0.783 | −0.024 [−0.037, −0.013] | 33 % | 0.749 | −0.012 [−0.033, +0.008] | 41 % |
+| LightGBM | 0.789 | −0.018 [−0.029, −0.008] | 41 % | 0.748 | −0.014 [−0.030, +0.003] | 40 % |
+| Random Forest | 0.811 | +0.003 [−0.010, +0.017] | 54 % | 0.775 | +0.014 [−0.003, +0.032] | 52 % |
+| Regresión logística | 0.765 | −0.043 [−0.065, −0.019] | 39 % | 0.692 | −0.070 [−0.097, −0.044] | 26 % |
+
+Lectura, con el criterio prerregistrado: la ventaja de LightGBM en 2024 no se
+mantiene. En 2025 queda por debajo del r10 (intervalo sin el cero) y en 2026
+empata. Random Forest empata con el r10 en las dos temporadas: su ventaja de
+2024 se reduce a una diferencia pequeña cuyo intervalo incluye el cero. La
+regresión logística queda por debajo en las dos y el XGBoost ajustado, por
+debajo en 2025 y empatado en 2026. Ningún algoritmo supera al r10 en las dos
+temporadas, de modo que el cambio de algoritmo no queda justificado.
+
+| Número | Qué es | Script | Salida | Se ejecuta con |
+|---|---|---|---|---|
+| 0.811 · 0.789 · 0.783 · 0.765 frente a 0.807 (2025); 0.775 · 0.748 · 0.749 · 0.692 frente a 0.762 (2026) | AUC medio dentro del día de Random Forest, LightGBM, XGBoost ajustado y regresión logística frente al r10 servido, en el replay con la previsión de la víspera | `05_iteracion2/57_ablaciones/dos_35_replay.py` | `dos_35_replay.json`, `dos_35_replay_<año>_ifs.csv` | archivo IFS |

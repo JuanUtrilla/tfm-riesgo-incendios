@@ -2,7 +2,7 @@
 > Registro cronológico de CADA transformación, decisión y comprobación sobre los datos,
 > con el racional de cada una. Material fuente para la sección de metodología de la memoria.
 > Convención: cada entrada dice QUÉ se hizo, POR QUÉ, CON QUÉ script y QUÉ salió.
-> Documento central: [`README.md`](README.md) · Hoja de ruta: [`PROXIMOS_PASOS.md`](PROXIMOS_PASOS.md) §⭐⭐
+> Documento central: [`README.md`](README.md)
 
 ## 14/07/2026 — Sesión nocturna: del muestreo al primer modelo
 
@@ -50,7 +50,7 @@
   ensamblado); 1.3% de positivos con `is_fire=1` (esperado: la máscara de IberFire es EFFIS
   ≥5 ha y la mayoría de incendios EGIF son <1 ha → correcto etiquetar con EGIF, no con `is_fire`).
 - **Verificación colateral**: `firms_iberia_2015_2024.parquet` íntegro (256,468 filas,
-  2015→ene-2025, 0 nulos en coordenadas) — deuda de SCRIPTS.md §B cerrada.
+  2015→ene-2025, 0 nulos en coordenadas).
 
 ### 4. Extracción de features del cubo — `extraer_features_cubo.py` → `dataset/features_cubo_v1.parquet`
 - **Acceso por bloques de chunk** (77×99 celdas × serie temporal completa, ~2 GB RAM transitorios,
@@ -149,7 +149,9 @@ intocado hasta el final), prevalencia real sin `scale_pos_weight` (salida como p
   el CUÁNDO con celda emparejada) es más fácil que la ocurrencia libre.
 
 ### 10. Ficha del dataset
-Definición exacta de las 66 columnas, fuentes y garantías anti-fuga: [`dataset/DATASET_CARD.md`](dataset/DATASET_CARD.md).
+
+`dataset/dataset_modelo_v1.parquet`: 76,666 filas × 51 features (§6), partición temporal
+train 2015-2018 / val 2019 / test 2020, prevalencia fijada y reportada por split (§6 QC).
 
 ### 11. Tuning bayesiano acotado — `tuning_optuna.py` → `dataset/tuning_optuna_v1.json`, `modelos/xgb_v1_tuned.ubj`
 - 40 trials de Optuna (TPE) optimizando AUC-PR en val 2019 (test intocado durante la búsqueda).
@@ -351,7 +353,7 @@ recomienda pasar de D+2 (la precipitación como probabilidad degrada el DC a má
   58% >p80). **Almería 10-jul: percentil 99.5 del año en Albox** (prob 0.77) — el modelo lo
   tenía como uno de los 1-2 días de más riesgo de 2026 en la zona.
 - **Validación prospectiva blindada**: el ranking diario ahora corre en **GitHub Actions** en el
-  repo privado del colector (`aemet-horario-verano2026`, workflow `ranking_diario.yml`, 08:30 UTC
+  colector de AEMET (workflow `ranking_diario.yml`, 08:30 UTC
   diario): job autocontenido (modelo + climatologías + estáticas en `modelo/`, 14 MB) que
   commitea `rankings/ranking_<fecha>.csv` — **cada predicción queda sellada con fecha por GitHub**,
   inmune a que el portátil esté apagado y a toda sospecha de predicción a posteriori. Probado en
@@ -366,9 +368,9 @@ recomienda pasar de D+2 (la precipitación como probabilidad degrada el DC a má
 - **Clave del diseño**: el mapa NO necesita el cubo en runtime. De sus 46 features, las ~20 que
   salen del cubo son estáticas (elevación, CLC, población...) o climatología mensual 2020-24
   (NDVI/LAI/SWI/LST + densidad EGIF mismo-mes) → se congelan UNA VEZ en npz
-  (`exportar_malla_gh.py` → `modelo/malla/` del repo del colector, ~35 MB: estáticas 15.5 MB +
+  (`exportar_malla_gh.py` → `modelo/malla/` del colector, ~35 MB: estáticas 15.5 MB +
   4 meses × 5 MB + mapeo estación→municipio). La meteo diaria ya salía de AEMET.
-- **`mapa_diario.py`** (repo colector, workflow `mapa_diario.yml` 04:45 UTC diario): serie de 80
+- **`mapa_diario.py`** (colector de AEMET, workflow `mapa_diario.yml` 04:45 UTC diario): serie de 80
   días de todas las estaciones → forecast municipal AEMET (1 fetch/municipio, throttling 1.2 s,
   reintentos con espera si 429; en la prueba: 663 municipios, 2 sin predicción, cero 429) → FWI
   propagado → features por estación para D0 y D1 (guardarraíl: se descartan estaciones con >5
@@ -401,8 +403,8 @@ recomienda pasar de D+2 (la precipitación como probabilidad degrada el DC a má
   **Verificación final en Actions (run 29971191325, 23/07 01:12-01:52 UTC, verde)**: 40 min,
   355 municipios AEMET dentro del presupuesto + 315 estaciones vía Open-Meteo (100% resueltas),
   0 estaciones sin predicción, 682 con features válidas; el bot commiteó mapas, tabla y CSVs
-  (7f9dec5). Consumo de Actions estimado: ~1,500-1,600 min/mes de los 2,000 gratuitos del repo
-  privado (bajar `PRESUPUESTO_AEMET_S` si se acerca al tope).
+  del día. Consumo de Actions estimado: ~1,500-1,600 min/mes de los 2,000 gratuitos del
+  colector de AEMET (bajar `PRESUPUESTO_AEMET_S` si se acerca al tope).
 
 ### 23. Verificación predicción→realidad visible + hindcast de julio (23/07 madrugada)
 - **Verificación automática diaria** (en `mapa_diario.py`, cron 04:45): cada mañana se contrasta
@@ -432,8 +434,7 @@ recomienda pasar de D+2 (la precipitación como probabilidad degrada el DC a má
 ## 11/08/2026 — v3: reajuste con todos los datos y dos resultados negativos útiles
 
 ### 24. Modelo v3 — `entrenar_modelo_v3.py`, `extraer_historia_firms_v3.py`, `ablacion_v3_firms.py`
-Motivación y criterio en [`EVALUACION_DETALLADA.md`](EVALUACION_DETALLADA.md) §10. **Nada se
-sobrescribe**: todo sale con sufijo `_v3`. Principio que ordena la sesión: *el protocolo de
+**Nada se sobrescribe**: todo sale con sufijo `_v3`. Principio que ordena la sesión: *el protocolo de
 evaluación y el modelo de producción no tienen por qué ser el mismo objeto* — se evalúa con el
 split congelado, se reporta ESE número, y se despliega un modelo reajustado con todo.
 
@@ -467,7 +468,7 @@ tendencia espuria). Ablación (`dataset/ablacion_v3_firms.json`, AUC-PR en val 2
 - **El resultado útil es el otro**: eliminar por completo la autorregresiva EGIF cuesta solo
   **−0.014 AUC-PR** (A−B). Es decir, **la feature congelada en 2020 NO es load-bearing y el
   problema de caducidad está acotado en −0.014**, muy por debajo de lo que se temía. Corrige la
-  estimación de EVALUACION_DETALLADA §10.3.c (que lo daba como "impacto alto").
+  estimación anterior, que lo daba como "impacto alto".
 
 **C. Hallazgo metodológico: la prevalencia varía MUCHO por año.** Al montar la CV temporal
 apareció que las pseudo-ausencias se sortearon con fecha uniforme dentro del **split**, no del
@@ -505,7 +506,7 @@ sistema avisara de menos**. Confirma que recalcularlos no era una formalidad.
 
 **E. Variante ligera — decisión de ingeniería documentada.** Los hiperparámetros de Optuna
 (depth 10, lr 0.017 → 590 árboles) ganan **+0.0014 AUC-PR en val** sobre los de base… y multiplican
-por 13 el fichero: **10.8 MB vs 0.8 MB**. El modelo viaja dentro del repo del colector para el job
+por 13 el fichero: **10.8 MB vs 0.8 MB**. El modelo viaja dentro del colector de AEMET para el job
 diario de GitHub Actions (§22), donde cada MB se paga.
 
 | | Test 2020 (protocolo) | CV norm. | Tamaño | Árboles |
@@ -524,7 +525,7 @@ del ruido. Se conservan los dos con sus metadatos y cortes propios.
 `eda/shap_summary_v3*.png`, logs en `dataset/*_v3.log`.
 
 **G. Pendiente para pasar v3 a producción** (no hecho en esta sesión, requiere tocar el prototipo
-y el repo del colector): apuntar `tiempo_real.py` / `mapa_riesgo_hoy.py` / el job de Actions al
+y el colector de AEMET): apuntar `tiempo_real.py` / `mapa_riesgo_hoy.py` / el job de Actions al
 nuevo modelo **y a sus nuevos cortes** (van juntos, no se pueden mezclar), y revalidar con
 `validar_eventos_firms.py` / `validar_eventos_estaciones.py` para comprobar que los percentiles
 agregados (85.5 / 84.9) se mantienen.
@@ -532,9 +533,8 @@ agregados (85.5 / 84.9) se mantienen.
 ## 11/08/2026 (tarde) — Cuarta fuente de verdad: los partes oficiales de MITECO
 
 ### 25. Validación contra MITECO — `validar_miteco.py`
-**Qué se ha incorporado.** El repo [TFM-RAG de Atomas9](https://github.com/Atomas9/TFM-RAG)
-(clonado en `../TFM-RAG`, **usado en solo lectura, sin modificar ni escribir nada en él**) monta un
-RAG sobre los **partes diarios de actuaciones en incendios forestales del MITECO** y trae un parser
+**Qué se ha incorporado.** El módulo RAG del TFM (**usado en solo lectura, sin modificar nada en él**; su parser está
+copiado en `01_datos/miteco/parseo_y_chuncking.py`) monta un RAG sobre los **partes diarios de actuaciones en incendios forestales del MITECO** y trae un parser
 de PDF que extrae, por incendio: comunidad, provincia, **localización (municipio)**, estado
 (ACTIVO/CONTROLADO/ESTABILIZADO/EXTINGUIDO), medios asignados y fecha del parte, con un
 `incident_key` que agrupa observaciones del mismo incendio en días distintos.
@@ -551,7 +551,7 @@ los de FIRMS, y por eso las dos juntas informan más que cualquiera sola.
 Geocodificación municipio → coordenadas contra el maestro AEMET de 8,122 municipios ya cacheado
 (`prototipo/cache/municipios.json`), priorizando la provincia del parte: **96% de coincidencias
 exactas, 4% difusas, 0 sin resolver**. Se cruzan con las previsiones **selladas por commit** del
-repo del colector. Metodología calcada de `validar_modelo.py` (unidad = estación-día, radio 25 km)
+colector de AEMET. Metodología calcada de `validar_modelo.py` (unidad = estación-día, radio 25 km)
 para que los números sean comparables entre etiquetas.
 
 **Resultado (modo INICIO: primera aparición de cada incidente = proxy de la ignición; el test
@@ -608,7 +608,7 @@ la diferencia: es un punto fuerte de rigor, no una debilidad.
 `dataset/comparacion_miteco_vs_firms.csv`. Modo `--modo todos` (todos los incendio-día, otra
 pregunta: "¿acierta los días con incendios activos?"): D0 AUC-ROC 0.633 · lift decil 2.81 · p70.5.
 
-**Dependencias añadidas al entorno** (no al repo de Atomas9): `pymupdf`, `pypdf`, `rapidfuzz`,
+**Dependencias añadidas al entorno** (no al módulo RAG): `pymupdf`, `pypdf`, `rapidfuzz`,
 `unidecode`.
 
 ### 26. Panel de validación y el contraste prospectivo contra el FWI (11/08/2026)
@@ -661,9 +661,9 @@ municipio, día de ignición como proxy) aplican igual y están escritos en el p
 ### 27. `descargar_verdad_operativa.py` + `validar_operativo.py`
 Se atacan los tres defectos que quedaban en la evaluación: la pseudo-replicación de FIRMS, la
 ausencia de los baselines que importan y la ausencia de incertidumbre. **3 verdades-terreno × 6
-scores × 3 radios, con intervalos de confianza.** Ningún repo externo se modifica.
+scores × 3 radios, con intervalos de confianza.** No se sobrescribe nada previo.
 
-**A. Datos nuevos** (a `dataset/`, no al repo del colector): EFFIS reproducido vía WFS abierto
+**A. Datos nuevos** (a `dataset/`, no al colector de AEMET): EFFIS reproducido vía WFS abierto
 (**1,841 perímetros** de España, 13-ene→11-ago-2026, con `FIREDATE` y `AREA_HA`; el fichero que
 había en el colector se cortaba el 27-jul) y FIRMS del periodo (**26,461 detecciones**, la copia
 local llegaba solo a 15-jul).

@@ -26,6 +26,7 @@ arrastre la estadística. Es más exigente que agrupar las probabilidades crudas
 Salida: dataset/dashboard_miteco.json  (no sobrescribe nada)
 """
 
+import os
 import json
 import re
 from pathlib import Path
@@ -33,8 +34,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-DIR = Path("/home/charredgem/Desktop/Master/TFM_fuego")
-RANKINGS = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026/rankings")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+RANKINGS = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector"))) / "rankings"
 RADIO_KM = 25.0
 
 # Scores que compiten. El modelo contra el estándar internacional y contra la

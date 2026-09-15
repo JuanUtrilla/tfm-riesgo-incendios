@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Exporta a `estado/` todo lo que la cadena diaria necesita del repo original
-y del disco externo, para que corra en GitHub Actions sin ellos.
+Exporta a `estado/` todo lo que la cadena diaria necesita de los datos externos
+(TFM_DATOS) y del disco de expansión, para que corra en GitHub Actions sin ellos.
 
 Se ejecuta en local (con el cubo y el USB) cada vez que cambie algo de esto:
 un modelo nuevo, otra climatología, otra capa. Después: `gh_estado.py push --base`.
@@ -14,7 +14,7 @@ Qué exporta y por qué:
   malla_mensual_m{4..11}.npz   vegetación/LST/EGIF mismo-mes (caché de producción)
   modelos/              xgb_v2 (+features), donde_dia_effis, cuando, mapa dónde
   municipios.json       geocodificador de MITECO
-  vendor/               parser de TFM-RAG y geocodificador de validar_miteco
+  vendor/               parser de partes del MITECO y geocodificador de validar_miteco
                         (copias literales, con su origen en cabecera)
   julio2026_effis.json, estaciones_prototipo.parquet  bases de los jueces en
                         vivo que siguieron la temporada 2026 (dos_15, dos_16)
@@ -79,8 +79,8 @@ for f in ("julio2026_effis.json",):
     if os.path.exists(config.salida(f)):
         shutil.copy(config.salida(f), f"{E}/{f}")
 # vendor: copias literales con cabecera de procedencia
-for origen, dest in ((f"{config.FUENTE}/validar_miteco.py", "validar_miteco.py"),
-                     ("/home/charredgem/Desktop/Master/TFM-RAG/src/miteco_rag/parseo_y_chuncking.py",
+for origen, dest in ((f"{config.BASE}/01_datos/miteco/validar_miteco.py", "validar_miteco.py"),
+                     (f"{config.BASE}/01_datos/miteco/parseo_y_chuncking.py",
                       "parseo_y_chuncking.py")):
     txt = open(origen).read()
     if dest == "validar_miteco.py":
@@ -89,8 +89,8 @@ for origen, dest in ((f"{config.FUENTE}/validar_miteco.py", "validar_miteco.py")
                           'MUNICIPIOS = DIR / "prototipo" / "cache" / "municipios.json"\n'
                           'if not MUNICIPIOS.exists():\n'
                           '    MUNICIPIOS = Path(__file__).resolve().parents[1] / "municipios.json"')
-    cab = (f"# COPIA LITERAL de {origen}\n# (exportada por gh_exportar_estado.py el "
-           f"21/08/2026 para correr sin ese repo; no editar aquí: editar allí y reexportar)\n")
+    cab = (f"# COPIA LITERAL de {os.path.relpath(origen, config.BASE)}\n# (exportada por "
+           f"gh_exportar_estado.py para la cadena diaria; no editar aquí: editar el original y reexportar)\n")
     open(f"{E}/vendor/{dest}", "w").write(cab + txt)
 open(f"{E}/vendor/__init__.py", "w").write("")
 

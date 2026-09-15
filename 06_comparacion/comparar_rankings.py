@@ -6,7 +6,7 @@ No toca producción. Escribe salida/rankings_effis.csv y .json.
 
 Por qué existía esto y no se estaba usando
 ------------------------------------------
-El proyecto hermano `aemet_horario_verano2026` lleva guardando su salida
+El colector de AEMET lleva guardando su salida
 operativa diaria: `rankings/prevision_D0_<fecha>.csv`, 687 estaciones con su
 probabilidad, del 22-jul al 18-ago de 2026. Son 24 días de sistema real,
 sellados en su momento, que ya estaban en disco.
@@ -35,7 +35,7 @@ iría ciega a los incendios en curso y perdería por un motivo falso, que es
 exactamente el error que se coló en la comparación del 20-ago.
 
 Etiqueta: estación positiva si hay superficie quemada de EFFIS a menos de
-25 km ese día, el mismo criterio que usa la validación del proyecto hermano.
+25 km ese día, el mismo criterio que usa la validación del colector de AEMET.
 
 Uso: python comparar_rankings.py
 """
@@ -65,8 +65,8 @@ from puntuar_effis import GEOJSON
 from riesgo_hoy import mensual
 
 load_dotenv(f"{config.FUENTE}/.env")
-RANKINGS = ("/home/charredgem/Desktop/Master/aemet_horario_verano2026/"
-            "rankings/prevision_D0_%s.csv")
+COLECTOR = os.environ.get("TFM_COLECTOR", f"{config.FUENTE}/colector")
+RANKINGS = f"{COLECTOR}/rankings/prevision_D0_%s.csv"
 RADIO_KM = 25
 # días de la ventana FIRMS [D-n, D-1]. 7 = la del entrenamiento.
 VENTANA_FIRMS = int(os.environ.get("TFM_FIRMS_DIAS", 7))
@@ -94,7 +94,7 @@ def firms_dia(dia, ds):
     `_firms{n}/` para poder comparar las dos.
 
     Producción nunca estuvo afectada: `riesgo_hoy.py` y el `firms_api.py` del
-    repo hermano llaman sin fecha de inicio (`.../-10,35,5,44/5`), que son los
+    scripts del colector llaman sin fecha de inicio (`.../-10,35,5,44/5`), que son los
     5 últimos días hasta hoy. La fuga solo se materializó aquí porque la caché
     de junio y julio se descargó en agosto, cuando el futuro ya existía.
     """

@@ -1,7 +1,6 @@
 """Descarga CAPE + precipitación convectiva + K-index diarios de ERA5 single levels.
 
-Proxy de "dry lightning" para el Modelo B (ver ESTADO_ARTE_ML_INCENDIOS.md y DATOS.md
-§features_extra/ → rayos). Ojo: ERA5-Land no tiene CAPE; se usa el dataset derivado
+Proxy de "dry lightning" para el Modelo B. Ojo: ERA5-Land no tiene CAPE; se usa el dataset derivado
 de estadísticas diarias de ERA5 single levels (0.25°, CC-BY), misma API cdsapi.
 
 Idempotente: un NetCDF por año y estadística en rayos_data/era5_cape/; si el fichero

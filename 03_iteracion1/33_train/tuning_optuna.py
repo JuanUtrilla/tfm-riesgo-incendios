@@ -5,12 +5,13 @@ Tuning bayesiano acotado del Modelo B (Optuna, 40 trials).
 Objetivo: AUC-PR en val 2019 (el test 2020 no se toca hasta el final).
 Presupuesto deliberadamente corto: la literatura y la escalera de features del
 propio trabajo muestran que la ganancia está en las features más que en el
-tuning (§3.1 PROXIMOS_PASOS).
+tuning.
 
 Salida: dataset/tuning_optuna_v1.json (mejores params + métrica final en test)
         modelos/xgb_v1_tuned.ubj (solo si mejora al modelo base en val)
 """
 
+import os
 import json
 
 import optuna
@@ -21,7 +22,8 @@ from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_s
 from entrenar_modelo import (FEATS_METEO, FEATS_VEG, FEATS_ESTAT, FEATS_HIST,
                              FEATS_CAL, SEED)
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
 FULL = FEATS_METEO + FEATS_VEG + FEATS_ESTAT + FEATS_HIST + FEATS_CAL
 
 df = pd.read_parquet(f"{DIR}/dataset/dataset_modelo_v1.parquet")

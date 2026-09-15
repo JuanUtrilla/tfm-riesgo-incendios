@@ -25,10 +25,13 @@ Pasos (cada uno documentado para la memoria):
    sin winsorización, sin imputación (§7.5 checklist negativo).
 """
 
+import os
+
 import numpy as np
 import pandas as pd
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego/dataset"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.path.join(os.environ.get("TFM_DATOS", f"{RAIZ}/datos"), "dataset")
 
 RANGOS_FISICOS = {
     "fwi": (0, 200), "t2m_max": (-30, 50), "t2m_min": (-40, 45),

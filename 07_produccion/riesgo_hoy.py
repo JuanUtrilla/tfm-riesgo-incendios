@@ -76,7 +76,7 @@ from dotenv import load_dotenv
 import config
 import malla_02b_ifs as ifsmod
 
-# Las claves viven en el .env del repo original. Sin esto, FIRMS_MAP_KEY no
+# Las claves viven en el .env de los datos externos. Sin esto, FIRMS_MAP_KEY no
 # está en el entorno y las features de FIRMS salen a cero, mientras que
 # producción sí las carga (vía `tiempo_real`): la comparación quedaría
 # trucada justo en las celdas con fuego activo, que es donde se decide.

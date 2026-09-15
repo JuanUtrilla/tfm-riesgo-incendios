@@ -2,10 +2,10 @@
 """Curva de captura y lift de los seis modelos del replay (condición IFS).
 
 Solo lectura. Entradas:
-  archivo_ifs/replay/<año>/ifs/<fecha>.npz   puntuación de cada modelo (920 x 1188)
-  archivo_ifs/replay/verdad_<año>/<fecha>.npz  celdas quemadas: celda (índice plano),
+  TFM_ARCHIVO/replay/<año>/ifs/<fecha>.npz   puntuación de cada modelo (920 x 1188)
+  TFM_ARCHIVO/replay/verdad_<año>/<fecha>.npz  celdas quemadas: celda (índice plano),
                                              fuego, area_ha y n_celdas por incendio
-  archivo_ifs/replay/replay_veredicto.json    para comprobar la reproducción
+  TFM_ARCHIVO/replay/replay_veredicto.json    para comprobar la reproducción
 
 Definiciones, las de replay_dia.py:
   peso de una celda quemada = ha de su incendio / celdas del incendio
@@ -22,12 +22,15 @@ Y para el r10 con escala absoluta: nivel >= EXTREMO y >= ALTO, con y sin semáfo
 """
 import glob
 import json
+import os
 import pathlib
 
 import numpy as np
 import pandas as pd
 
-M = pathlib.Path.home() / "Desktop/Master/archivo_ifs/replay"
+RAIZ = pathlib.Path(__file__).resolve().parents[1]
+DATOS = pathlib.Path(os.environ.get("TFM_DATOS", RAIZ / "datos"))
+M = pathlib.Path(os.environ.get("TFM_ARCHIVO", DATOS / "archivo")) / "replay"
 OUT = pathlib.Path(__file__).resolve().parent
 MODELOS = ["prod", "unico", "r10", "pareja", "donde", "cuando"]
 XS = [0.5, 1, 2, 5, 10, 20]

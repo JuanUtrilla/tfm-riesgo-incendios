@@ -93,7 +93,7 @@ De ahí el diseño de abajo:
     se recupera solo tras varios envíos buenos.
  5. Los trabajos ya descargados se borran del servidor para liberar hueco.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_04_climatologia.py
+Uso: python malla_04_climatologia.py
 """
 
 import gc

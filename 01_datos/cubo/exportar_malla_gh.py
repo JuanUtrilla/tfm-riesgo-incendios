@@ -4,7 +4,7 @@ Exporta a ~35 MB de npz/csv solo lo que el mapa nacional necesita del cubo
 IberFire (29 GB), para que mapa_diario.py pueda correr en GitHub Actions sin
 el cubo. Se ejecuta una vez en local (y otra vez solo si cambia el modelo).
 
-Genera en <repo colector>/modelo/malla/:
+Genera en <TFM_COLECTOR>/modelo/malla/ (el colector de AEMET):
 - estaticas.npz:     13 capas estáticas 2D (float32) + x/y/is_spain
 - mensual_m6..9.npz: clim. mensual 2020-24 de NDVI/LAI/SWI/LST + EGIF mismo-mes
                       (reutiliza malla_mensual de mapa_riesgo_hoy, misma caché)
@@ -15,6 +15,8 @@ Uso: python3 exportar_malla_gh.py
 """
 
 import json
+import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -23,7 +25,9 @@ from scipy.spatial import cKDTree
 
 from mapa_riesgo_hoy import DIR, malla_estaticas, malla_mensual
 
-REPO = "/home/charredgem/Desktop/Master/aemet_horario_verano2026"
+RAIZ = Path(__file__).resolve().parents[2]
+REPO = os.environ.get("TFM_COLECTOR", os.path.join(
+    os.environ.get("TFM_DATOS", str(RAIZ / "datos")), "colector"))
 DESTINO = f"{REPO}/modelo/malla"
 
 

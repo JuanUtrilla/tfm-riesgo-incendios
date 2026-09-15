@@ -2,10 +2,10 @@
 """Variantes del semáforo del r10, evaluadas fuera de los años de calibración.
 
 Solo lectura. Entradas:
-  calibracion_si/sandbox/salida/dos_26_dias.csv        p98 diario del r10 2015-2024
-  calibracion_si/sandbox/salida/dos_26_calibracion.json betas y umbrales (ajustados
-                                                         en 2015-2021, dos_26)
-  archivo_ifs/replay/replay_<año>_ifs.csv               p98 diario del r10 en el replay
+  salida/dos_26_dias.csv                   p98 diario del r10 2015-2024
+  salida/dos_26_calibracion.json           betas y umbrales (ajustados en 2015-2021,
+                                           dos_26)
+  TFM_ARCHIVO/replay/replay_<año>_ifs.csv  p98 diario del r10 en el replay
 
 Variantes:
   V0   la que estuvo en servicio hasta el 14/09/2026: beta y umbral globales
@@ -20,17 +20,21 @@ Salida: semaforo_variantes.csv junto a este script. Con estos resultados el
 semáforo se retiró de la cadena el 14/09/2026 (ver mapas_hoy_manana.py).
 """
 import json
+import os
 import pathlib
 
 import numpy as np
 import pandas as pd
 
-M = pathlib.Path.home() / "Desktop/Master"
+RAIZ = pathlib.Path(__file__).resolve().parents[2]
+DATOS = pathlib.Path(os.environ.get("TFM_DATOS", RAIZ / "datos"))
+ARCH = pathlib.Path(os.environ.get("TFM_ARCHIVO", DATOS / "archivo"))
+SAL = pathlib.Path(os.environ.get("TFM_SALIDA", RAIZ / "salida"))
 OUT = pathlib.Path(__file__).resolve().parent
 REG = {**{m: "invierno-primavera" for m in (12, 1, 2, 3, 4)},
        **{m: "transicion" for m in (5, 10, 11)},
        **{m: "verano" for m in (6, 7, 8, 9)}}
-CAL = json.load(open(M / "calibracion_si/sandbox/salida/dos_26_calibracion.json"))
+CAL = json.load(open(SAL / "dos_26_calibracion.json"))
 
 
 def prob(s, beta):
@@ -77,7 +81,7 @@ def resume(df, av, extra_ha=False):
 
 
 def cubo():
-    d = pd.read_csv(M / "calibracion_si/sandbox/salida/dos_26_dias.csv")
+    d = pd.read_csv(SAL / "dos_26_dias.csv")
     d = d.assign(p98=d["p980_r10"], regimen=d["mes"].map(REG),
                  grande=d["primer_dia"] >= 5, celdas=d["primer_dia"])
     assert (d["regimen"] == d["regimen"]).all()
@@ -98,7 +102,7 @@ def cubo():
 def replay():
     filas = []
     for anio in (2025, 2026):
-        r = pd.read_csv(M / f"archivo_ifs/replay/replay_{anio}_ifs.csv")
+        r = pd.read_csv(ARCH / f"replay/replay_{anio}_ifs.csv")
         r["fecha"] = pd.to_datetime(r["fecha"])
         r = r.assign(p98=r["p_p98_r10"], regimen=r["fecha"].dt.month.map(REG),
                      grande=r["celdas_quemadas"] >= 5, celdas=r["celdas_quemadas"],

@@ -49,6 +49,7 @@ Uso:
     python malla_02_descarga.py --verificar        # solo el contraste
 """
 
+from pathlib import Path
 import argparse
 import os
 import zipfile
@@ -57,7 +58,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
+RAIZ = Path(__file__).resolve().parents[3]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
 DATA = f"{DIR}/malla_data"
 CRUDO = f"{DATA}/_cds"
 # caja de la Península con margen: [N, W, S, E], alineada a 0,1°

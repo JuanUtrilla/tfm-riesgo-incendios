@@ -4,8 +4,9 @@ Todas las figuras salen a ../ en PNG de 300 dpi, con ancho pensado para el
 ancho de página de la memoria (16 cm), sin título dentro de la figura (el
 título va en el pie) y con la paleta Okabe-Ito, segura para daltonismo.
 
-Rutas: RAIZ es la carpeta que contiene los repositorios de trabajo. Se puede
-fijar con la variable de entorno TFM_RAIZ.
+Rutas: RAIZ es la raíz de este repositorio (REPO, un alias). Los datos
+externos se indican con TFM_DATOS, el archivo de previsiones IFS con
+TFM_ARCHIVO y la carpeta de resultados de los scripts con TFM_SALIDA.
 """
 import os
 import pathlib
@@ -14,11 +15,11 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-RAIZ = pathlib.Path(os.environ.get(
-    "TFM_RAIZ", pathlib.Path(__file__).resolve().parents[5]))
-REPO = RAIZ / "tfm-riesgo-incendios"
-MALLA = RAIZ / "TFM_fuego_malla"
-ORIG = RAIZ / "TFM_fuego"
+RAIZ = pathlib.Path(__file__).resolve().parents[4]
+REPO = RAIZ
+DATOS = pathlib.Path(os.environ.get("TFM_DATOS", RAIZ / "datos"))
+ARCHIVO = pathlib.Path(os.environ.get("TFM_ARCHIVO", DATOS / "archivo"))
+SALIDA_REPO = pathlib.Path(os.environ.get("TFM_SALIDA", RAIZ / "salida"))
 SALIDA = pathlib.Path(__file__).resolve().parents[1]
 
 # Okabe-Ito

@@ -81,7 +81,7 @@ para descartar la hipótesis.
 | `malla_03_cuantiles.py`, `malla_03b_fwi_qm.py`, `malla_03c_aceptacion.py` | Correcciones por cuantiles de la precipitación y del FWI, con su prueba de aceptación | Medidas y descartadas: llevar el FWI a la escala del cubo empeora |
 | `malla_05_riesgo.py`, `malla_05b_evaluacion.py` | Mapa retrospectivo desde la malla sin interpolación y su discriminación en varios días | Comprobar que la malla discrimina como el cubo |
 | `prueba_era5_atribucion.py`, `prueba_era5_produccion.py`, `prueba_ifs_produccion.py`, `prueba_hibrido_produccion.py`, `prueba_hibrido_corregido.py` | Cinco pruebas acotadas: de dónde viene el sesgo de ERA5, y si ERA5, el IFS o el híbrido sirven como entrada de producción | El camino hasta la configuración de servicio |
-| `prototipo_TFM_fuego/` | La primera versión de los módulos de malla (`malla_01`, `02`, `04`, `05`, `05b`), la que produjo los números de este capítulo | La versión definitiva de `01_datos/` y `07_produccion/` divergió después, y se conservan las dos |
+| `prototipo_malla/` | La primera versión de los módulos de malla (`malla_01`, `02`, `04`, `05`, `05b`), la que produjo los números de este capítulo | La versión definitiva de `01_datos/` y `07_produccion/` divergió después, y se conservan las dos |
 
 ## 43 · Segunda hipótesis: el desfase entre entrenar y servir
 

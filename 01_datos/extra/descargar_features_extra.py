@@ -12,6 +12,7 @@ correr: en un entorno con ancho de banda limitado, las 12 teselas WorldCover (~1
 Uso:
     python descargar_features_extra.py
 """
+import os
 import subprocess
 from pathlib import Path
 
@@ -21,7 +22,8 @@ import pandas as pd
 import rasterio
 from shapely.geometry import box
 
-BASE = Path("/home/charredgem/Desktop/Master/TFM_fuego")
+RAIZ = Path(__file__).resolve().parents[2]
+BASE = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
 RAW = BASE / "features_extra" / "raw"
 RAW.mkdir(parents=True, exist_ok=True)
 (RAW / "worldcover").mkdir(exist_ok=True)

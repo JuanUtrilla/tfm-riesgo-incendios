@@ -57,9 +57,10 @@ evaluación jun-sep 2024. 2024 es el último año que cubre el cubo (acaba el
 2024-12-31), así que es el único solape posible con datos reales de las tres
 fuentes.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python prueba_era5_produccion.py [--n 120]
+Uso: python prueba_era5_produccion.py [--n 120]
 """
 
+from pathlib import Path
 import argparse
 import json
 import os
@@ -73,9 +74,9 @@ import xarray as xr
 
 from fwi_canadiense import calcular_fwi_serie
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
-CACHE = ("/tmp/claude-1000/-home-charredgem-Desktop-Master/"
-         "232d0846-5a96-422a-9c0b-bf08265e8663/scratchpad")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
+CACHE = os.path.join(os.environ.get("TFM_SALIDA", str(RAIZ / "salida")), "cache")
 SPIN = "2023-01-01"
 FIN = "2024-12-31"
 EVAL = (6, 9)                      # jun-sep: la temporada que importa

@@ -19,6 +19,10 @@ como negativo y con qué verdad se evalúa.
 | `extra/` | Carreteras, población, usos del suelo, censo ganadero, rayos WGLC | Variables humanas y estructurales |
 | `comun/` | `config`, `features`, `fwi_canadiense` | Rutas, el orden de las 46 variables y el cálculo del FWI (*Fire Weather Index*) |
 
+![La malla de servicio: nodos de ERA5-Land sobre las celdas de 1 km](../docs/MEMORIA/figs/f17_malla_nodos.png)
+
+*Cada celda de 1 km toma la meteorología de su nodo de ERA5-Land (0.1°, unos 9 km), sin interpolar. Cada cuadro del damero es el área que sirve un nodo.*
+
 ## Qué hace cada script
 
 ### `comun/`, módulos que importa todo el repositorio

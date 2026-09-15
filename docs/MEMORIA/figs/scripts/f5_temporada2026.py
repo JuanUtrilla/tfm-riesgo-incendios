@@ -5,7 +5,7 @@ Reproduce la lógica de `06_comparacion/dos_19_veredicto.py` (bootstrap de días
 no de celdas; N=2000, SEED=42) sobre `salida/dos_09_temporada2026.csv` (74 días,
 ventana FIRMS de 7 días, corrida limpia del 31/08/2026). No reentrena ningún
 modelo.
-Uso:  python f5_temporada2026.py   [TFM_MALLA=<ruta a TFM_fuego_malla>]
+Uso:  python f5_temporada2026.py   [TFM_SALIDA=<carpeta de resultados>]
 """
 import os
 import pathlib
@@ -17,9 +17,9 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
-from comun import ANCHO, AZUL, BERMELLON, GRIS, NEGRO, MALLA, guarda
+from comun import ANCHO, AZUL, BERMELLON, GRIS, NEGRO, SALIDA_REPO, guarda
 
-SAL = pathlib.Path(os.environ.get("TFM_MALLA", MALLA)) / "salida"
+SAL = SALIDA_REPO
 CSV = SAL / "dos_09_temporada2026.csv"
 VER = SAL / "dos_19_veredicto.json"
 N_BOOT, SEED = 2000, 42

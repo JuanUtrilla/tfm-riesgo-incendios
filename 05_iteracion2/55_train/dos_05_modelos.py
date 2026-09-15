@@ -19,7 +19,7 @@ Los modelos (todos XGBoost, mismos hiperparámetros base de `entrenar_modelo.py`
               lleva).
   donde_cel_hist  ídem + densidad EGIF 2008-14 (previa al dataset, servible
               congelada). Es la variante «mapa de dónde hubo incendios antes»
-              de la que avisa `CUANDO_Y_DONDE.md`: se mide qué añade.
+              que se quería descartar: se mide qué añade.
   donde_dia   modelo único con features completas entrenado sobre el diseño
               `donde` (mismo día, otra celda). Lo que pasa si solo se cambia
               el muestreo y nada más.

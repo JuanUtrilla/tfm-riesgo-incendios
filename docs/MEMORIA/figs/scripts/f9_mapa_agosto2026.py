@@ -2,10 +2,10 @@
 """F9 - El mismo día según producción y según el r10, y la resta entre ambos.
 
 Día: 7 de agosto de 2026 (44.672 ha, el segundo mayor de la temporada). Mapas
-del replay con la pasada IFS de la víspera (`archivo_ifs/replay/2026/ifs/`),
+del replay con la pasada IFS de la víspera (`replay/2026/ifs/` del archivo de previsiones IFS),
 pintados en percentil del día como hace `07_produccion/dos_riesgo_hoy.py`; las
 celdas EFFIS de primer día (`replay/verdad_2026/`) en negro.
-Uso:  python f9_mapa_agosto2026.py   [TFM_ARCHIVO=<ruta a archivo_ifs>]
+Uso:  python f9_mapa_agosto2026.py   [TFM_ARCHIVO=<ruta al archivo de previsiones IFS>]
 """
 import os
 import pathlib
@@ -14,10 +14,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm, ListedColormap
 
-from comun import ANCHO, RAIZ, guarda
+from comun import ANCHO, ARCHIVO, RAIZ, guarda
 
-ARCHIVO = pathlib.Path(os.environ.get("TFM_ARCHIVO", RAIZ / "archivo_ifs"))
-LIMITES = RAIZ / "tfm-riesgo-incendios" / "muestras" / "limites.npz"
+LIMITES = RAIZ / "muestras" / "limites.npz"
 FECHA = "2026-08-07"
 # los cortes y colores de dos_riesgo_hoy.py
 CORTES = [0, 10, 30, 60, 90, 98, 100]

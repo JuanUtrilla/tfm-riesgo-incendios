@@ -1,5 +1,5 @@
-# COPIA LITERAL de /home/charredgem/Desktop/Master/TFM_fuego/validar_miteco.py
-# (exportada por gh_exportar_estado.py el 21/08/2026 para correr sin ese repo; no editar aquí: editar allí y reexportar)
+# Copia del validador contra el MITECO de la primera versión del proyecto
+# (copiada el 21/08/2026 por gh_exportar_estado.py para la cadena diaria).
 #!/usr/bin/env python3
 """
 Validación del modelo contra los PARTES OFICIALES DE MITECO — la fuente de
@@ -37,13 +37,13 @@ eso las dos validaciones juntas son más informativas que cualquiera sola):
     incidente como proxy de la ignición (modo por defecto).
 
 =============================================================================
-PROCEDENCIA DE LOS DATOS  (los dos repos se usan en SOLO LECTURA)
+ORIGEN DE LOS DATOS  (todo se usa en SOLO LECTURA)
 =============================================================================
-  · Partes MITECO + parser  → repo TFM-RAG de Atomas9
-      https://github.com/Atomas9/TFM-RAG
-      Se importa su `miteco_rag.parseo_y_chuncking` sin modificar ni escribir
-      nada dentro de su repositorio. Todas las salidas van a TFM_fuego.
-  · Previsiones del modelo  → repo del colector (aemet_horario_verano2026)
+  · Partes MITECO + parser  → el módulo RAG del TFM
+      Su parser (`parseo_y_chuncking.py`, copiado en esta carpeta) se importa
+      sin modificar. Los PDF se leen de `TFM_DATOS/miteco/` y todas las
+      salidas van a `TFM_DATOS/dataset/`.
+  · Previsiones del modelo  → el colector de AEMET (`TFM_COLECTOR`)
       `rankings/prevision_D{0,1}_<fecha>.csv`, SELLADAS por commit de GitHub
       Actions ANTES del día evaluado → validación prospectiva pura.
   · Maestro de municipios   → prototipo/cache/municipios.json (8.122 municipios
@@ -61,7 +61,7 @@ validaciones del TFM: 85,5 en 2021-24 y 84,9 en 2025-26).
 
 Modos de etiquetado:
   --modo inicio  (por defecto) solo la PRIMERA aparición de cada incidente
-                 (`incident_key` del parser de Atomas9) → proxy del día de
+                 (`incident_key` del parser del módulo RAG) → proxy del día de
                  ignición. Es el test correcto para un modelo de riesgo de
                  ignición y evita que un incendio de 5 días cuente 5 veces.
   --modo todos   todos los incendio-día. Responde a otra pregunta: "¿acierta el
@@ -78,6 +78,7 @@ Salidas (nada se sobrescribe de v1/v2/v3):
 
 import argparse
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -86,10 +87,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-DIR = Path("/home/charredgem/Desktop/Master/TFM_fuego")
-REPO_RAG = Path("/home/charredgem/Desktop/Master/TFM-RAG")
-REPO_COLECTOR = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
-PDFS_MITECO = REPO_RAG / "data" / "raw" / "miteco"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+REPO_COLECTOR = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector")))
+PDFS_MITECO = DIR / "miteco"
 RANKINGS = REPO_COLECTOR / "rankings"
 MUNICIPIOS = DIR / "prototipo" / "cache" / "municipios.json"
 if not MUNICIPIOS.exists():
@@ -137,11 +138,11 @@ def norm(s: str | None) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# 1. Partes de MITECO (parser de Atomas9, en solo lectura)
+# 1. Partes de MITECO (parser del módulo RAG, en solo lectura)
 # --------------------------------------------------------------------------- #
 def cargar_partes(modo: str) -> pd.DataFrame:
-    sys.path.insert(0, str(REPO_RAG / "src"))
-    from miteco_rag.parseo_y_chuncking import parse_pdf_directory
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from parseo_y_chuncking import parse_pdf_directory
 
     snaps = parse_pdf_directory(PDFS_MITECO)
     df = pd.DataFrame([{
@@ -258,7 +259,7 @@ def filtrar_peninsula(g: pd.DataFrame) -> pd.DataFrame:
 # 3. Previsiones selladas del colector
 # --------------------------------------------------------------------------- #
 def previsiones() -> list:
-    """CSV de predicción del repo del colector, con su tipo y el día evaluado.
+    """CSV de predicción del colector de AEMET, con su tipo y el día evaluado.
 
     D0/D1 están SELLADOS por commit ANTES del día al que se refieren (D1 es
     forecast puro: se emitió la víspera). `retro` es hindcast y `ranking` es el
@@ -410,8 +411,8 @@ def main() -> None:
         "rango_fechas_miteco": [str(fuegos.fecha.min().date()),
                                 str(fuegos.fecha.max().date())],
         "procedencia": {
-            "partes_y_parser": "repo TFM-RAG de Atomas9 (solo lectura)",
-            "previsiones": "repo aemet_horario_verano2026, rankings/*.csv "
+            "partes_y_parser": "módulo RAG del TFM (solo lectura)",
+            "previsiones": "colector de AEMET, rankings/*.csv "
                            "sellados por commit de GitHub Actions",
             "municipios": "prototipo/cache/municipios.json (maestro AEMET)",
         },

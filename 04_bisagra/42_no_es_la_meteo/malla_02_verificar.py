@@ -25,9 +25,10 @@ Ojo: el fallo que este test busca por encima de todo es el del acumulado. Si la
 regla de `total_precipitation` fuera una suma de horarios en vez del acumulado
 diario, `prec` saldría ~24× más alta, y eso se vería aquí de inmediato.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_02_verificar.py
+Uso: python malla_02_verificar.py
 """
 
+from pathlib import Path
 import json
 import os
 
@@ -36,9 +37,9 @@ import pandas as pd
 import requests
 import xarray as xr
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
-CACHE = ("/tmp/claude-1000/-home-charredgem-Desktop-Master/"
-         "232d0846-5a96-422a-9c0b-bf08265e8663/scratchpad")
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = os.environ.get("TFM_DATOS", str(RAIZ / "datos"))
+CACHE = os.path.join(os.environ.get("TFM_SALIDA", str(RAIZ / "salida")), "cache")
 INI, FIN = "2026-05-01", "2026-08-13"
 N = 250
 

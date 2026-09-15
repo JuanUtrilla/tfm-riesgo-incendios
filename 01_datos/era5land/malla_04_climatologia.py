@@ -93,7 +93,7 @@ De ahí el diseño de abajo:
     se recupera solo tras varios envíos buenos.
  5. Los trabajos ya descargados se borran del servidor para liberar hueco.
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_04_climatologia.py
+Uso: python malla_04_climatologia.py
 """
 
 import gc
@@ -113,7 +113,7 @@ DATA = config.SALIDA
 DIR = config.FUENTE
 
 CLIM = f"{DATA}/_clim"
-CLIM_LECTURA = f"{config.DATA}/_clim"   # meses ya agregados en el original
+CLIM_LECTURA = f"{config.DATA}/_clim"   # meses ya agregados en los datos externos
 ANIOS = range(2008, 2015)
 VARS = ["tmax", "hr_min", "viento_max", "prec"]
 COLECCION = "reanalysis-era5-land"
@@ -140,7 +140,7 @@ def cliente():
 
 
 def ruta_mes(anio, mes):
-    """Escritura aquí; lectura también del original, para no repetir trabajo."""
+    """Escritura en salida/; lectura también de los datos externos, para no repetir trabajo."""
     nombre = f"diario_{anio}{mes:02d}.npz"
     ya = f"{CLIM_LECTURA}/{nombre}"
     if not os.path.exists(f"{CLIM}/{nombre}") and os.path.exists(ya):

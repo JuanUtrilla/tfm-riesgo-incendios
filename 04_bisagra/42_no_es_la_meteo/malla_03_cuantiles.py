@@ -42,7 +42,7 @@ El script recalcula el FWI con ERA5-Land corregido y lo compara con el del
 cubo. Criterio: |sesgo| < 1,0 y corr > 0,97 (con `era5_seamless` era −2,01 y
 0,976; el reanálisis debería mejorarlo).
 
-Uso: /home/charredgem/miniconda3/envs/tfm_fuego/bin/python malla_03_cuantiles.py
+Uso: python malla_03_cuantiles.py
 """
 
 import json

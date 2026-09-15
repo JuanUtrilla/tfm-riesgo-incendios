@@ -2,8 +2,8 @@
 """Verifica la procedencia de `xgb_v2_prototipo`, el modelo servido en producción.
 
 No existe script que lo entrene: fue un reentrenamiento interactivo del
-15-jul-2026 (el .ubj es de las 08:51, horas antes del commit inicial de
-`TFM_fuego`) documentado en `../MODELO_B_BITACORA.md` §16: v1 sin las cuatro
+15-jul-2026 (el .ubj es de las 08:51, horas antes del primer commit de la
+primera versión del proyecto) documentado en `../MODELO_B_BITACORA.md` §16: v1 sin las cuatro
 autorregresivas intra-celda contaminadas por el artefacto del muestreo
 misma-celda (+0,92 log-odds por `n_fuegos_1km_hist=0` en pleno Madrid urbano;
 AUC-PR 0,828 frente a 0,843, «coste pequeño, modelo honesto para producción»).

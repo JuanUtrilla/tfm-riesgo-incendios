@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Anexo B: distribución del AUC por día de los seis modelos en las dos
 temporadas del replay (condición IFS, días con fuego).
-Entrada (solo lectura): ~/Desktop/Master/archivo_ifs/replay/replay_{2025,2026}_ifs.csv
+Entrada (solo lectura): replay/replay_{2025,2026}_ifs.csv del archivo de
+previsiones IFS (TFM_ARCHIVO)
 (copias en docs/resultados/ si existen). Escribe docs/MEMORIA/figs/anexo_b_boxplot.png."""
+import os
 import pathlib
 import matplotlib
 matplotlib.use("Agg")
@@ -10,7 +12,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-M = pathlib.Path.home() / "Desktop/Master"
+DATOS = pathlib.Path(os.environ.get(
+    "TFM_DATOS", pathlib.Path(__file__).resolve().parents[4] / "datos"))
+M = pathlib.Path(os.environ.get("TFM_ARCHIVO", DATOS / "archivo"))
 OUT = pathlib.Path(__file__).resolve().parents[1]
 NARANJA, AZUL, BERMELLON, VERDE, GRIS, AZUL_CIELO = (
     "#E69F00", "#0072B2", "#D55E00", "#009E73", "#7F7F7F", "#56B4E9")
@@ -27,7 +31,7 @@ MODELOS = [("prod", "producción", GRIS), ("unico", "único 1:3", AZUL),
 
 def leer(anio):
     for ruta in (OUT.parents[1] / "resultados" / f"replay_{anio}_ifs.csv",
-                 M / "archivo_ifs/replay" / f"replay_{anio}_ifs.csv"):
+                 M / "replay" / f"replay_{anio}_ifs.csv"):
         if ruta.exists():
             d = pd.read_csv(ruta)
             return d[d["celdas_quemadas"] > 0]

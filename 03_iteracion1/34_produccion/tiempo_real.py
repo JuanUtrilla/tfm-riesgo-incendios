@@ -31,15 +31,17 @@ from entrenar_modelo import (FEATS_METEO, FEATS_VEG, FEATS_ESTAT, FEATS_HIST,
                              FEATS_CAL)
 from fwi_canadiense import calcular_fwi_serie
 
-DIR = "/home/charredgem/Desktop/Master/TFM_fuego"
-DB_COLECTOR = "/home/charredgem/Desktop/Master/aemet_horario_verano2026/data/aemet_horario_verano2026.db"
+RAIZ = os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/../..")
+DIR = os.environ.get("TFM_DATOS", f"{RAIZ}/datos")
+COLECTOR = os.environ.get("TFM_COLECTOR", f"{DIR}/colector")   # colector de AEMET
+DB_COLECTOR = f"{COLECTOR}/data/aemet_horario.db"
 DIR_CACHE = f"{DIR}/prototipo/cache"
 # El prototipo usa xgb_v2_prototipo: el modelo sin las autorregresivas
 # intra-celda (n_fuegos_1km_hist/90d, 10km_90d/365d), que en el dataset llevan
 # un artefacto del muestreo misma-celda (el positivo se suma al historial de
 # los negativos posteriores, así que el modelo aprende orden temporal y no
 # física). Coste medido: AUC-PR de 0,843 a 0,828. Detalle: MODELO_B_BITACORA §16.
-with open(f"/home/charredgem/Desktop/Master/TFM_fuego/modelos/"
+with open(f"{DIR}/modelos/"
           f"xgb_v2_prototipo_features.json") as _f:
     FULL = json.load(_f)
 INICIO_SERIE = "2026-05-01"          # ~75 días de spin-up del FWI

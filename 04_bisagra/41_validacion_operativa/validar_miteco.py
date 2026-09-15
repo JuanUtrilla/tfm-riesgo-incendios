@@ -35,13 +35,13 @@ eso las dos comprobaciones juntas informan más que cualquiera sola):
   − El parte no siempre trae fecha de inicio: se usa la primera aparición del
     incidente como proxy de la ignición (modo por defecto).
 
-Procedencia de los datos (los dos repos se usan en solo lectura)
+Procedencia de los datos (todos se leen en solo lectura)
 
-  · Partes MITECO + parser: repo TFM-RAG de Atomas9
-      https://github.com/Atomas9/TFM-RAG
-      Se importa su `miteco_rag.parseo_y_chuncking` sin modificar ni escribir
-      nada dentro de su repositorio. Todas las salidas van a TFM_fuego.
-  · Previsiones del modelo: repo del colector (aemet_horario_verano2026)
+  · Partes MITECO + parser: el módulo RAG del TFM, del que se usa sin cambios
+      `parseo_y_chuncking` (copia en 01_datos/miteco/). Los PDF de los partes
+      están en miteco/ de los datos externos (TFM_DATOS) y las salidas van a
+      dataset/ de esos mismos datos.
+  · Previsiones del modelo: el colector de AEMET (TFM_COLECTOR)
       `rankings/prevision_D{0,1}_<fecha>.csv`, selladas por commit de GitHub
       Actions antes del día evaluado, así que la comparación es prospectiva.
   · Maestro de municipios: prototipo/cache/municipios.json (8.122 municipios
@@ -58,7 +58,7 @@ validaciones del TFM: 85,5 en 2021-24 y 84,9 en 2025-26).
 
 Modos de etiquetado:
   --modo inicio  (por defecto) solo la primera aparición de cada incidente
-                 (`incident_key` del parser de Atomas9), proxy del día de
+                 (`incident_key` del parser del módulo RAG), proxy del día de
                  ignición. Es el test correcto para un modelo de riesgo de
                  ignición y evita que un incendio de 5 días cuente 5 veces.
   --modo todos   todos los incendio-día. Responde a otra pregunta: "¿acierta el
@@ -73,6 +73,7 @@ Salidas (nada se sobrescribe de v1/v2/v3):
     dataset/validacion_miteco_<modo>.json   agregados y metadatos
 """
 
+import os
 import argparse
 import json
 import re
@@ -83,11 +84,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-DIR = Path("/home/charredgem/Desktop/Master/TFM_fuego")
-REPO_RAG = Path("/home/charredgem/Desktop/Master/TFM-RAG")
-REPO_COLECTOR = Path("/home/charredgem/Desktop/Master/aemet_horario_verano2026")
-PDFS_MITECO = REPO_RAG / "data" / "raw" / "miteco"
-RANKINGS = REPO_COLECTOR / "rankings"
+RAIZ = Path(__file__).resolve().parents[2]
+DIR = Path(os.environ.get("TFM_DATOS", str(RAIZ / "datos")))
+COLECTOR = Path(os.environ.get("TFM_COLECTOR", str(DIR / "colector")))
+PDFS_MITECO = DIR / "miteco"
+RANKINGS = COLECTOR / "rankings"
 MUNICIPIOS = DIR / "prototipo" / "cache" / "municipios.json"
 
 # Código INE de provincia → nombre, para desambiguar municipios homónimos
@@ -132,11 +133,11 @@ def norm(s: str | None) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# 1. Partes de MITECO (parser de Atomas9, en solo lectura)
+# 1. Partes de MITECO (parser del módulo RAG del TFM)
 # --------------------------------------------------------------------------- #
 def cargar_partes(modo: str) -> pd.DataFrame:
-    sys.path.insert(0, str(REPO_RAG / "src"))
-    from miteco_rag.parseo_y_chuncking import parse_pdf_directory
+    sys.path.insert(0, str(RAIZ / "01_datos" / "miteco"))
+    from parseo_y_chuncking import parse_pdf_directory
 
     snaps = parse_pdf_directory(PDFS_MITECO)
     df = pd.DataFrame([{
@@ -253,7 +254,7 @@ def filtrar_peninsula(g: pd.DataFrame) -> pd.DataFrame:
 # 3. Previsiones selladas del colector
 # --------------------------------------------------------------------------- #
 def previsiones() -> list:
-    """CSV de predicción del repo del colector, con su tipo y el día evaluado.
+    """CSV de predicción del colector de AEMET, con su tipo y el día evaluado.
 
     D0/D1 están sellados por commit antes del día al que se refieren (D1 es
     forecast puro: se emitió la víspera). `retro` es hindcast y `ranking` es el
@@ -405,8 +406,8 @@ def main() -> None:
         "rango_fechas_miteco": [str(fuegos.fecha.min().date()),
                                 str(fuegos.fecha.max().date())],
         "procedencia": {
-            "partes_y_parser": "repo TFM-RAG de Atomas9 (solo lectura)",
-            "previsiones": "repo aemet_horario_verano2026, rankings/*.csv "
+            "partes_y_parser": "módulo RAG del TFM (parseo_y_chuncking, sin cambios)",
+            "previsiones": "colector de AEMET, rankings/*.csv "
                            "sellados por commit de GitHub Actions",
             "municipios": "prototipo/cache/municipios.json (maestro AEMET)",
         },
