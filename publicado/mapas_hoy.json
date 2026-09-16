@@ -1,18 +1,18 @@
 {
- "fecha": "2026-09-15",
- "pct_extremo": 1.357,
- "posicion_referencia": 47.6,
+ "fecha": "2026-09-16",
+ "pct_extremo": 1.73,
+ "posicion_referencia": 53.6,
  "dias_referencia": 250,
  "mediana_referencia": 1.497,
  "niveles_pct": {
-  "BAJO": 36.04356809018515,
-  "MODERADO": 56.3378332296953,
-  "ALTO": 6.261207951377049,
-  "EXTREMO": 1.3573907287425029
+  "BAJO": 37.59171965578801,
+  "MODERADO": 55.29135658836981,
+  "ALTO": 5.3868373016669,
+  "EXTREMO": 1.7300864541752752
  },
- "celdas_extremo": 6767,
- "p98_r10": 0.33472,
+ "celdas_extremo": 8625,
+ "p98_r10": 0.37158,
  "rama": "reanálisis + IFS mapeado",
- "fwi_medio": 50.86859397005337,
- "fwi_medio_pctl_clim": 81.85332731345001
+ "fwi_medio": 39.79195515102292,
+ "fwi_medio_pctl_clim": 63.006931718588156
 }
