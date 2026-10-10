@@ -1,5 +1,4 @@
 fecha,pct_extremo,posicion,celdas_effis_D,celdas_effis_D1,n_miteco,abs_D_extremo,abs_D_alto_o_mas,abs_D1_extremo,abs_D1_alto_o_mas,abs_miteco_extremo_10km,abs_miteco_alto_o_mas_10km,pct_D_extremo,pct_D_alto_o_mas,pct_D1_extremo,pct_D1_alto_o_mas,pct_miteco_extremo_10km,pct_miteco_alto_o_mas_10km
-2026-09-19,3.26,78.0,24,1,3,16.7,20.8,0.0,0.0,33.3,100.0,0.0,29.2,0.0,0.0,33.3,100.0
 2026-09-20,3.61,80.0,1,26,3,0.0,0.0,50.0,65.4,66.7,66.7,0.0,0.0,11.5,69.2,66.7,66.7
 2026-09-21,2.67,72.0,26,16,6,34.6,61.5,6.2,56.2,66.7,100.0,15.4,65.4,0.0,56.2,66.7,100.0
 2026-09-22,4.14,86.0,16,5,3,18.8,62.5,0.0,0.0,100.0,100.0,0.0,62.5,0.0,0.0,100.0,100.0
@@ -19,3 +18,4 @@ fecha,pct_extremo,posicion,celdas_effis_D,celdas_effis_D1,n_miteco,abs_D_extremo
 2026-10-06,0.0,0.0,0,0,0,,,,,,,,,,,,
 2026-10-07,0.0,0.0,0,0,0,,,,,,,,,,,,
 2026-10-08,0.21,5.0,0,0,0,,,,,,,,,,,,
+2026-10-09,0.36,12.0,0,0,0,,,,,,,,,,,,
